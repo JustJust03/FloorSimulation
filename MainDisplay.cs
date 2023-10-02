@@ -17,9 +17,12 @@ namespace FloorSimulation
             //Non resisable window
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
 
-            this.Size = new Size(1280, 720);
-            this.BackColor = Color.FromArgb(255, 180, 180, 180);
+            this.Size = new Size(1422, 800);
+            this.BackColor = Color.DarkSlateGray;
             this.Text = "AllGreen Floor Simulation";
+
+            Floor F = new Floor(new Point(0, 0), this);
+            Controls.Add(F);
         }
     }
 }

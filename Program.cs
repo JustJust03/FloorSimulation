@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using System.IO;
 
 namespace FloorSimulation
 {
@@ -8,6 +9,8 @@ namespace FloorSimulation
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
+        public const string rootfolder = @"Z:\justh\AllGreen\Simulation\FloorSimulation";
+
         [STAThread]
         static void Main()
         {
