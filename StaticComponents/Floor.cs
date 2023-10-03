@@ -14,12 +14,16 @@ namespace FloorSimulation
     {
         MainDisplay Display;
         readonly Color FloorColor = Color.FromArgb(255, 180, 180, 180); //Concrete gray
+        public readonly Pen BPen = new Pen(Color.Black);
+
         // Real size: 4000 cm x 4000 cm
-        public const int RealFloorWidth = 4000; //cm
-        public const int RealFloorHeight = 4000; //cm
-        public const float ScaleFactor = 0.2f;
+        public const int RealFloorWidth = 2000; //cm
+        public const int RealFloorHeight = 2000; //cm
+        public const float ScaleFactor = 0.4f; //(RealFloorHeight / Height of window) - (800 / 2000 = 0.4)
+
 
         private List<DanishTrolley> TrolleyList; // A list with all the trolleys that are on the floor.
+        private ShopHub FirstShop;
 
         /// <summary>
         /// Sets the pixel floor size by using the ScaleFactor.
@@ -32,15 +36,13 @@ namespace FloorSimulation
 
             Size PixelFloorSize = new Size((int)(RealFloorWidth * ScaleFactor),
                                            (int)(RealFloorHeight * ScaleFactor));
-
             this.Location = PanelLocation;
             this.Size = PixelFloorSize;
             this.BackColor = FloorColor;
 
-            TrolleyList = new List<DanishTrolley>
-            {
-                new DanishTrolley()
-            };
+            TrolleyList = new List<DanishTrolley>();
+
+            FirstShop = new ShopHub("IKEA", 0, new Point(0, 0), this, 2);
 
             this.Paint += PaintTrolleys;
             this.Invalidate();
@@ -57,6 +59,17 @@ namespace FloorSimulation
             {
                 t.DrawObject(g);
             }
+
+            FirstShop.DrawHub(g, true);
+        }
+
+        public Point ConvertToSimPoint(Point RPoint)
+        {
+            return new Point((int)(RPoint.X * ScaleFactor), (int)(RPoint.Y * ScaleFactor));
+        }
+        public Size ConvertToSimSize(Size RSize)
+        {
+            return new Size((int)(RSize.Width * ScaleFactor), (int)(RSize.Height * ScaleFactor));
         }
     }
 }

@@ -11,14 +11,21 @@ namespace FloorSimulation
     /// </summary>
     internal class DanishTrolley
     {
-        public Point panellocation; //Where in the panel Should the trolley be drawn.
-        public Point reallocation;
+        public Point SimPoint; //Where in the panel Should the trolley be drawn.
+        public Point RPoint;
         private Image TrolleyIMG;
+        public int id;
+        public Size TrolleySize; //Is the Real size in cm.
 
-        public DanishTrolley()
+        public DanishTrolley(int id_, Point RPoint_ = default)
         {
-            panellocation = new Point(400, 400);
+            RPoint = RPoint_;
+
+            id = id_;
+
             TrolleyIMG = Image.FromFile(Program.rootfolder + @"\SimImages\DanishTrolleyTransparent.png");
+            TrolleySize = new Size((int)(TrolleyIMG.Width * Floor.ScaleFactor), 
+                                   (int)(TrolleyIMG.Height * Floor.ScaleFactor));
         }
 
         /// <summary>
@@ -27,9 +34,19 @@ namespace FloorSimulation
         /// <param name="g"></param>
         public void DrawObject(Graphics g)
         {
-            g.DrawImage(TrolleyIMG, panellocation.X, panellocation.Y, 
-                        TrolleyIMG.Width * Floor.ScaleFactor,
-                        TrolleyIMG.Height * Floor.ScaleFactor);
+            g.DrawImage(TrolleyIMG, new Rectangle(SimPoint, TrolleySize));
         }
+
+        /// <summary>
+        /// This function 'teleports' the trolley to a new point.
+        /// This should only be used when initializing the trolley, and SimPoint was previously default.
+        /// </summary>
+        /// <param name="p"></param>
+        public void TeleportTrolley(Point p)
+        {
+            SimPoint = p;
+        }
+
+        // TODO: Create a function that assigns every new trolley an unique id.
     }
 }

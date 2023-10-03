@@ -57,6 +57,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StaticComponents\ShopHub.cs" />
     <Compile Include="StaticComponents\DanishTrolley.cs" />
     <Compile Include="StaticComponents\Floor.cs">
       <SubType>Component</SubType>
