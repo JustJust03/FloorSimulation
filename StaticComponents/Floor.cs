@@ -19,11 +19,14 @@ namespace FloorSimulation
         // Real size: 4000 cm x 4000 cm
         public const int RealFloorWidth = 2000; //cm
         public const int RealFloorHeight = 2000; //cm
-        public const float ScaleFactor = 0.4f; //(RealFloorHeight / Height of window) - (800 / 2000 = 0.4)
+        public const float ScaleFactor = 0.4f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
 
 
         private List<DanishTrolley> TrolleyList; // A list with all the trolleys that are on the floor.
         private ShopHub FirstShop;
+        private StartHub FirstStartHub;
+        private Distributer FirstDistr;
+        private WalkWay FirstWW;
 
         /// <summary>
         /// Sets the pixel floor size by using the ScaleFactor.
@@ -42,7 +45,10 @@ namespace FloorSimulation
 
             TrolleyList = new List<DanishTrolley>();
 
-            FirstShop = new ShopHub("IKEA", 0, new Point(0, 0), this, 2);
+            FirstShop = new ShopHub("IKEA", 1, new Point(0, 0), this, 2, AccPoint_: new Point(200, 90));
+            FirstDistr = new Distributer(0, this);
+            FirstStartHub = new StartHub("Start hub", 0, new Point(1000, 1800), this, initial_trolleys_: 5, vertical_trolleys_: true);
+            FirstWW = new WalkWay(new Point(200, 0), new Size(200, 2000), this);
 
             this.Paint += PaintTrolleys;
             this.Invalidate();
@@ -60,7 +66,10 @@ namespace FloorSimulation
                 t.DrawObject(g);
             }
 
+            FirstWW.DrawObject(g);
             FirstShop.DrawHub(g, true);
+            FirstStartHub.DrawHub(g, true);
+            FirstDistr.DrawObject(g);
         }
 
         public Point ConvertToSimPoint(Point RPoint)

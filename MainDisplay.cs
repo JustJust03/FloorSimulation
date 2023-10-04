@@ -17,7 +17,7 @@ namespace FloorSimulation
             //Non resisable window
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
 
-            this.Size = new Size(1422, 800);
+            this.Size = new Size(1422, 840); //40px for the top bar.
             this.BackColor = Color.DarkSlateGray;
             this.Text = "AllGreen Floor Simulation";
 
