@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PathFinding\DijkstraWalkWays.cs" />
     <Compile Include="SimComponents\Distributer.cs" />
     <Compile Include="SmoothPanel.cs">
       <SubType>Component</SubType>
@@ -66,6 +67,7 @@
     </Compile>
     <Compile Include="StaticComponents\StartHub.cs" />
     <Compile Include="StaticComponents\WalkWay.cs" />
+    <Compile Include="StaticComponents\WalkTile.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
