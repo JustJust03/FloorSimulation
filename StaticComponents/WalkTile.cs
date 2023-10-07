@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
 
 namespace FloorSimulation
 {
@@ -19,15 +20,20 @@ namespace FloorSimulation
         public int ClearanceBot; //How many free tiles to the bottom
         public int ClearanceRight; //How many free tile to the right
 
+        public Point Simpoint;
+        public Point Rpoint;
+
         //Used by the dijkstra algo.
         public int TravelCost = int.MaxValue;
         public bool visited = false;
         public WalkTile Parent = null;  //From which tile did you get to here. (start tiles and unreachable tiles are null)
 
-        public WalkTile(int tileX_, int tileY_, bool occupied_, WalkWay ww_)
+        public WalkTile(int tileX_, int tileY_, Point Simpoint_, Point Rpoint_, bool occupied_, WalkWay ww_)
         {
             TileX = tileX_;
             TileY = tileY_;
+            Simpoint = Simpoint_;
+            Rpoint = Rpoint_;
             occupied = occupied_;
             WW = ww_;
         }

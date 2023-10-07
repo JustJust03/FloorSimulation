@@ -47,13 +47,28 @@ namespace FloorSimulation
 
             FirstShop = new ShopHub("IKEA", 1, new Point(0, 0), this, 2, AccPoint_: new Point(200, 90));
             FirstStartHub = new StartHub("Start hub", 0, new Point(1000, 1800), this, initial_trolleys_: 5, vertical_trolleys_: true);
-            FirstWW = new WalkWay(new Point(200, 0), new Size(200, 2000), this);
-            FirstDistr = new Distributer(0, this, FirstWW);
+            FirstWW = new WalkWay(new Point(200, 0), new Size(800, 2000), this);
+            FirstDistr = new Distributer(0, this, FirstWW, Rpoint_: new Point(200, 70));
 
             FirstDistr.TravelTo(null);
 
             this.Paint += PaintTrolleys;
             this.Invalidate();
+        }
+
+        public void TickButton(object sender, EventArgs e)
+        {
+            FirstDistr.Tick();
+            Invalidate();
+        }
+
+        /// <summary>
+        /// Start Stop button of the tick system
+        /// </summary>
+        public void SSButton(object sender, EventArgs e)
+        {
+            
+
         }
 
         /// <summary>

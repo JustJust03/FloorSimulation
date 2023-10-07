@@ -28,7 +28,7 @@ namespace FloorSimulation
         /// </summary>
         /// <param name="start_tile"></param>
         /// <param name="target_tile"></param>
-        /// <returns></returns>
+        /// <returns>The route to take (List of WalkTiles)</returns>
         public List<WalkTile> RunAlgo(WalkTile start_tile, WalkTile target_tile) 
         { 
             TileStack.Clear();

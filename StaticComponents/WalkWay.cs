@@ -26,11 +26,14 @@ namespace FloorSimulation
         public int WalkTileListWidth;
         public int WalkTileListHeight;
 
+        public const int WALK_TILE_WIDTH = 10; //cm
+        public const int WALK_TILE_HEIGHT = 10; //cm
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="RP"></param>
-        /// <param name="RS">Should always be devisable by 10</param>
+        /// <param name="RS">Should always be devisable by Walk tile width and height</param>
         /// <param name="floor_"></param>
         public WalkWay(Point RP, Size RS, Floor floor_)  
         {
@@ -40,8 +43,8 @@ namespace FloorSimulation
             RSizeWW = RS;
             SizeWW = floor.ConvertToSimSize(RS);
 
-            WalkTileListWidth = RSizeWW.Width / 10;
-            WalkTileListHeight = RSizeWW.Height / 10;
+            WalkTileListWidth = RSizeWW.Width / WALK_TILE_WIDTH;
+            WalkTileListHeight = RSizeWW.Height / WALK_TILE_HEIGHT;
 
             WWBrush = new SolidBrush(Color.Gray);
             InitWalkTiles();
@@ -67,7 +70,11 @@ namespace FloorSimulation
 
                 for (int y = 0; y < WalkTileListHeight; y++)
                 {
-                    col.Add(new WalkTile(x, y, false, this));
+                    Point Rp = new Point(RPointWW.X + x * WALK_TILE_WIDTH,
+                                         RPointWW.Y + y * WALK_TILE_HEIGHT);
+                    Point p = floor.ConvertToSimPoint(Rp);
+
+                    col.Add(new WalkTile(x, y, p, Rp, false, this));
                 }
                 WalkTileList.Add(col);
             }
