@@ -46,6 +46,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PathFinding\DijkstraWalkWays.cs" />
+    <Compile Include="SimComponents\Distributer.cs" />
     <Compile Include="SmoothPanel.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -57,6 +59,15 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StaticComponents\Hub.cs" />
+    <Compile Include="StaticComponents\ShopHub.cs" />
+    <Compile Include="StaticComponents\DanishTrolley.cs" />
+    <Compile Include="StaticComponents\Floor.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="StaticComponents\StartHub.cs" />
+    <Compile Include="StaticComponents\WalkWay.cs" />
+    <Compile Include="StaticComponents\WalkTile.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -78,6 +89,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="SimImages\Distributer.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
