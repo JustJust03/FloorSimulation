@@ -53,7 +53,7 @@ namespace FloorSimulation
         private void InitTimer()
         {
             timer = new Timer();
-            timer.Interval = 30;
+            timer.Interval = Program.TICKS_PER_SECOND;
             timer.Tick += F.TickButton;
         }
 

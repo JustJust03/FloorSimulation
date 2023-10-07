@@ -63,15 +63,6 @@ namespace FloorSimulation
         }
 
         /// <summary>
-        /// Start Stop button of the tick system
-        /// </summary>
-        public void SSButton(object sender, EventArgs e)
-        {
-            
-
-        }
-
-        /// <summary>
         /// Paints all trolleys that are in the trolleylist, thus all trolleys that are on the floor.
         /// </summary>
         public void PaintTrolleys(object obj, PaintEventArgs pea)
