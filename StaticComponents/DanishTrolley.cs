@@ -59,6 +59,18 @@ namespace FloorSimulation
             else
                 g.DrawImage(HTrolleyIMG, new Rectangle(SimPoint, HTrolleySize));
         }
+        
+        /// <summary>
+        /// Return the real size of trolley. 
+        /// According to horizontal or vertical orientation.
+        /// </summary>
+        public Size GetSize()
+        {
+            if (IsVertical)
+                return VRTrolleySize;
+            else
+                return HRTrolleySize;
+        }
 
         /// <summary>
         /// This function 'teleports' the trolley to a new point.

@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assignments\Task.cs" />
     <Compile Include="PathFinding\DijkstraWalkWays.cs" />
     <Compile Include="SimComponents\Distributer.cs" />
     <Compile Include="SmoothPanel.cs">
@@ -60,6 +61,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StaticComponents\Hub.cs" />
+    <Compile Include="StaticComponents\plants.cs" />
     <Compile Include="StaticComponents\ShopHub.cs" />
     <Compile Include="StaticComponents\DanishTrolley.cs" />
     <Compile Include="StaticComponents\Floor.cs">
@@ -77,6 +79,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="Assignments\assignment1.json" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -93,5 +96,6 @@
   <ItemGroup>
     <Content Include="SimImages\Distributer.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

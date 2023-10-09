@@ -13,9 +13,9 @@ namespace FloorSimulation
     internal class Distributer
     {
         private Image DistributerIMG;
-        private Point RDPoint; // Real distributer point
+        public Point RDPoint; // Real distributer point
         private Point DPoint; // Sim distributer point
-        private Size RDistributerSize; //Is the real size in cm.
+        public Size RDistributerSize; //Is the real size in cm.
         private Size DistributerSize; 
         public int id;
         private Floor floor;
@@ -35,7 +35,6 @@ namespace FloorSimulation
             floor = floor_;
             RDPoint = Rpoint_;
             WW = WW_;
-            DWW = new DijkstraWalkWays(WW);
 
             DistributerIMG = Image.FromFile(Program.rootfolder + @"\SimImages\Distributer.png");
             RDistributerSize = new Size(DistributerIMG.Width, DistributerIMG.Height);
@@ -44,6 +43,11 @@ namespace FloorSimulation
             DPoint = floor.ConvertToSimPoint(RDPoint);
 
             travel_dist_per_tick = WALKSPEED / Program.TICKS_PER_SECOND;
+
+            int[] indices = WW.TileListIndices(RDPoint, RDistributerSize);
+            int width = indices[2]; int height = indices[3];
+            DWW = new DijkstraWalkWays(WW, this, width, height);
+            WW.fill_tiles(RDPoint, RDistributerSize);
         }
 
         public void Tick()
@@ -62,7 +66,7 @@ namespace FloorSimulation
         /// <param name="target_tile"></param>
         public void TravelTo(WalkTile target_tile)
         {
-            route = DWW.RunAlgo(WW.WalkTileList[0][7], WW.WalkTileList[76][178]);
+            route = DWW.RunAlgo(WW.GetTile(RDPoint), target_tile);
         }
 
         /// <summary>
@@ -72,6 +76,9 @@ namespace FloorSimulation
         /// <exception cref="ArgumentException"></exception>
         public void TickWalk()
         {
+            if (route == null)
+                return;
+
             // TODO: develop non square tile tickwalks.
             if (WalkWay.WALK_TILE_WIDTH != WalkWay.WALK_TILE_HEIGHT)
                 throw new ArgumentException("Distributer walk has not yet been developed for non square tiles.");
@@ -87,9 +94,17 @@ namespace FloorSimulation
                         break;
                     }
                     //TODO: Update occupiance of WalkWay tiles when moving tiles. Also check if tile is occupied before traveling.
+                    WW.unfill_tiles(RDPoint, RDistributerSize);
+
                     DPoint = route[0].Simpoint;
+                    RDPoint = floor.ConvertToRealPoint(DPoint);
+
                     ticktravel -= WalkWay.WALK_TILE_WIDTH;
                     route.RemoveAt(0);
+                    
+                    WW.fill_tiles(RDPoint, RDistributerSize); ;
+                    //TODO: Update the clearance, and make this clearance update faster.
+                    //WW.UpdateClearances();
                 }
             }
         }

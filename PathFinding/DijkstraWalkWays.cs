@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,12 +15,18 @@ namespace FloorSimulation
     internal class DijkstraWalkWays
     {
         private WalkWay WW;
-        private Stack<WalkTile> TileStack;
+        private Queue<WalkTile> TileQueue;
+        private Distributer distributer;
+        int clearance_down;
+        int clearance_right;
 
-        public DijkstraWalkWays(WalkWay WW_)
+        public DijkstraWalkWays(WalkWay WW_, Distributer distributer_, int clearance_down_, int clearance_right_)
         {
             WW = WW_;
-            TileStack = new Stack<WalkTile>();
+            distributer = distributer_; 
+            clearance_down = clearance_down_;
+            clearance_right = clearance_right_;
+            TileQueue = new Queue<WalkTile>();
         }
 
         /// <summary>
@@ -31,16 +38,19 @@ namespace FloorSimulation
         /// <returns>The route to take (List of WalkTiles)</returns>
         public List<WalkTile> RunAlgo(WalkTile start_tile, WalkTile target_tile) 
         { 
-            TileStack.Clear();
+            TileQueue.Clear();
             ResetTravelCosts();
+            //TODO: update the clearances costs too much time right now.
+            WW.unfill_tiles(distributer.RDPoint, distributer.RDistributerSize);
+            WW.UpdateClearances();
 
             start_tile.TravelCost = 0;
             start_tile.visited = true;
-            TileStack.Push(start_tile);
+            TileQueue.Enqueue(start_tile);
 
-            while(TileStack.Count > 0) 
-            { 
-                WalkTile tile = TileStack.Pop();
+            while(TileQueue.Count > 0) 
+            {
+                WalkTile tile = TileQueue.Dequeue();
                 tile.visited = true;
 
                 WalkTile tileA = tile.TileAbove();
@@ -49,36 +59,36 @@ namespace FloorSimulation
                 WalkTile tileR = tile.TileRight();
 
                 //up
-                if (tileA != null && !tileA.occupied && tileA.TravelCost > tile.TravelCost + 1)
+                if (IsTileAccessible(tileA) && tileA.TravelCost > tile.TravelCost + 1)
                 {
                     tileA.TravelCost = tile.TravelCost + 1;
                     tileA.Parent = tile;
                     if (!tileA.visited)
-                        TileStack.Push(tileA);
+                        TileQueue.Enqueue(tileA);
                 }
                 //down
-                if (tileB != null && !tileB.occupied && tileB.TravelCost > tile.TravelCost + 1)
+                if (IsTileAccessible(tileB) && tileB.TravelCost > tile.TravelCost + 1)
                 {
                     tileB.TravelCost = tile.TravelCost + 1;
                     tileB.Parent = tile;
                     if (!tileB.visited)
-                        TileStack.Push(tileB);
+                        TileQueue.Enqueue(tileB);
                 }
                 //left
-                if (tileL != null && !tileL.occupied && tileL.TravelCost > tile.TravelCost + 1)
+                if (IsTileAccessible(tileL) && tileL.TravelCost > tile.TravelCost + 1)
                 {
                     tileL.TravelCost = tile.TravelCost + 1;
                     tileL.Parent = tile;
                     if (!tileL.visited)
-                        TileStack.Push(tileL);
+                        TileQueue.Enqueue(tileL);
                 }
                 //right
-                if (tileR != null && !tileR.occupied && tileR.TravelCost > tile.TravelCost + 1)
+                if (IsTileAccessible(tileR) && tileR.TravelCost > tile.TravelCost + 1)
                 {
                     tileR.TravelCost = tile.TravelCost + 1;
                     tileR.Parent = tile;
                     if (!tileR.visited)
-                        TileStack.Push(tileR);
+                        TileQueue.Enqueue(tileR);
                 }
             }
 
@@ -96,6 +106,8 @@ namespace FloorSimulation
                 ptile = ptile.Parent;
                 Route.Insert(0, ptile);
             }
+
+            WW.fill_tiles(distributer.RDPoint, distributer.RDistributerSize);
             return Route;
         }
 
@@ -111,6 +123,11 @@ namespace FloorSimulation
                     tile.visited = false;
                     tile.Parent = null;
                 } 
+        }
+
+        private bool IsTileAccessible(WalkTile tile)
+        {
+            return tile != null && !tile.occupied && tile.ClearanceRight >= clearance_right && tile.ClearanceBot >= clearance_down;
         }
     }
 }

@@ -20,17 +20,19 @@ namespace FloorSimulation
         protected Size RHubSize;        //Real size of the hub. In cm.
         protected Size HubSize;
         protected Floor floor;
+        protected WalkWay WW;
         protected int max_trolleys;     //How many trolleys can be placed in this hub
         protected Point RAccessPoint;    //Point from where a distributer can access the hub.
         protected Point AccessPoint;
 
-        public Hub(string name_, int id_, Point FPoint_, Floor floor_, Size RHubSize_, int initial_trolleys = 0, 
-                   bool vertical_trolleys = false, Point AccPoint_ = default)
+        public Hub(string name_, int id_, Point FPoint_, Floor floor_, WalkWay ww_, Size RHubSize_, int initial_trolleys = 0, 
+                   bool vertical_trolleys = false)
         {
             name = name_;
             id = id_;
             RFloorPoint = FPoint_;
             floor = floor_;
+            WW = ww_;
             RHubSize = RHubSize_;   
 
 
@@ -49,6 +51,8 @@ namespace FloorSimulation
             FloorPoint = floor.ConvertToSimPoint(RFloorPoint); //Scaled up the Real Hub Floor Point to the SimPoint
             HubSize = floor.ConvertToSimSize(RHubSize); //Scaled up the Real Hub Size to the SimSize
 
+            //TODO: Redo accesspoints
+            /*
             //Adds an access point to this hub
             if (AccPoint_ == default) //No accesspoint, default to topleft.
             {
@@ -60,6 +64,7 @@ namespace FloorSimulation
                 RAccessPoint = AccPoint_;
                 AccessPoint = floor.ConvertToSimPoint(RAccessPoint);
             }
+            */
         }
 
         /// <summary>
@@ -83,6 +88,7 @@ namespace FloorSimulation
                 int trolleyX = RFloorPoint.X + Rslack; 
 
                 DT.TeleportTrolley(new Point(trolleyX, trolleyY));
+                WW.fill_tiles(DT.RPoint, DT.GetSize());
                 HubTrolleys.Add(DT);
             }
         }
@@ -103,6 +109,7 @@ namespace FloorSimulation
                 int trolleyY = RFloorPoint.Y + Rslack; 
 
                 DT.TeleportTrolley(new Point(trolleyX, trolleyY));
+                WW.fill_tiles(DT.RPoint, DT.GetSize());
                 HubTrolleys.Add(DT);
             }
 
@@ -124,9 +131,6 @@ namespace FloorSimulation
             //outline
             if (DrawOutline)
             {
-                //access point shifted to make the middle of the circle the exact accesspoint.
-                Point shiftedPoint = new Point(AccessPoint.X - 5, AccessPoint.Y - 5);
-                g.FillEllipse(new SolidBrush(Color.Red), new Rectangle(shiftedPoint, new Size(10, 10)));
                 g.DrawRectangle(floor.BPen, new Rectangle(FloorPoint, HubSize));
             }
 

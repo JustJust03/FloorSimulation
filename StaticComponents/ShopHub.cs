@@ -21,9 +21,9 @@ namespace FloorSimulation
         /// Shop hub has a standard size: (200cm x 200cm)
         /// Usually horizontal trolleys
         /// </summary>
-        public ShopHub(string name_, int id_, Point FPoint_, Floor floor_, 
-            int initial_trolleys = 0, Point AccPoint_ = default) : 
-            base(name_, id_, FPoint_, floor_, new Size(200, 180), initial_trolleys: initial_trolleys, AccPoint_:AccPoint_)
+        public ShopHub(string name_, int id_, Point FPoint_, Floor floor_, WalkWay ww_,
+            int initial_trolleys = 0) : 
+            base(name_, id_, FPoint_, floor_, ww_, new Size(160, 160), initial_trolleys: initial_trolleys)
         {
 
         }
