@@ -23,7 +23,11 @@ namespace FloorSimulation
         private List<WalkTile> route;
         private const float WALKSPEED = 500f; // cm/s
         private float travel_dist_per_tick;
-        private float ticktravel = 0f; //The distance that has been traveled, but not registered to walkway yet.
+        private int distributionms_per_tick; // plant distribution per tick in ms
+        private float ticktravel = 0f; //The distance that has been traveled, but not registered to walkway yet
+        private int distributionms = 0; // How many ms have you been distributing
+        private Task MainTask;
+        public DanishTrolley trolley;
 
         private DijkstraWalkWays DWW;
         public WalkWay WW;
@@ -43,6 +47,9 @@ namespace FloorSimulation
             DPoint = floor.ConvertToSimPoint(RDPoint);
 
             travel_dist_per_tick = WALKSPEED / Program.TICKS_PER_SECOND;
+            distributionms_per_tick = (int)(1000f / Program.TICKS_PER_SECOND);
+            MainTask = new Task(floor.FirstStartHub.PeekFirstTrolley(), floor.FirstStartHub, this, "TakeFullTrolley");
+            trolley = null;
 
             int[] indices = WW.TileListIndices(RDPoint, RDistributerSize);
             int width = indices[2]; int height = indices[3];
@@ -52,11 +59,13 @@ namespace FloorSimulation
 
         public void Tick()
         {
-            TickWalk();
+            MainTask.PerformTask();
         }
 
         public void DrawObject(Graphics g)
         {
+            if (trolley != null)
+                trolley.DrawObject(g);
             g.DrawImage(DistributerIMG, new Rectangle(DPoint, DistributerSize));
         }
 
@@ -64,16 +73,25 @@ namespace FloorSimulation
         /// Makes the distributer walk towards the target tile using a shortest path algorithm.
         /// </summary>
         /// <param name="target_tile"></param>
-        public void TravelTo(WalkTile target_tile)
+        public void TravelToTile(WalkTile target_tile)
         {
-            route = DWW.RunAlgo(WW.GetTile(RDPoint), target_tile);
+            route = DWW.RunAlgoTile(WW.GetTile(RDPoint), target_tile);
         }
 
+        /// <summary>
+        /// Makes the distributer walk towards the target tile using a shortest path algorithm.
+        /// </summary>
+        /// <param name="target_tile"></param>
+        public void TravelToTrolley(DanishTrolley target_trolley)
+        {
+            route = DWW.RunAlgoDistrToTrolley(this, target_trolley);
+        }
+        
         /// <summary>
         /// Ticks the walking distance. 
         /// If the walking distance is bigger than the width of a tile, move the distributer.
         /// </summary>
-        /// <exception cref="ArgumentException"></exception>
+        /// <returns>true if there de distributer is walking, false if route has been completed</returns>
         public void TickWalk()
         {
             if (route == null)
@@ -99,6 +117,16 @@ namespace FloorSimulation
                     DPoint = route[0].Simpoint;
                     RDPoint = floor.ConvertToRealPoint(DPoint);
 
+                    if (trolley != null) //If you have a trolley, drag it with you.
+                    {
+                        WW.unfill_tiles(trolley.RPoint, trolley.GetSize());
+
+                        trolley.RPoint = new Point(RDPoint.X, RDPoint.Y + RDistributerSize.Height);
+                        trolley.SimPoint = floor.ConvertToSimPoint(trolley.RPoint);
+
+                        WW.fill_tiles(trolley.RPoint, trolley.GetSize());
+                    }
+
                     ticktravel -= WalkWay.WALK_TILE_WIDTH;
                     route.RemoveAt(0);
                     
@@ -106,6 +134,18 @@ namespace FloorSimulation
                     //TODO: Update the clearance, and make this clearance update faster.
                     //WW.UpdateClearances();
                 }
+            }
+            else // Route is empty, thus target has been reached.
+                MainTask.RouteCompleted(); 
+        }
+
+        public void TickDistribute()
+        {
+            distributionms += distributionms_per_tick ;
+            if (distributionms >= trolley.PlantList[0].ReorderTime)
+            {
+                distributionms -= trolley.PlantList[0].ReorderTime;
+                MainTask.DistributionCompleted();
             }
         }
     }

@@ -16,17 +16,16 @@ namespace FloorSimulation
         public StartHub(string name_, int id_, Point FPoint_, Floor floor_, WalkWay ww_, int initial_trolleys_ = 0, bool vertical_trolleys_ = true) : 
             base(name_, id_, FPoint_, floor_, ww_, new Size(400, 200), initial_trolleys:initial_trolleys_, vertical_trolleys:vertical_trolleys_)
         {
+
         }
 
-        /// <summary>
-        /// Takes the first trolley from the hub trolley list and deletes it.
-        /// </summary>
-        public DanishTrolley TakeTrolley()
+        public void InitFirstTrolley()
         {
-            DanishTrolley FirstTrolley = HubTrolleys[0];
-            HubTrolleys.RemoveAt(0);
-
-            return FirstTrolley;
+            HubTrolleys[0].PlantList.Add(new plant(floor.HubList[7]));
+            HubTrolleys[0].PlantList.Add(new plant(floor.HubList[3]));
+            HubTrolleys[0].PlantList.Add(new plant(floor.HubList[3]));
+            HubTrolleys[0].PlantList.Add(new plant(floor.HubList[12]));
+            HubTrolleys[0].PlantList.Add(new plant(floor.HubList[15]));
         }
     }
 }

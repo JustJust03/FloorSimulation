@@ -29,6 +29,44 @@ namespace FloorSimulation
             TileQueue = new Queue<WalkTile>();
         }
 
+        public List<WalkTile> RunAlgoDistrToTrolley(Distributer DButer , DanishTrolley TargetTrolley)
+        {
+            WalkTile StartTile = WW.GetTile(DButer.RDPoint);
+            int[] tindices = WW.TileListIndices(TargetTrolley.RPoint, TargetTrolley.GetSize());
+            int tx = tindices[0]; int ty = tindices[1]; int twidth = tindices[2]; int theight = tindices[3];
+            int[] dindices = WW.TileListIndices(DButer.RDPoint, DButer.RDistributerSize);
+            int dx = dindices[0]; int dy = dindices[1]; int dwidth = dindices[2]; int dheight = dindices[3];
+
+            List<WalkTile> TargetTiles = new List<WalkTile>();
+            if (TargetTrolley.IsVertical) //Vertical target trolley's
+            {
+                int toppoint = ty - 1 - dheight;
+                int botpoint = ty + 1 + theight + dheight;
+
+                if (toppoint > 0)
+                    TargetTiles.Add(WW.WalkTileList[tx][toppoint]); //top accesspoint to trolley
+                if (botpoint < WW.WalkTileList[0].Count)
+                    TargetTiles.Add(WW.WalkTileList[tx][botpoint]); //bot accesspoint to trolley
+            }
+            else //Horizontal target trolley
+            {
+                int rightpoint = tx + 1 + twidth;
+                int leftpoint = tx - 1 - dwidth;
+
+                if (rightpoint < WW.WalkTileList.Count)
+                    TargetTiles.Add(WW.WalkTileList[rightpoint][ty]); //bot accesspoint to trolley
+                if (leftpoint > 0)
+                    TargetTiles.Add(WW.WalkTileList[leftpoint][ty]); //top accesspoint to trolley
+            }
+
+            return RunAlgo(StartTile, TargetTiles);
+        }
+
+        public List<WalkTile> RunAlgoTile(WalkTile Start_tile, WalkTile target_tile)
+        {
+            return RunAlgo(Start_tile, new List<WalkTile>() {target_tile});
+        }
+
         /// <summary>
         /// Runs the dijkstra algorithm.
         /// Returns a list of the shortest path. 0 = start tile, last item = target tile, with the route within it.
@@ -36,14 +74,14 @@ namespace FloorSimulation
         /// <param name="start_tile"></param>
         /// <param name="target_tile"></param>
         /// <returns>The route to take (List of WalkTiles)</returns>
-        public List<WalkTile> RunAlgo(WalkTile start_tile, WalkTile target_tile) 
+        private List<WalkTile> RunAlgo(WalkTile start_tile, List<WalkTile> target_tiles) 
         { 
             TileQueue.Clear();
             ResetTravelCosts();
             //TODO: update the clearances costs too much time right now.
             WW.unfill_tiles(distributer.RDPoint, distributer.RDistributerSize);
             WW.UpdateClearances();
-
+ 
             start_tile.TravelCost = 0;
             start_tile.visited = true;
             TileQueue.Enqueue(start_tile);
@@ -91,9 +129,12 @@ namespace FloorSimulation
                         TileQueue.Enqueue(tileR);
                 }
             }
+            WW.fill_tiles(distributer.RDPoint, distributer.RDistributerSize);
+
+            WalkTile target_tile = ClosestTargetTile(target_tiles);
 
             //No route was found
-            if (target_tile.TravelCost == int.MaxValue)
+            if (target_tile == null || target_tile.TravelCost == int.MaxValue)
                 return null;
             
             //Trace back from the target tile to it's parent to calculate the route.
@@ -107,7 +148,6 @@ namespace FloorSimulation
                 Route.Insert(0, ptile);
             }
 
-            WW.fill_tiles(distributer.RDPoint, distributer.RDistributerSize);
             return Route;
         }
 
@@ -128,6 +168,22 @@ namespace FloorSimulation
         private bool IsTileAccessible(WalkTile tile)
         {
             return tile != null && !tile.occupied && tile.ClearanceRight >= clearance_right && tile.ClearanceBot >= clearance_down;
+        }
+
+        private WalkTile ClosestTargetTile(List<WalkTile> target_tiles)
+        {
+            WalkTile ClosestTile = null;
+            int shortest = int.MaxValue;
+            foreach(WalkTile TargetTile in target_tiles)
+            {
+                if (TargetTile.TravelCost < shortest)
+                {
+                    ClosestTile = TargetTile;
+                    shortest = TargetTile.TravelCost;
+                }
+            }
+
+            return ClosestTile;
         }
     }
 }

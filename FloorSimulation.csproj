@@ -60,14 +60,15 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StaticComponents\Hub.cs" />
-    <Compile Include="StaticComponents\plants.cs" />
-    <Compile Include="StaticComponents\ShopHub.cs" />
+    <Compile Include="StaticComponents\Hubs\BufferHub.cs" />
+    <Compile Include="StaticComponents\Hubs\Hub.cs" />
+    <Compile Include="StaticComponents\plant.cs" />
+    <Compile Include="StaticComponents\Hubs\ShopHub.cs" />
     <Compile Include="StaticComponents\DanishTrolley.cs" />
     <Compile Include="StaticComponents\Floor.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="StaticComponents\StartHub.cs" />
+    <Compile Include="StaticComponents\Hubs\StartHub.cs" />
     <Compile Include="StaticComponents\WalkWay.cs" />
     <Compile Include="StaticComponents\WalkTile.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">

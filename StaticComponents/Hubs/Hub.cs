@@ -50,21 +50,6 @@ namespace FloorSimulation
 
             FloorPoint = floor.ConvertToSimPoint(RFloorPoint); //Scaled up the Real Hub Floor Point to the SimPoint
             HubSize = floor.ConvertToSimSize(RHubSize); //Scaled up the Real Hub Size to the SimSize
-
-            //TODO: Redo accesspoints
-            /*
-            //Adds an access point to this hub
-            if (AccPoint_ == default) //No accesspoint, default to topleft.
-            {
-                RAccessPoint = RFloorPoint;
-                AccessPoint = FloorPoint;
-            }
-            else
-            {
-                RAccessPoint = AccPoint_;
-                AccessPoint = floor.ConvertToSimPoint(RAccessPoint);
-            }
-            */
         }
 
         /// <summary>
@@ -139,6 +124,34 @@ namespace FloorSimulation
             {
                 DT.DrawObject(g);
             }
+        }
+        
+        /// <summary>
+        /// Peeks at the first trolley in this hub's trolley list
+        /// </summary>
+        public virtual DanishTrolley PeekFirstTrolley()
+        {
+            return HubTrolleys[0];
+        }
+
+        /// <summary>
+        /// Takes the first trolley from the hub trolley list and deletes it.
+        /// </summary>
+        public virtual DanishTrolley GiveTrolley()
+        {
+            DanishTrolley FirstTrolley = HubTrolleys[0];
+            HubTrolleys.RemoveAt(0);
+
+            return FirstTrolley;
+        }
+        /// <summary>
+        /// Takes in the trolley in it's trolley list.
+        /// </summary>
+        public virtual void TakeTrolleyIn(DanishTrolley t)
+        {
+            if (HubTrolleys.Count + 1 == max_trolleys)//Max trolleys reached, give error
+                throw new ArgumentException("Can't add more trolleys to this shop hub.");
+            HubTrolleys.Add(t); 
         }
     }
 }

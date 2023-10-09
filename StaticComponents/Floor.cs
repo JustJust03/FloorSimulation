@@ -21,11 +21,12 @@ namespace FloorSimulation
         public const int RealFloorHeight = 2000; //cm
         public const float ScaleFactor = 0.4f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
 
-        private int Nshops = 54;
+        private int Nshops = 16;
 
         private List<DanishTrolley> TrolleyList; // A list with all the trolleys that are on the floor.
-        private List<Hub> HubList; // A list with all the trolleys that are on the floor.
-        private StartHub FirstStartHub;
+        public List<Hub> HubList; // A list with all the hubs that are on the floor (starthub: 0, shophubs >= 1)
+        public StartHub FirstStartHub;
+        public BufferHub BuffHub;
         private Distributer FirstDistr;
         private WalkWay FirstWW;
 
@@ -49,11 +50,14 @@ namespace FloorSimulation
 
             FirstWW = new WalkWay(new Point(0, 0), new Size(2000, 2000), this);
             FirstStartHub = new StartHub("Start hub", 0, new Point(200, 1800), this, FirstWW, initial_trolleys_: 5, vertical_trolleys_: true);
+            BuffHub = new BufferHub("Buffer hub", 1, new Point(0, 0), this, FirstWW);
+            //BuffHub.OpenSpot(new DanishTrolley(433, this));
             HubList.Add(FirstStartHub);
+            HubList.Add(BuffHub);
             FirstDistr = new Distributer(0, this, FirstWW, Rpoint_: new Point(200, 70));
             init_shops();
 
-            FirstDistr.TravelTo(FirstWW.WalkTileList[100][100]);
+            FirstStartHub.InitFirstTrolley();
 
             this.Paint += PaintFloor;
             this.Invalidate();
@@ -102,7 +106,7 @@ namespace FloorSimulation
         /// </summary>
         public void init_shops()
         {
-            int UpperY = 180;
+            int UpperY = 320;
             int LowerY = 1400;
             int StreetWidth = 300;
 

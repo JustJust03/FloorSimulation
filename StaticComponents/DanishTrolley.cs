@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
+using System.Collections.Generic;
 
 namespace FloorSimulation
 {
@@ -26,6 +27,9 @@ namespace FloorSimulation
         private Floor floor;
         public bool IsVertical;
 
+        //TODO: Keep track of maximum plants per trolley.
+        public List<plant> PlantList;
+
         /// <summary>
         /// Constructer initializing the variables
         /// Use the image to generate the sim and real sizes.
@@ -46,6 +50,7 @@ namespace FloorSimulation
             HTrolleySize = floor.ConvertToSimSize(HRTrolleySize);
 
             IsVertical = IsVertical_;
+            PlantList = new List<plant>();
         }
 
         /// <summary>
@@ -81,6 +86,26 @@ namespace FloorSimulation
         {
             RPoint = Rp;
             SimPoint = floor.ConvertToSimPoint(Rp);
+        }
+
+        public void TakePlantIn(plant p)
+        {
+            PlantList.Add(p);
+        }
+
+        public plant PeekFirstPlant()
+        {
+            if (PlantList.Count > 0) 
+                return PlantList[0];
+            else 
+                return null;
+        }
+
+        public plant GiveFirstPlant()
+        {
+            plant p = PlantList[0]; 
+            PlantList.RemoveAt(0);
+            return p;
         }
 
         // TODO: Create a function that assigns every new trolley an unique id.
