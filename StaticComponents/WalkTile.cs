@@ -15,11 +15,12 @@ namespace FloorSimulation
     {
         public int TileX;
         public int TileY;
+
         public bool occupied;
         public bool accessible; //The square is accessible by the agent taking into account its dimensions. 
+        public bool IsAgentsTile; //The agent is standing on this tile.
+
         private WalkWay WW;
-        public Size ClearanceR; //The square that is unoccupied to the right of this tile. size is in squares.
-        public Size ClearanceD; //The square that is unoccupied to the bottom of this tile. size is in squares.
 
         public Point Simpoint;
         public Point Rpoint;
@@ -40,7 +41,8 @@ namespace FloorSimulation
             Simpoint = Simpoint_;
             Rpoint = Rpoint_;
             occupied = occupied_;
-            accessible = occupied_;
+            accessible = !occupied_;
+            IsAgentsTile = false;
             WW = ww_;
 
             SimSize = SimSize_;
@@ -49,22 +51,11 @@ namespace FloorSimulation
         public void DrawOccupiance(Graphics g)
         {
             if (occupied)
-            {
                 g.DrawRectangle(WW.WWTilePen, new Rectangle(Simpoint, SimSize));
-            }
-
-            else
+            else if (!accessible)
             {
-                Pen p = new Pen(Color.FromArgb(Math.Min(ClearanceR.Width * 10, 255), Math.Min(ClearanceD.Height * 10, 255), 0));
+                Pen p = new Pen(Color.Orange);
                 g.DrawRectangle(p, new Rectangle(Simpoint, SimSize));
-
-            }
-
-            if (TileX == 0 && TileY == 0)
-            {
-                Pen p = new Pen(Color.FromArgb(255, 255, 255));
-                g.DrawRectangle(p, new Rectangle(Simpoint, SimSize));
-
             }
         }
 

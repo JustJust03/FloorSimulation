@@ -21,7 +21,7 @@ namespace FloorSimulation
         public Floor floor;
 
         private List<WalkTile> route;
-        private const float WALKSPEED = 500f; // cm/s
+        private const float WALKSPEED = 1000f; // cm/s
         private float travel_dist_per_tick;
         private int distributionms_per_tick; // plant distribution per tick in ms
         private float ticktravel = 0f; //The distance that has been traveled, but not registered to walkway yet
@@ -51,9 +51,7 @@ namespace FloorSimulation
             MainTask = new Task(floor.FirstStartHub, this, "TakeFullTrolley");
             trolley = null;
 
-            int[] indices = WW.TileListIndices(RDPoint, RDistributerSize);
-            int width = indices[2]; int height = indices[3];
-            DWW = new DijkstraWalkWays(WW, this, width, height);
+            DWW = new DijkstraWalkWays(WW, this);
             WW.fill_tiles(RDPoint, RDistributerSize);
         }
 
@@ -93,7 +91,7 @@ namespace FloorSimulation
         /// <param name="target_tile"></param>
         public void TravelToTrolley(DanishTrolley target_trolley)
         {
-            route = DWW.RunAlgoDistrToTrolley(this, target_trolley);
+            route = DWW.RunAlgoDistrToTrolley(target_trolley);
         }
         
         /// <summary>

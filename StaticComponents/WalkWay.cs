@@ -19,7 +19,7 @@ namespace FloorSimulation
         public Point PointWW;
         public Size RSizeWW;
         public Size SizeWW;
-        private WalkWayClearance WWC;
+        public WalkWayClearance WWC;
 
         private Brush WWBrush;
         public Pen WWTilePen;
@@ -52,7 +52,7 @@ namespace FloorSimulation
             WWTilePen = new Pen(Color.Red);
 
             InitWalkTiles();
-            WWC = new WalkWayClearance(this, 7, 20);
+            WWC = new WalkWayClearance(this);
         }
 
         /// <summary>
@@ -111,7 +111,6 @@ namespace FloorSimulation
                 {
                     WalkTile t = WalkTileList[xi][yi];
                     t.occupied = true;
-                    WWC.UpdateTileClearance(t);
                 }
         }
 
@@ -131,7 +130,6 @@ namespace FloorSimulation
                 {
                     WalkTile t = WalkTileList[xi][yi];
                     t.occupied = false;
-                    WWC.UpdateTileClearance(t);
                 }
         }
 

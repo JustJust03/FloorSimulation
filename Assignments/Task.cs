@@ -10,6 +10,7 @@ namespace FloorSimulation
     {
         public DanishTrolley Trolley;
         public Hub TargetHub;
+        public Hub StartHub;
         private Distributer DButer;
 
         public bool InTask = false;
@@ -20,7 +21,7 @@ namespace FloorSimulation
         public Task(Hub TargetHub_,  Distributer DButer_, string Goal_, DanishTrolley trolley_ = default)
         {
             Trolley = trolley_;
-            TargetHub = TargetHub_;
+            StartHub = TargetHub_;
             DButer = DButer_;
             Goal = Goal_;
         }
@@ -29,10 +30,14 @@ namespace FloorSimulation
         {
             if (!InTask && Goal == "TakeFullTrolley")
             {
-                Trolley = DButer.floor.FirstStartHub.PeekFirstTrolley();
-                DButer.TravelToTrolley(Trolley);
-                InTask = true;
-                Travelling = true;
+                TargetHub = StartHub;
+                Trolley = TargetHub.PeekFirstTrolley();
+                if (Trolley != null)
+                {
+                    DButer.TravelToTrolley(Trolley);
+                    InTask = true;
+                    Travelling = true;
+                }
             }
 
             if (InTask && Travelling)
@@ -47,7 +52,7 @@ namespace FloorSimulation
             if (Goal == "TakeFullTrolley") //Old goal
             {
                 //TODO: Check to see to which trolley you should deliver to
-                DButer.trolley = TargetHub.GiveTrolley();
+                DButer.trolley = StartHub.GiveTrolley();
                 TargetHub = DButer.trolley.PeekFirstPlant().DestinationHub;
                 Trolley = TargetHub.PeekFirstTrolley();
                 DButer.TravelToTrolley(Trolley);

@@ -14,131 +14,67 @@ namespace FloorSimulation
     internal class WalkWayClearance
     {
         private WalkWay WW;
-        private int WidestObject; //In TileSquares
-        private int HeighestObject; //In TileSquares
 
-        public WalkWayClearance(WalkWay WW_, int WidestObject_, int HeighestObject_)
+        public WalkWayClearance(WalkWay WW_)
         {
             WW = WW_;
-            WidestObject = WidestObject_;
-            HeighestObject = HeighestObject_;
-            InitClearance();
+        }
+
+        public void UpdateClearances(Distributer DButer, Size ObjSize)
+        {
+            foreach (List<WalkTile> TileCol in WW.WalkTileList)
+                foreach (WalkTile t in TileCol)
+                {
+                    t.accessible = true;
+                    t.IsAgentsTile = false;
+                }
+
+            Clear(DButer, ObjSize);
+
+            foreach (List<WalkTile> TileCol in WW.WalkTileList)
+                foreach (WalkTile t in TileCol)
+                    if (t.occupied && !t.IsAgentsTile) 
+                        //If the tile is occupied and the agent is not standing on this tile, update it's accessibility
+                        UpdateTileClearance(t, ObjSize);
         }
         
-        private void InitClearance() 
+        /// <summary>
+        /// Updates the accessibility of a tile based on the object size that needs to traverse the walkway
+        /// </summary>
+        private void UpdateTileClearance(WalkTile t, Size ObjSize)
         {
-            for (int xindex = 0; xindex < WW.WalkTileList.Count; xindex++) 
-                for (int yindex = 0; yindex < WW.WalkTileList[0].Count; yindex++)
-                {
-                    WW.WalkTileList[xindex][yindex].ClearanceR = new Size(WW.WalkTileList.Count - xindex, yindex + 1);
-                    WW.WalkTileList[xindex][yindex].ClearanceD = new Size(WW.WalkTileList.Count - xindex, yindex + 1);
-                }
+            int leftx = Math.Min(ObjSize.Width, t.TileX);
+            int topy = Math.Min(ObjSize.Height, t.TileY);
+
+            for(int x = t.TileX; x > t.TileX - leftx; x--) 
+                for (int y = t.TileY; y > t.TileY - topy; y--)
+                    WW.WalkTileList[x][y].accessible = false;
         }
 
         /// <summary>
-        /// Updates the clearances of every tile.
-        /// This is done so the biggest object that could be on the screen is able to fit trough all the occupied tiles.
+        /// Make all tiles around the distributer accessible.
+        /// Used so the object can in fact move trough itself.
         /// </summary>
-        public void UpdateTileClearance(WalkTile t)
+        /// <param name="DButer"></param>
+        /// <param name="ObjSize">Size of the distributer in tiles</param>
+        private void Clear(Distributer DButer, Size ObjSize)
         {
-            int leftx = Math.Min(WidestObject, t.TileX);
-            int topy = Math.Min(HeighestObject, t.TileY);
+            int[] dindices = WW.TileListIndices(DButer.RDPoint, DButer.RDistributerSize);
+            int dx = dindices[0]; int dy = dindices[1]; int dwidth = dindices[2]; int dheight = dindices[3];
 
-            if(t.occupied)  //just got occupied
-                NewOccupation(t, leftx, topy);
-            else            //just got unoccupied
-                NewUnOccupation(t, leftx, topy);
-        }
+            int StartX = Math.Max(dx - ObjSize.Width, 0);
+            int EndX = Math.Min(dx + ObjSize.Width, WW.WalkTileListWidth - 1);
 
-        /// <summary>
-        /// From the tile start unclearing to the top left.
-        /// When an occupied tile is found, stop clearing above that tile.
-        /// </summary>
-        private void NewOccupation(WalkTile t, int leftx, int topy)
-        {
-            int ClearanceLeft = 1;
-            int ClearanceTop = 1;
+            int StartY = Math.Max(dy - ObjSize.Height, 0);
+            int EndY = Math.Min(dy + ObjSize.Height, WW.WalkTileListHeight - 1);
 
-            int MinX = t.TileX - leftx; //Generally determined by the width of the biggest object
-            int MinY = t.TileY - topy;  //Generally determined by the height of the biggest object
-
-            // For the tiles left to this tile, update the right clearance from 0.
-            for (int FirstRowX = t.TileX; FirstRowX > MinX; FirstRowX--)
-            {
-                WalkTile targett = WW.WalkTileList[FirstRowX][t.TileY];
-                if (targett == t)
+            for(int x = StartX; x < EndX; x++)
+                for (int y = StartY; y < EndY; y++)
                 {
-                    t.ClearanceR = new Size(0, 0);
-                    continue;
+                    WW.WalkTileList[x][y].accessible = true;
+                    if(x >= dx && y >= dy)
+                        WW.WalkTileList[x][y].IsAgentsTile = true;
                 }
-                
-                targett.ClearanceR = new Size(ClearanceLeft, 1);
-                targett.ClearanceD = new Size(ClearanceLeft, );
-                ClearanceLeft++;
-            }
-
-            // For the tiles above this tile, update the down clearance from 0.
-            for (int FirstRowY = t.TileY; FirstRowY > MinY; FirstRowY--)
-            {
-                WalkTile targett = WW.WalkTileList[t.TileX][FirstRowY];
-                if (targett == t)
-                    continue;
-
-                targett.ClearanceD = new Size(1, ClearanceTop);
-                ClearanceTop++;
-            }
-
-
-            // For the tiles above this tile, udpate the right clearance from what they had.
-            ClearanceLeft = 0;
-            ClearanceTop = 0;   
-            for (int xindex = t.TileX; xindex > MinX; xindex--) 
-            { 
-                for (int yindex = t.TileY; yindex > MinY; yindex--)
-                {
-                    WalkTile targett = WW.WalkTileList[xindex][yindex];
-                    if (targett == t)
-                        continue;
-                    if (targett.occupied) //Occupied tile found, stop clearing top left from this
-                        MinY = yindex;
-
-                    targett.ClearanceR = new Size(targett.ClearanceR.Width, ClearanceTop);
-                    ClearanceTop++;
-                }
-                ClearanceTop = 0;
-                ClearanceLeft++;
-            }
-
-        }
-
-        /// <summary>
-        /// From the newly unoccupied tile start clearing to the top left.
-        /// When an occupied tile is found, stop clearing above that tile.
-        /// </summary>
-        private void NewUnOccupation(WalkTile t, int leftx, int topy)
-        {
-            //TODO: Maybe you can stop clearing faster by stopp when clearing exceeds max object size
-            int ClearanceLeft = 1;
-            int ClearanceTop = 1;
-
-            int MinX = t.TileX - leftx; //Generally determined by the width of the biggest object
-            int MaxY = topy;            //Generally determined by the height of the biggest object
-
-            for (int xindex = t.TileX; xindex > MinX; xindex--) 
-            { 
-                for (int yindex = t.TileY; yindex < MaxY; yindex++)
-                {
-                    WalkTile targett = WW.WalkTileList[xindex][yindex];
-                    if (targett == t) { }
-                    else if (targett.occupied) //Occupied tile found, stop clearing top left from this
-                        MaxY = yindex;
-
-                    Size OldClearance = targett.ClearanceR;
-                    targett.ClearanceR = new Size(OldClearance.Width + ClearanceLeft, OldClearance.Height + ClearanceTop);
-                    ClearanceTop++;
-                }
-                ClearanceLeft++;
-            }
         }
     }
 }

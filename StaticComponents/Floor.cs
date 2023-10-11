@@ -27,7 +27,7 @@ namespace FloorSimulation
         public List<Hub> HubList; // A list with all the hubs that are on the floor (starthub: 0, shophubs >= 1)
         public StartHub FirstStartHub;
         public BufferHub BuffHub;
-        private Distributer FirstDistr;
+        public Distributer FirstDistr;
         private WalkWay FirstWW;
 
         /// <summary>
@@ -50,10 +50,10 @@ namespace FloorSimulation
 
             FirstWW = new WalkWay(new Point(0, 0), new Size(2000, 2000), this);
             FirstStartHub = new StartHub("Start hub", 0, new Point(200, 1800), this, FirstWW, initial_trolleys_: 5, vertical_trolleys_: true);
-            BuffHub = new BufferHub("Buffer hub", 1, new Point(0, 20), this, FirstWW);
             HubList.Add(FirstStartHub);
-            HubList.Add(BuffHub);
             FirstDistr = new Distributer(0, this, FirstWW, Rpoint_: new Point(600, 70));
+            BuffHub = new BufferHub("Buffer hub", 1, new Point(0, 20), this, FirstWW);
+            HubList.Add(BuffHub);
             init_shops();
 
             FirstStartHub.InitFirstTrolley();
@@ -105,7 +105,7 @@ namespace FloorSimulation
         /// </summary>
         public void init_shops()
         {
-            int UpperY = 320;
+            int UpperY = 340;
             int LowerY = 1400;
             int StreetWidth = 300;
 

@@ -21,11 +21,16 @@ namespace FloorSimulation
 
         public void InitFirstTrolley()
         {
-            HubTrolleys[0].PlantList.Add(new plant(floor.HubList[7]));
+            //HubTrolleys[0].PlantList.Add(new plant(floor.HubList[7]));
             //HubTrolleys[0].PlantList.Add(new plant(floor.HubList[3]));
             //HubTrolleys[0].PlantList.Add(new plant(floor.HubList[3]));
             //HubTrolleys[0].PlantList.Add(new plant(floor.HubList[12]));
             HubTrolleys[0].PlantList.Add(new plant(floor.HubList[15]));
+
+            HubTrolleys[1].PlantList.Add(new plant(floor.HubList[15]));
+            HubTrolleys[2].PlantList.Add(new plant(floor.HubList[5]));
+            HubTrolleys[3].PlantList.Add(new plant(floor.HubList[10]));
+            HubTrolleys[4].PlantList.Add(new plant(floor.HubList[8]));
         }
     }
 }

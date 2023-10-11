@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,24 +17,35 @@ namespace FloorSimulation
     {
         private WalkWay WW;
         private Queue<WalkTile> TileQueue;
-        private Distributer distributer;
-        int clearance_down;
-        int clearance_right;
+        private Distributer DButer;
 
-        public DijkstraWalkWays(WalkWay WW_, Distributer distributer_, int clearance_down_, int clearance_right_)
+        private Size DButerTileSize;
+        private Size DButerTileSizeWithHTrolley;
+        private Size DButerTileSizeWithVTrolley;
+
+        public DijkstraWalkWays(WalkWay WW_, Distributer distributer_)
         {
             WW = WW_;
-            distributer = distributer_; 
-            clearance_down = clearance_down_;
-            clearance_right = clearance_right_;
+            DButer = distributer_; 
             TileQueue = new Queue<WalkTile>();
+
+            int[] dindices = WW.TileListIndices(DButer.RDPoint, DButer.RDistributerSize);
+            DButerTileSize = new Size(dindices[2], dindices[3]);
+
+            DanishTrolley HorizontalDummyTrolley = new DanishTrolley(0, DButer.floor);
+            int[] HIndices = WW.TileListIndices(new Point(0, 0), HorizontalDummyTrolley.GetSize());
+            DButerTileSizeWithHTrolley = new Size(Math.Max(dindices[2], HIndices[2]), HIndices[3] + dindices[3]);
+
+            DanishTrolley VerticalDummyTrolley = new DanishTrolley(0, DButer.floor, IsVertical_: true);
+            int[] VIndices = WW.TileListIndices(new Point(0, 0), VerticalDummyTrolley.GetSize());
+            DButerTileSizeWithVTrolley = new Size(Math.Max(dindices[2], VIndices[2]), VIndices[3] + dindices[3]);
         }
 
         /// <summary>
         /// returns shortest path to a trolley.
         /// Access points are at the top or bottom for vertical trolleys and at the right and left of horizontal trolleys
         /// </summary>
-        public List<WalkTile> RunAlgoDistrToTrolley(Distributer DButer , DanishTrolley TargetTrolley)
+        public List<WalkTile> RunAlgoDistrToTrolley(DanishTrolley TargetTrolley)
         {
             WalkTile StartTile = WW.GetTile(DButer.RDPoint);
             int[] tindices = WW.TileListIndices(TargetTrolley.RPoint, TargetTrolley.GetSize());
@@ -44,8 +56,8 @@ namespace FloorSimulation
             List<WalkTile> TargetTiles = new List<WalkTile>();
             if (TargetTrolley.IsVertical) //Vertical target trolley's
             {
-                int toppoint = ty - 1 - dheight;
-                int botpoint = ty + 1 + theight + dheight;
+                int toppoint = ty - dheight;
+                int botpoint = ty + theight + dheight;
 
                 if (toppoint > 0)
                     TargetTiles.Add(WW.WalkTileList[tx][toppoint]); //top accesspoint to trolley
@@ -54,7 +66,7 @@ namespace FloorSimulation
             }
             else //Horizontal target trolley
             {
-                int rightpoint = tx + 1 + twidth;
+                int rightpoint = tx + twidth;
                 int leftpoint = tx - 1 - dwidth;
 
                 if (rightpoint < WW.WalkTileList.Count)
@@ -63,23 +75,48 @@ namespace FloorSimulation
                     TargetTiles.Add(WW.WalkTileList[leftpoint][ty]); //top accesspoint to trolley
             }
 
-            return RunAlgo(StartTile, TargetTiles);
+            if (DButer.trolley == null)
+                return RunAlgo(StartTile, TargetTiles, DButerTileSize);
+            else
+            {
+                if (DButer.trolley.IsVertical)
+                    return RunAlgo(StartTile, TargetTiles, DButerTileSizeWithVTrolley);
+                else
+                    return RunAlgo(StartTile, TargetTiles, DButerTileSizeWithHTrolley);
+            }
         }
 
         /// <summary>
         /// Returns shortest path to the target tile
         /// </summary>
-        public List<WalkTile> RunAlgoTile(WalkTile Start_tile, WalkTile target_tile)
+        public List<WalkTile> RunAlgoTile(WalkTile StartTile, WalkTile TargetTile)
         {
-            return RunAlgo(Start_tile, new List<WalkTile>() {target_tile});
+            List<WalkTile> TargetTiles = new List<WalkTile>() { TargetTile};
+            if (DButer.trolley == null)
+                return RunAlgo(StartTile, TargetTiles, DButerTileSize);
+            else
+            {
+                if (DButer.trolley.IsVertical)
+                    return RunAlgo(StartTile, TargetTiles, DButerTileSizeWithVTrolley);
+                else
+                    return RunAlgo(StartTile, TargetTiles, DButerTileSizeWithHTrolley);
+            }
         }
 
         /// <summary>
         /// Returns the path to the closest target tile
         /// </summary>
-        public List<WalkTile> RunAlgoTiles(WalkTile Start_tile, List<WalkTile> target_tiles)
+        public List<WalkTile> RunAlgoTiles(WalkTile StartTile, List<WalkTile> TargetTiles)
         {
-            return RunAlgo(Start_tile, target_tiles);
+            if (DButer.trolley == null)
+                return RunAlgo(StartTile, TargetTiles, DButerTileSize);
+            else
+            {
+                if (DButer.trolley.IsVertical)
+                    return RunAlgo(StartTile, TargetTiles, DButerTileSizeWithVTrolley);
+                else
+                    return RunAlgo(StartTile, TargetTiles, DButerTileSizeWithHTrolley);
+            }
         }
 
         /// <summary>
@@ -87,12 +124,13 @@ namespace FloorSimulation
         /// Returns a list of the shortest path. 0 = start tile, last item = target tile, with the route within it.
         /// </summary>
         /// <returns>The route to take (List of WalkTiles)</returns>
-        private List<WalkTile> RunAlgo(WalkTile start_tile, List<WalkTile> target_tiles) 
+        private List<WalkTile> RunAlgo(WalkTile start_tile, List<WalkTile> target_tiles, Size ObjSize) 
         { 
             TileQueue.Clear();
             ResetTravelCosts();
             //TODO: update the clearances costs too much time right now.
-            WW.unfill_tiles(distributer.RDPoint, distributer.RDistributerSize);
+            WW.unfill_tiles(DButer.RDPoint, DButer.RDistributerSize);
+            WW.WWC.UpdateClearances(DButer, ObjSize);
  
             start_tile.TravelCost = 0;
             start_tile.visited = true;
@@ -141,7 +179,7 @@ namespace FloorSimulation
                         TileQueue.Enqueue(tileR);
                 }
             }
-            WW.fill_tiles(distributer.RDPoint, distributer.RDistributerSize);
+            WW.fill_tiles(DButer.RDPoint, DButer.RDistributerSize);
 
             WalkTile target_tile = ClosestTargetTile(target_tiles);
 
@@ -185,7 +223,7 @@ namespace FloorSimulation
         /// </summary>
         private bool IsTileAccessible(WalkTile tile)
         {
-            return tile != null && !tile.occupied && tile.ClearanceR.Width >= clearance_right && tile.ClearanceR.Height >= clearance_down;
+            return tile != null && tile.accessible;
         }
 
         /// <summary>
