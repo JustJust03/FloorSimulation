@@ -71,6 +71,7 @@
     <Compile Include="StaticComponents\Hubs\StartHub.cs" />
     <Compile Include="StaticComponents\WalkWay.cs" />
     <Compile Include="StaticComponents\WalkTile.cs" />
+    <Compile Include="StaticComponents\WalkWayClearance.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

@@ -50,11 +50,10 @@ namespace FloorSimulation
 
             FirstWW = new WalkWay(new Point(0, 0), new Size(2000, 2000), this);
             FirstStartHub = new StartHub("Start hub", 0, new Point(200, 1800), this, FirstWW, initial_trolleys_: 5, vertical_trolleys_: true);
-            BuffHub = new BufferHub("Buffer hub", 1, new Point(0, 0), this, FirstWW);
-            //BuffHub.OpenSpot(new DanishTrolley(433, this));
+            BuffHub = new BufferHub("Buffer hub", 1, new Point(0, 20), this, FirstWW);
             HubList.Add(FirstStartHub);
             HubList.Add(BuffHub);
-            FirstDistr = new Distributer(0, this, FirstWW, Rpoint_: new Point(200, 70));
+            FirstDistr = new Distributer(0, this, FirstWW, Rpoint_: new Point(600, 70));
             init_shops();
 
             FirstStartHub.InitFirstTrolley();

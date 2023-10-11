@@ -19,6 +19,7 @@ namespace FloorSimulation
         public Point PointWW;
         public Size RSizeWW;
         public Size SizeWW;
+        private WalkWayClearance WWC;
 
         private Brush WWBrush;
         public Pen WWTilePen;
@@ -49,8 +50,9 @@ namespace FloorSimulation
 
             WWBrush = new SolidBrush(Color.Gray);
             WWTilePen = new Pen(Color.Red);
+
             InitWalkTiles();
-            ;
+            WWC = new WalkWayClearance(this, 7, 20);
         }
 
         /// <summary>
@@ -91,23 +93,6 @@ namespace FloorSimulation
                 }
                 WalkTileList.Add(col);
             }
-
-            UpdateClearances();
-        }
-
-        /// <summary>
-        /// Updates all the clearances of all the tiles in the walktile list
-        /// </summary>
-        public void UpdateClearances()
-        {
-            // TODO: Make this smarter and faster.
-            foreach(List<WalkTile> col in WalkTileList)
-            {
-                foreach(WalkTile tile in col)
-                {
-                    tile.UpdateClearance();
-                }
-            }
         }
 
         /// <summary>
@@ -123,7 +108,11 @@ namespace FloorSimulation
 
             for (int xi = x; xi < x + width; xi++) 
                 for (int yi = y; yi < y + height; yi++)
-                    WalkTileList[xi][yi].occupied = true;
+                {
+                    WalkTile t = WalkTileList[xi][yi];
+                    t.occupied = true;
+                    WWC.UpdateTileClearance(t);
+                }
         }
 
         /// <summary>
@@ -139,7 +128,11 @@ namespace FloorSimulation
 
             for (int xi = x; xi < x + width; xi++) 
                 for (int yi = y; yi < y + height; yi++)
-                    WalkTileList[xi][yi].occupied = false;
+                {
+                    WalkTile t = WalkTileList[xi][yi];
+                    t.occupied = false;
+                    WWC.UpdateTileClearance(t);
+                }
         }
 
         /// <summary>

@@ -18,7 +18,7 @@ namespace FloorSimulation
         public Size RDistributerSize; //Is the real size in cm.
         private Size DistributerSize; 
         public int id;
-        private Floor floor;
+        public Floor floor;
 
         private List<WalkTile> route;
         private const float WALKSPEED = 500f; // cm/s
@@ -48,7 +48,7 @@ namespace FloorSimulation
 
             travel_dist_per_tick = WALKSPEED / Program.TICKS_PER_SECOND;
             distributionms_per_tick = (int)(1000f / Program.TICKS_PER_SECOND);
-            MainTask = new Task(floor.FirstStartHub.PeekFirstTrolley(), floor.FirstStartHub, this, "TakeFullTrolley");
+            MainTask = new Task(floor.FirstStartHub, this, "TakeFullTrolley");
             trolley = null;
 
             int[] indices = WW.TileListIndices(RDPoint, RDistributerSize);
@@ -76,6 +76,15 @@ namespace FloorSimulation
         public void TravelToTile(WalkTile target_tile)
         {
             route = DWW.RunAlgoTile(WW.GetTile(RDPoint), target_tile);
+        }
+
+        /// <summary>
+        /// Makes a distributer walk towards the closest available target tile using a shortest path algorithm.
+        /// </summary>
+        /// <param name="target_tile"></param>
+        public void TravelToClosestTile(List<WalkTile> target_tiles)
+        {
+            route = DWW.RunAlgoTiles(WW.GetTile(RDPoint), target_tiles);
         }
 
         /// <summary>

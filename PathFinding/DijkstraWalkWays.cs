@@ -29,6 +29,10 @@ namespace FloorSimulation
             TileQueue = new Queue<WalkTile>();
         }
 
+        /// <summary>
+        /// returns shortest path to a trolley.
+        /// Access points are at the top or bottom for vertical trolleys and at the right and left of horizontal trolleys
+        /// </summary>
         public List<WalkTile> RunAlgoDistrToTrolley(Distributer DButer , DanishTrolley TargetTrolley)
         {
             WalkTile StartTile = WW.GetTile(DButer.RDPoint);
@@ -62,17 +66,26 @@ namespace FloorSimulation
             return RunAlgo(StartTile, TargetTiles);
         }
 
+        /// <summary>
+        /// Returns shortest path to the target tile
+        /// </summary>
         public List<WalkTile> RunAlgoTile(WalkTile Start_tile, WalkTile target_tile)
         {
             return RunAlgo(Start_tile, new List<WalkTile>() {target_tile});
         }
 
         /// <summary>
+        /// Returns the path to the closest target tile
+        /// </summary>
+        public List<WalkTile> RunAlgoTiles(WalkTile Start_tile, List<WalkTile> target_tiles)
+        {
+            return RunAlgo(Start_tile, target_tiles);
+        }
+
+        /// <summary>
         /// Runs the dijkstra algorithm.
         /// Returns a list of the shortest path. 0 = start tile, last item = target tile, with the route within it.
         /// </summary>
-        /// <param name="start_tile"></param>
-        /// <param name="target_tile"></param>
         /// <returns>The route to take (List of WalkTiles)</returns>
         private List<WalkTile> RunAlgo(WalkTile start_tile, List<WalkTile> target_tiles) 
         { 
@@ -80,7 +93,6 @@ namespace FloorSimulation
             ResetTravelCosts();
             //TODO: update the clearances costs too much time right now.
             WW.unfill_tiles(distributer.RDPoint, distributer.RDistributerSize);
-            WW.UpdateClearances();
  
             start_tile.TravelCost = 0;
             start_tile.visited = true;
@@ -165,11 +177,20 @@ namespace FloorSimulation
                 } 
         }
 
+        /// <summary>
+        /// Checks if tile is accessible: 
+        /// Does the tile exist, 
+        /// Is it unoccupied, 
+        /// Is there enough clearance on the right and bottom.
+        /// </summary>
         private bool IsTileAccessible(WalkTile tile)
         {
-            return tile != null && !tile.occupied && tile.ClearanceRight >= clearance_right && tile.ClearanceBot >= clearance_down;
+            return tile != null && !tile.occupied && tile.ClearanceR.Width >= clearance_right && tile.ClearanceR.Height >= clearance_down;
         }
 
+        /// <summary>
+        /// From a list of target tiles return the one with the lowest travel cost (thus the one that has the shortest path)
+        /// </summary>
         private WalkTile ClosestTargetTile(List<WalkTile> target_tiles)
         {
             WalkTile ClosestTile = null;
