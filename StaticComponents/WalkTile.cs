@@ -15,50 +15,47 @@ namespace FloorSimulation
     {
         public int TileX;
         public int TileY;
+
         public bool occupied;
+        public bool accessible; //The square is accessible by the agent taking into account its dimensions. 
+        public bool IsAgentsTile; //The agent is standing on this tile.
+
         private WalkWay WW;
-        public int ClearanceBot; //How many free tiles to the bottom
-        public int ClearanceRight; //How many free tile to the right
 
         public Point Simpoint;
         public Point Rpoint;
+        public Size SimSize;
 
         //Used by the dijkstra algo.
         public int TravelCost = int.MaxValue;
         public bool visited = false;
         public WalkTile Parent = null;  //From which tile did you get to here. (start tiles and unreachable tiles are null)
 
-        public WalkTile(int tileX_, int tileY_, Point Simpoint_, Point Rpoint_, bool occupied_, WalkWay ww_)
+        public const int Rwidth = 10;
+        public const int Rheight = 10;
+
+        public WalkTile(int tileX_, int tileY_, Point Simpoint_, Point Rpoint_, Size SimSize_, bool occupied_, WalkWay ww_)
         {
             TileX = tileX_;
             TileY = tileY_;
             Simpoint = Simpoint_;
             Rpoint = Rpoint_;
             occupied = occupied_;
+            accessible = !occupied_;
+            IsAgentsTile = false;
             WW = ww_;
+
+            SimSize = SimSize_;
         }
         
-        /// <summary>
-        /// Updates Clearance right and clearance left of this tile.
-        /// </summary>
-        public void UpdateClearance()
+        public void DrawOccupiance(Graphics g)
         {
-            // Clearance on the right
-            ClearanceRight = 0;
-            for (int x = TileX; x < WW.WalkTileListWidth; x++)
+            if (occupied)
+                g.DrawRectangle(WW.WWTilePen, new Rectangle(Simpoint, SimSize));
+            else if (!accessible)
             {
-                if (WW.WalkTileList[x][TileY].occupied)
-                    break;
-                ClearanceRight++;
-            }
-
-            // Clearance on the bottom
-            ClearanceBot = 0;
-            for (int y = TileY; y < WW.WalkTileListHeight; y++)
-            {
-                if (WW.WalkTileList[TileX][y].occupied)
-                    break;
-                ClearanceBot++;
+                Pen p = new Pen(Color.Orange);
+                g.DrawRectangle(p, new Rectangle(Simpoint, SimSize));
             }
         }
 
