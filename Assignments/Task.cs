@@ -70,6 +70,7 @@ namespace FloorSimulation
             else if (Goal == "DeliveringEmptyTrolley") //Old goal
             {
                 TargetHub.TakeVTrolleyIn(Trolley, DButer.RDPoint);
+                DButer.WW.unoccupie_by_tiles(DButer.trolley.RPoint, DButer.trolley.GetRSize()); // drop the trolley of from the distributer
                 DButer.trolley = null;
                 Goal = "TakeFullTrolley"; //New goal
                 Travelling = false;

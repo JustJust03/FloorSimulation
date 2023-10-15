@@ -19,6 +19,7 @@ namespace FloorSimulation
         public bool occupied;
         public bool accessible; //The square is accessible by the agent taking into account its dimensions. 
         public bool IsAgentsTile; //The agent is standing on this tile.
+        public Distributer occupied_by;
 
         private WalkWay WW;
 
@@ -50,6 +51,12 @@ namespace FloorSimulation
         
         public void DrawOccupiance(Graphics g)
         {
+            if (occupied_by != null)
+            {
+                Pen p = new Pen(Color.Green);
+                g.DrawRectangle(p, new Rectangle(Simpoint, SimSize));
+                return;
+            }
             if (occupied)
                 g.DrawRectangle(WW.WWTilePen, new Rectangle(Simpoint, SimSize));
             else if (!accessible)

@@ -19,7 +19,6 @@ namespace FloorSimulation
         private Queue<WalkTile> TileQueue;
         private Distributer DButer;
 
-        private Size DButerTileSize;
         private Size DButerTileSizeWithHTrolley;
         private Size DButerTileSizeWithVTrolley;
 
@@ -29,16 +28,14 @@ namespace FloorSimulation
             DButer = distributer_; 
             TileQueue = new Queue<WalkTile>();
 
-            int[] dindices = WW.TileListIndices(DButer.RDPoint, DButer.RDistributerSize);
-            DButerTileSize = new Size(dindices[2], dindices[3]);
 
             DanishTrolley HorizontalDummyTrolley = new DanishTrolley(0, DButer.floor);
-            int[] HIndices = WW.TileListIndices(new Point(0, 0), HorizontalDummyTrolley.GetSize());
-            DButerTileSizeWithHTrolley = new Size(Math.Max(dindices[2], HIndices[2]), HIndices[3] + dindices[3]);
+            int[] HIndices = WW.TileListIndices(new Point(0, 0), HorizontalDummyTrolley.GetRSize());
+            DButerTileSizeWithHTrolley = new Size(DButer.DButerTileSize.Width + HIndices[2], Math.Max(HIndices[3], DButer.DButerTileSize.Height));
 
             DanishTrolley VerticalDummyTrolley = new DanishTrolley(0, DButer.floor, IsVertical_: true);
-            int[] VIndices = WW.TileListIndices(new Point(0, 0), VerticalDummyTrolley.GetSize());
-            DButerTileSizeWithVTrolley = new Size(Math.Max(dindices[2], VIndices[2]), VIndices[3] + dindices[3]);
+            int[] VIndices = WW.TileListIndices(new Point(0, 0), VerticalDummyTrolley.GetRSize());
+            DButerTileSizeWithVTrolley = new Size(Math.Max(DButer.DButerTileSize.Width, VIndices[2]), VIndices[3] + DButer.DButerTileSize.Height);
         }
 
         /// <summary>
@@ -48,7 +45,7 @@ namespace FloorSimulation
         public List<WalkTile> RunAlgoDistrToTrolley(DanishTrolley TargetTrolley)
         {
             WalkTile StartTile = WW.GetTile(DButer.RDPoint);
-            int[] tindices = WW.TileListIndices(TargetTrolley.RPoint, TargetTrolley.GetSize());
+            int[] tindices = WW.TileListIndices(TargetTrolley.RPoint, TargetTrolley.GetRSize());
             int tx = tindices[0]; int ty = tindices[1]; int twidth = tindices[2]; int theight = tindices[3];
             int[] dindices = WW.TileListIndices(DButer.RDPoint, DButer.RDistributerSize);
             int dx = dindices[0]; int dy = dindices[1]; int dwidth = dindices[2]; int dheight = dindices[3];
@@ -76,7 +73,7 @@ namespace FloorSimulation
             }
 
             if (DButer.trolley == null)
-                return RunAlgo(StartTile, TargetTiles, DButerTileSize);
+                return RunAlgo(StartTile, TargetTiles, DButer.DButerTileSize);
             else
             {
                 if (DButer.trolley.IsVertical)
@@ -93,7 +90,7 @@ namespace FloorSimulation
         {
             List<WalkTile> TargetTiles = new List<WalkTile>() { TargetTile};
             if (DButer.trolley == null)
-                return RunAlgo(StartTile, TargetTiles, DButerTileSize);
+                return RunAlgo(StartTile, TargetTiles, DButer.DButerTileSize);
             else
             {
                 if (DButer.trolley.IsVertical)
@@ -109,7 +106,7 @@ namespace FloorSimulation
         public List<WalkTile> RunAlgoTiles(WalkTile StartTile, List<WalkTile> TargetTiles)
         {
             if (DButer.trolley == null)
-                return RunAlgo(StartTile, TargetTiles, DButerTileSize);
+                return RunAlgo(StartTile, TargetTiles, DButer.DButerTileSize);
             else
             {
                 if (DButer.trolley.IsVertical)
@@ -129,7 +126,6 @@ namespace FloorSimulation
             TileQueue.Clear();
             ResetTravelCosts();
             //TODO: update the clearances costs too much time right now.
-            WW.unfill_tiles(DButer.RDPoint, DButer.RDistributerSize);
             WW.WWC.UpdateClearances(DButer, ObjSize);
  
             start_tile.TravelCost = 0;
@@ -179,7 +175,7 @@ namespace FloorSimulation
                         TileQueue.Enqueue(tileR);
                 }
             }
-            WW.fill_tiles(DButer.RDPoint, DButer.RDistributerSize);
+            WW.fill_tiles(DButer.RDPoint, DButer.RDistributerSize, DButer);
 
             WalkTile target_tile = ClosestTargetTile(target_tiles);
 
@@ -223,7 +219,7 @@ namespace FloorSimulation
         /// </summary>
         private bool IsTileAccessible(WalkTile tile)
         {
-            return tile != null && tile.accessible;
+            return tile != null && (tile.accessible || tile.occupied_by == DButer);
         }
 
         /// <summary>

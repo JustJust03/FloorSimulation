@@ -16,7 +16,8 @@ namespace FloorSimulation
         public Point RDPoint; // Real distributer point
         private Point DPoint; // Sim distributer point
         public Size RDistributerSize; //Is the real size in cm.
-        private Size DistributerSize; 
+        private Size DistributerSize;
+        public Size DButerTileSize; //The size of this agent in tiles
         public int id;
         public Floor floor;
 
@@ -43,6 +44,9 @@ namespace FloorSimulation
             DistributerIMG = Image.FromFile(Program.rootfolder + @"\SimImages\Distributer.png");
             RDistributerSize = new Size(DistributerIMG.Width, DistributerIMG.Height);
 
+            int[] dindices = WW.TileListIndices(RDPoint, RDistributerSize);
+            DButerTileSize = new Size(dindices[2], dindices[3]);
+
             DistributerSize = floor.ConvertToSimSize(RDistributerSize);
             DPoint = floor.ConvertToSimPoint(RDPoint);
 
@@ -52,7 +56,7 @@ namespace FloorSimulation
             trolley = null;
 
             DWW = new DijkstraWalkWays(WW, this);
-            WW.fill_tiles(RDPoint, RDistributerSize);
+            WW.fill_tiles(RDPoint, RDistributerSize, this);
         }
 
         public void Tick()
@@ -118,28 +122,33 @@ namespace FloorSimulation
                         ticktravel = 0;
                         break;
                     }
-                    //TODO: Update occupiance of WalkWay tiles when moving tiles. Also check if tile is occupied before traveling.
-                    WW.unfill_tiles(RDPoint, RDistributerSize);
 
+                    WW.WWC.UpdateClearances(this, DButerTileSize);
+
+                    WalkTile destination = route[0];
+                    if (!destination.accessible)
+                    {
+                        ;
+                    }
+
+                    WW.unfill_tiles(RDPoint, RDistributerSize);
                     DPoint = route[0].Simpoint;
                     RDPoint = floor.ConvertToRealPoint(DPoint);
+                    WW.fill_tiles(RDPoint, RDistributerSize, this);
 
                     if (trolley != null) //If you have a trolley, drag it with you.
                     {
-                        WW.unfill_tiles(trolley.RPoint, trolley.GetSize());
+                        WW.unfill_tiles(trolley.RPoint, trolley.GetRSize());
 
                         trolley.RPoint = new Point(RDPoint.X, RDPoint.Y + RDistributerSize.Height);
                         trolley.SimPoint = floor.ConvertToSimPoint(trolley.RPoint);
 
-                        WW.fill_tiles(trolley.RPoint, trolley.GetSize());
+                        WW.fill_tiles(trolley.RPoint, trolley.GetRSize(), this);
                     }
 
                     ticktravel -= WalkWay.WALK_TILE_WIDTH;
                     route.RemoveAt(0);
                     
-                    WW.fill_tiles(RDPoint, RDistributerSize); ;
-                    //TODO: Update the clearance, and make this clearance update faster.
-                    //WW.UpdateClearances();
                 }
             }
             else // Route is empty, thus target has been reached.

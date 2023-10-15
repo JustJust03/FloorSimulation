@@ -22,9 +22,9 @@ namespace FloorSimulation
         {
             DummyTrolley = new DanishTrolley(433, floor, IsVertical_: true);
             if (vertical_trolleys_)
-                Trolleyarr = new DanishTrolley[RHubSize.Width / (Rslack + DummyTrolley.VRTrolleySize.Width)];
+                Trolleyarr = new DanishTrolley[RHubSize.Width / (Rslack + DummyTrolley.GetRSize().Width)];
             else
-                Trolleyarr = new DanishTrolley[RHubSize.Height / (Rslack + DummyTrolley.HRTrolleySize.Height)];
+                Trolleyarr = new DanishTrolley[RHubSize.Height / (Rslack + DummyTrolley.GetRSize().Height)];
 
 
             //TODO: This ALWAYS puts the distributer at the top of the trolley
@@ -32,7 +32,7 @@ namespace FloorSimulation
             HubAccessPointsX = new int[Trolleyarr.Length];
             for (int i = 0; i < Trolleyarr.Length; i++)
             {
-                int trolleyX = RFloorPoint.X + Rslack + i * (Rslack + DummyTrolley.VRTrolleySize.Width); //this point + how far in the line it is
+                int trolleyX = RFloorPoint.X + Rslack + i * (Rslack + DummyTrolley.GetRSize().Width); //this point + how far in the line it is
                 int trolleyY = RFloorPoint.Y + Rslack - floor.FirstDistr.RDistributerSize.Height;
 
                 HubAccessPoints[i] = WW.GetTile(new Point(trolleyX, trolleyY));

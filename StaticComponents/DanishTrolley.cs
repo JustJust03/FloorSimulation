@@ -17,11 +17,11 @@ namespace FloorSimulation
         public Point SimPoint; //Where in the panel Should the trolley be drawn.
         public Point RPoint;
         //Vertical
-        public Size VRTrolleySize; //Is the Real size in cm.
-        public Size VTrolleySize; //Sim trolley size
+        private Size VRTrolleySize; //Is the Real size in cm.
+        private Size VTrolleySize; //Sim trolley size
         //Horizontal
-        public Size HRTrolleySize; //Is the Real size in cm.
-        public Size HTrolleySize; //Sim trolley size
+        private Size HRTrolleySize; //Is the Real size in cm.
+        private Size HTrolleySize; //Sim trolley size
 
         public int id;
         private Floor floor;
@@ -69,7 +69,7 @@ namespace FloorSimulation
         /// Return the real size of trolley. 
         /// According to horizontal or vertical orientation.
         /// </summary>
-        public Size GetSize()
+        public Size GetRSize()
         {
             if (IsVertical)
                 return VRTrolleySize;

@@ -39,12 +39,12 @@ namespace FloorSimulation
             DanishTrolley DummyTrolley = new DanishTrolley(433, floor, IsVertical_: true);
             if (vertical_trolleys)
             {
-                max_trolleys = RHubSize.Width / (Rslack + DummyTrolley.VRTrolleySize.Width);
+                max_trolleys = RHubSize.Width / (Rslack + DummyTrolley.GetRSize().Width);
                 InitVTrolleys(initial_trolleys);
             }
             else
             {
-                max_trolleys = RHubSize.Height / Rslack + DummyTrolley.HRTrolleySize.Height;
+                max_trolleys = RHubSize.Height / Rslack + DummyTrolley.GetRSize().Height;
                 InitHTrolleys(initial_trolleys);
             }
 
@@ -68,11 +68,11 @@ namespace FloorSimulation
                 DanishTrolley DT = new DanishTrolley(i, floor, IsVertical_: false);
 
                 int trolleyY = UpperY + Rslack; 
-                UpperY += DT.HRTrolleySize.Height + Rslack;
+                UpperY += DT.GetRSize().Height + Rslack;
                 int trolleyX = RFloorPoint.X + Rslack; 
 
                 DT.TeleportTrolley(new Point(trolleyX, trolleyY));
-                WW.fill_tiles(DT.RPoint, DT.GetSize());
+                WW.fill_tiles(DT.RPoint, DT.GetRSize());
                 HubTrolleys.Add(DT);
             }
         }
@@ -89,11 +89,11 @@ namespace FloorSimulation
                 DanishTrolley DT = new DanishTrolley(i, floor, IsVertical_: true);
 
                 int trolleyX = LeftX + Rslack; 
-                LeftX += DT.VRTrolleySize.Width + Rslack;
+                LeftX += DT.GetRSize().Width + Rslack;
                 int trolleyY = RFloorPoint.Y + Rslack; 
 
                 DT.TeleportTrolley(new Point(trolleyX, trolleyY));
-                WW.fill_tiles(DT.RPoint, DT.GetSize());
+                WW.fill_tiles(DT.RPoint, DT.GetRSize());
                 HubTrolleys.Add(DT);
             }
 

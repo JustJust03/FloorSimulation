@@ -28,6 +28,7 @@ namespace FloorSimulation
         public StartHub FirstStartHub;
         public BufferHub BuffHub;
         public Distributer FirstDistr;
+        //public Distributer SecondDistr;
         private WalkWay FirstWW;
 
         /// <summary>
@@ -52,6 +53,7 @@ namespace FloorSimulation
             FirstStartHub = new StartHub("Start hub", 0, new Point(200, 1800), this, FirstWW, initial_trolleys_: 5, vertical_trolleys_: true);
             HubList.Add(FirstStartHub);
             FirstDistr = new Distributer(0, this, FirstWW, Rpoint_: new Point(600, 70));
+            //SecondDistr = new Distributer(0, this, FirstWW, Rpoint_: new Point(800, 70));
             BuffHub = new BufferHub("Buffer hub", 1, new Point(0, 20), this, FirstWW);
             HubList.Add(BuffHub);
             init_shops();
@@ -65,6 +67,7 @@ namespace FloorSimulation
         public void TickButton(object sender, EventArgs e)
         {
             FirstDistr.Tick();
+            //SecondDistr.Tick();
             Invalidate();
         }
 
@@ -98,6 +101,7 @@ namespace FloorSimulation
             PaintHubs(g);
             PaintTrolleys(g);
             FirstDistr.DrawObject(g);
+            //SecondDistr.DrawObject(g);
         }
         
         /// <summary>
