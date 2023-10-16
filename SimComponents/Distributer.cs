@@ -12,15 +12,18 @@ namespace FloorSimulation
     /// </summary>
     internal class Distributer
     {
-        private Image DistributerIMG;
+        private Image HDistributerIMG;
+        private Image VDistributerIMG;
         public Point RDPoint; // Real distributer point
         private Point DPoint; // Sim distributer point
         public Size RDistributerSize; //Is the real size in cm.
         private Size DistributerSize;
+        private Size HRDistributerSize;
+        private Size VRDistributerSize;
         public int id;
         public Floor floor;
 
-        private List<WalkTile> route;
+        public List<WalkTile> route;
         private const float WALKSPEED = 1000f; // cm/s
         private float travel_dist_per_tick;
         private int distributionms_per_tick; // plant distribution per tick in ms
@@ -28,23 +31,34 @@ namespace FloorSimulation
         private int distributionms = 0; // How many ms have you been distributing
         private Task MainTask;
         public DanishTrolley trolley;
+        private bool IsVertical;
+        private bool TrolleyOnTopLeft; //True when the trolley is to the left or on top of the distributer
 
         private DijkstraWalkWays DWW;
         public WalkWay WW;
 
         
-        public Distributer(int id_, Floor floor_, WalkWay WW_, Point Rpoint_ = default)
+        public Distributer(int id_, Floor floor_, WalkWay WW_, Point Rpoint_ = default, bool IsVertical_ = true)
         {
             id = id_;
             floor = floor_;
             RDPoint = Rpoint_;
             WW = WW_;
+            IsVertical = IsVertical_;
 
-            DistributerIMG = Image.FromFile(Program.rootfolder + @"\SimImages\Distributer.png");
-            RDistributerSize = new Size(DistributerIMG.Width, DistributerIMG.Height);
+            VDistributerIMG = Image.FromFile(Program.rootfolder + @"\SimImages\Distributer_vertical.png");
+            VRDistributerSize = new Size(VDistributerIMG.Width, VDistributerIMG.Height);
+            HDistributerIMG = Image.FromFile(Program.rootfolder + @"\SimImages\Distributer_horizontal.png");
+            HRDistributerSize = new Size(HDistributerIMG.Width, HDistributerIMG.Height);
+            if (IsVertical)
+                RDistributerSize = VRDistributerSize;
+            else
+                RDistributerSize = HRDistributerSize;
 
             DistributerSize = floor.ConvertToSimSize(RDistributerSize);
             DPoint = floor.ConvertToSimPoint(RDPoint);
+            if(id == -1)
+                return;
 
             travel_dist_per_tick = WALKSPEED / Program.TICKS_PER_SECOND;
             distributionms_per_tick = (int)(1000f / Program.TICKS_PER_SECOND);
@@ -64,7 +78,10 @@ namespace FloorSimulation
         {
             if (trolley != null)
                 trolley.DrawObject(g);
-            g.DrawImage(DistributerIMG, new Rectangle(DPoint, DistributerSize));
+            if(IsVertical)
+                g.DrawImage(VDistributerIMG, new Rectangle(DPoint, DistributerSize));
+            else
+                g.DrawImage(HDistributerIMG, new Rectangle(DPoint, DistributerSize));
         }
 
         /// <summary>
@@ -122,7 +139,7 @@ namespace FloorSimulation
                     WW.WWC.UpdateClearances(this, GetDButerTileSize());
 
                     WalkTile destination = route[0];
-                    if (!DWW.IsTileAccessible(destination)) //Route failed, there was something occupieing the calculated route
+                    if (!DWW.IsTileAccessible(destination)) //Route failed, there was something occupying the calculated route
                     {
                         ticktravel -= travel_dist_per_tick;
                         MainTask.FailRoute();
@@ -135,14 +152,7 @@ namespace FloorSimulation
                     WW.fill_tiles(RDPoint, RDistributerSize, this);
 
                     if (trolley != null) //If you have a trolley, drag it with you.
-                    {
-                        WW.unfill_tiles(trolley.RPoint, trolley.GetRSize());
-
-                        trolley.RPoint = new Point(RDPoint.X, RDPoint.Y + RDistributerSize.Height);
-                        trolley.SimPoint = floor.ConvertToSimPoint(trolley.RPoint);
-
-                        WW.fill_tiles(trolley.RPoint, trolley.GetRSize(), this);
-                    }
+                        TravelTrolley();
 
                     ticktravel -= WalkWay.WALK_TILE_WIDTH;
                     route.RemoveAt(0);
@@ -150,6 +160,20 @@ namespace FloorSimulation
             }
             else // Route is empty, thus target has been reached.
                 MainTask.RouteCompleted(); 
+        }
+
+        private void TravelTrolley()
+        {
+            WW.unfill_tiles(trolley.RPoint, trolley.GetRSize());
+
+            if (IsVertical)
+                trolley.RPoint = new Point(RDPoint.X, RDPoint.Y + RDistributerSize.Height);
+
+            else
+                trolley.RPoint = new Point(RDPoint.X + RDistributerSize.Width, RDPoint.Y);
+            trolley.SimPoint = floor.ConvertToSimPoint(trolley.RPoint);
+
+            WW.fill_tiles(trolley.RPoint, trolley.GetRSize(), this);
         }
 
         public void TickDistribute()
@@ -171,24 +195,56 @@ namespace FloorSimulation
         {
             trolley = t;
 
+            if (IsVertical != trolley.IsVertical)
+            {
+                RotateDistributer();
+                if (RDPoint.X < t.RPoint.X || RDPoint.Y < t.RPoint.Y)
+                    TrolleyOnTopLeft = true;
+                else //Switches the trolley and the distributer
+                {
+                    //TODO: Rebuild your system so trolleys can also be transported from the bottom right.
+                    WW.unfill_tiles(trolley.RPoint, trolley.GetRSize());
+                    WW.unfill_tiles(RDPoint, GetRDbuterSize());
+
+                    TrolleyOnTopLeft = false;
+                    RDPoint = trolley.RPoint;
+                    if (IsVertical)
+                        trolley.RPoint.Y = RDPoint.Y - VRDistributerSize.Height;
+                    else
+                        trolley.RPoint.X = RDPoint.X + HRDistributerSize.Width;
+                    DPoint = floor.ConvertToSimPoint(RDPoint);
+                    trolley.SimPoint = floor.ConvertToSimPoint(trolley.RPoint);
+
+                    WW.fill_tiles(RDPoint, GetDButerTileSize());
+                }
+            }
+            trolley.IsInTransport = true;
+
             WW.unfill_tiles(trolley.RPoint, trolley.GetRSize());
             WW.fill_tiles(trolley.RPoint, trolley.GetRSize(), this);
         }
 
         /// <summary>
         /// Leaves the trolley behind at the current point
+        /// And teleports the distributer up
         /// </summary>
         /// <returns></returns>
         public DanishTrolley GiveTrolley()
         {
             WW.unfill_tiles(RDPoint, GetDButerTileSize());
+            trolley.IsInTransport = false;
 
             WW.WWC.ClearOccupiedBy();
-            int upteleport = 10;
-            RDPoint.Y -= upteleport;
+            int teleport = 10;
+
+            if(IsVertical)
+                RDPoint.Y -= teleport;
+            else
+                RDPoint.X -= teleport;
             DPoint = floor.ConvertToSimPoint(RDPoint);
             WW.fill_tiles(RDPoint, GetDButerTileSize(), this);
 
+            //This is done so the tiles of this trolley are no longer occupied by the distributer.
             WW.unfill_tiles(trolley.RPoint, trolley.GetRSize());
             WW.fill_tiles(trolley.RPoint, trolley.GetRSize());
 
@@ -197,6 +253,11 @@ namespace FloorSimulation
             return t;
         }
         
+        /// <summary>
+        /// Returns the size of the distributer in tiles.
+        /// This includes the trolley if the distributer has a trolley.
+        /// </summary>
+        /// <returns></returns>
         public Size GetDButerTileSize()
         {
             int[] dindices = WW.TileListIndices(RDPoint, GetRDbuterSize());
@@ -208,7 +269,7 @@ namespace FloorSimulation
         /// <summary>
         /// Including The trolley if it has a trolley
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The Real distributer Size</returns>
         public Size GetRDbuterSize()
         {
             if (trolley == null)
@@ -218,6 +279,18 @@ namespace FloorSimulation
             
             return new Size(RDistributerSize.Width + trolley.GetRSize().Width, Math.Max(RDistributerSize.Height, trolley.GetRSize().Height));
 
+        }
+
+        public void RotateDistributer()
+        {
+            WW.unfill_tiles(RDPoint, RDistributerSize);
+            IsVertical = !IsVertical;
+            if (IsVertical)
+                RDistributerSize = VRDistributerSize;
+            else 
+                RDistributerSize = HRDistributerSize;
+            DistributerSize = floor.ConvertToSimSize(RDistributerSize);
+            WW.fill_tiles(RDPoint, RDistributerSize, this);
         }
     }
 }

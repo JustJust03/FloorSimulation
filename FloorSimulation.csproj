@@ -61,6 +61,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StaticComponents\Hubs\BufferHub.cs" />
+    <Compile Include="StaticComponents\Hubs\FullTrolleyHub.cs" />
     <Compile Include="StaticComponents\Hubs\Hub.cs" />
     <Compile Include="StaticComponents\plant.cs" />
     <Compile Include="StaticComponents\Hubs\ShopHub.cs" />

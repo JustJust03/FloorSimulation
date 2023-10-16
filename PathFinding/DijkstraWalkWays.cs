@@ -32,6 +32,8 @@ namespace FloorSimulation
         /// </summary>
         public List<WalkTile> RunAlgoDistrToTrolley(DanishTrolley TargetTrolley)
         {
+            if (TargetTrolley == null)
+                return null;
             WalkTile StartTile = WW.GetTile(DButer.RDPoint);
             int[] tindices = WW.TileListIndices(TargetTrolley.RPoint, TargetTrolley.GetRSize());
             int tx = tindices[0]; int ty = tindices[1]; int twidth = tindices[2]; int theight = tindices[3];
@@ -157,6 +159,7 @@ namespace FloorSimulation
                 Route.Insert(0, ptile);
             }
 
+            Route.RemoveAt(0);
             return Route;
         }
 

@@ -26,6 +26,8 @@ namespace FloorSimulation
         public int id;
         private Floor floor;
         public bool IsVertical;
+        public bool AccessOnTopLeft;
+        public bool IsInTransport;
 
         //TODO: Keep track of maximum plants per trolley.
         public List<plant> PlantList;
@@ -50,6 +52,7 @@ namespace FloorSimulation
             HTrolleySize = floor.ConvertToSimSize(HRTrolleySize);
 
             IsVertical = IsVertical_;
+            IsInTransport = false;
             PlantList = new List<plant>();
         }
 
@@ -88,9 +91,10 @@ namespace FloorSimulation
             SimPoint = floor.ConvertToSimPoint(Rp);
         }
 
-        public void TakePlantIn(plant p)
+        public bool TakePlantIn(plant p)
         {
             PlantList.Add(p);
+            return IsFull();
         }
 
         public plant PeekFirstPlant()
@@ -106,6 +110,13 @@ namespace FloorSimulation
             plant p = PlantList[0]; 
             PlantList.RemoveAt(0);
             return p;
+        }
+
+        public bool IsFull()
+        {
+            if (PlantList.Count > 0)
+                return true;
+            return false;
         }
 
         // TODO: Create a function that assigns every new trolley an unique id.

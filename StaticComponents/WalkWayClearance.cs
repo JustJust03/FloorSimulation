@@ -58,8 +58,8 @@ namespace FloorSimulation
         /// </summary>
         private void UpdateTileClearance(WalkTile t, Size ObjSize, Distributer DButer = null)
         {
-            int leftx = Math.Min(ObjSize.Width, t.TileX);
-            int topy = Math.Min(ObjSize.Height, t.TileY);
+            int leftx = Math.Min(ObjSize.Width, t.TileX + 1);
+            int topy = Math.Min(ObjSize.Height, t.TileY + 1);
 
             for (int x = t.TileX; x > t.TileX - leftx; x--)
                 for (int y = t.TileY; y > t.TileY - topy; y--)
