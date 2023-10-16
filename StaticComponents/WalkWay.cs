@@ -111,8 +111,11 @@ namespace FloorSimulation
                 {
                     WalkTile t = WalkTileList[xi][yi];
                     t.occupied = true;
+
                     if (DButer != null)
                         t.occupied_by = DButer;
+                    else
+                        t.occupied_by = null;
                 }
         }
 
@@ -133,6 +136,8 @@ namespace FloorSimulation
                     WalkTile t = WalkTileList[xi][yi];
                     t.occupied = false;
                     t.occupied_by = null;
+                    t.accessible = true;
+                    t.inaccessible_by_static = false;
                 }
         }
 

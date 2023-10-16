@@ -14,13 +14,17 @@ namespace FloorSimulation
     internal class WalkWayClearance
     {
         private WalkWay WW;
-        private Distributer dummy_db;
 
         public WalkWayClearance(WalkWay WW_)
         {
             WW = WW_;
         }
 
+        /// <summary>
+        /// Updates the clearances using tile obj size
+        /// </summary>
+        /// <param name="DButer"></param>
+        /// <param name="ObjSize"></param>
         public void UpdateClearances(Distributer DButer, Size ObjSize)
         {
             foreach (List<WalkTile> TileCol in WW.WalkTileList)
@@ -28,20 +32,22 @@ namespace FloorSimulation
                 {
                     t.accessible = true;
                     t.IsAgentsTile = false;
+                    t.inaccessible_by_static = false;
+                    t.occupied_by = null;
                     if (t.occupied_by != null && !t.occupied) //Makes the inaccessible tiles around the distributer occupied by nothing again.
                         t.occupied_by = null;
                 }
 
+            int[] indices = WW.TileListIndices(DButer.RDPoint, DButer.GetRDbuterSize());
+            int x = indices[0]; int y = indices[1]; int width = indices[2]; int height = indices[3];
+            ;
             foreach (List<WalkTile> TileCol in WW.WalkTileList)
                 foreach (WalkTile t in TileCol)
                 {
-                    if (t.occupied && t.occupied_by != DButer) 
-                        //If the tile is occupied and the agent is not standing on this tile, update it's accessibility
-                        //TODO: Detect which object its occupied by
-                        UpdateTileClearance(t, ObjSize);
-                    else if (t.occupied_by == DButer)
-                        //If the Agent is standing on this tile update the tiles around to be occupied by this agent.
+                    if(t.TileX >= x && t.TileX < x + width && t.TileY >= y && t.TileY < y + height)
                         UpdateTileClearance(t, ObjSize, DButer);
+                    if (t.occupied && t.occupied_by != DButer) 
+                        UpdateTileClearance(t, ObjSize);
                 }
                     
         }
@@ -55,13 +61,23 @@ namespace FloorSimulation
             int leftx = Math.Min(ObjSize.Width, t.TileX);
             int topy = Math.Min(ObjSize.Height, t.TileY);
 
-            for(int x = t.TileX; x > t.TileX - leftx; x--) 
+            for (int x = t.TileX; x > t.TileX - leftx; x--)
                 for (int y = t.TileY; y > t.TileY - topy; y--)
                 {
                     WW.WalkTileList[x][y].accessible = false;
+
                     if (DButer != null)
                         WW.WalkTileList[x][y].occupied_by = DButer;
+                    else
+                        WW.WalkTileList[x][y].inaccessible_by_static = true;
                 }
+        }
+
+        public void ClearOccupiedBy()
+        {
+            foreach (List<WalkTile> TileCol in WW.WalkTileList)
+                foreach (WalkTile t in TileCol)
+                    t.occupied_by = null;
         }
     }
 }

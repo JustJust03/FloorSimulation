@@ -20,6 +20,7 @@ namespace FloorSimulation
         public bool accessible; //The square is accessible by the agent taking into account its dimensions. 
         public bool IsAgentsTile; //The agent is standing on this tile.
         public Distributer occupied_by;
+        public bool inaccessible_by_static; //Is this tile unavailable because of a static object.
 
         private WalkWay WW;
 
@@ -43,6 +44,7 @@ namespace FloorSimulation
             Rpoint = Rpoint_;
             occupied = occupied_;
             accessible = !occupied_;
+            inaccessible_by_static = accessible;
             IsAgentsTile = false;
             WW = ww_;
 
@@ -51,6 +53,12 @@ namespace FloorSimulation
         
         public void DrawOccupiance(Graphics g)
         {
+            if (occupied_by != null && inaccessible_by_static)
+            {
+                Pen p = new Pen(Color.Purple);
+                g.DrawRectangle(p, new Rectangle(Simpoint, SimSize));
+                return;
+            }
             if (occupied_by != null)
             {
                 Pen p = new Pen(Color.Green);

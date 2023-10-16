@@ -23,6 +23,7 @@ namespace FloorSimulation
         protected WalkWay WW;
         protected int max_trolleys;     //How many trolleys can be placed in this hub
         protected int Rslack = 20;
+        protected List<bool> HubTrolleyAvailable;  
 
         public Hub(string name_, int id_, Point FPoint_, Floor floor_, WalkWay ww_, Size RHubSize_, int initial_trolleys = 0, 
                    bool vertical_trolleys = false)
@@ -36,6 +37,7 @@ namespace FloorSimulation
 
 
             HubTrolleys = new List<DanishTrolley>();
+            HubTrolleyAvailable = new List<bool>();
             DanishTrolley DummyTrolley = new DanishTrolley(433, floor, IsVertical_: true);
             if (vertical_trolleys)
             {
@@ -74,6 +76,7 @@ namespace FloorSimulation
                 DT.TeleportTrolley(new Point(trolleyX, trolleyY));
                 WW.fill_tiles(DT.RPoint, DT.GetRSize());
                 HubTrolleys.Add(DT);
+                HubTrolleyAvailable.Add(true);
             }
         }
 
@@ -95,6 +98,7 @@ namespace FloorSimulation
                 DT.TeleportTrolley(new Point(trolleyX, trolleyY));
                 WW.fill_tiles(DT.RPoint, DT.GetRSize());
                 HubTrolleys.Add(DT);
+                HubTrolleyAvailable.Add(true);
             }
 
         }
@@ -122,12 +126,20 @@ namespace FloorSimulation
         }
         
         /// <summary>
-        /// Peeks at the first trolley in this hub's trolley list
+        /// Peeks at the first available trolley in this hub's trolley list 
         /// </summary>
         public virtual DanishTrolley PeekFirstTrolley()
         {
             if (HubTrolleys.Count == 0) return null;
-            return HubTrolleys[0];
+            for (int i = 0; i < HubTrolleys.Count; i++)
+            {
+                if (HubTrolleyAvailable[i])
+                {
+                    HubTrolleyAvailable[i] = false;
+                    return HubTrolleys[i];
+                }
+            }
+            return null;
         }
 
         /// <summary>
@@ -137,6 +149,7 @@ namespace FloorSimulation
         {
             DanishTrolley FirstTrolley = HubTrolleys[0];
             HubTrolleys.RemoveAt(0);
+            HubTrolleyAvailable.RemoveAt(0);
 
             return FirstTrolley;
         }
@@ -147,7 +160,8 @@ namespace FloorSimulation
         {
             if (HubTrolleys.Count + 1 == max_trolleys)//Max trolleys reached, give error
                 throw new ArgumentException("Can't add more trolleys to this shop hub.");
-            HubTrolleys.Add(t); 
+            HubTrolleys.Add(t);
+            HubTrolleyAvailable.Add(true);
         }
 
         /// <summary>

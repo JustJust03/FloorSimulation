@@ -52,7 +52,7 @@ namespace FloorSimulation
             if (Goal == "TakeFullTrolley") //Old goal
             {
                 //TODO: Check to see to which trolley you should deliver to
-                DButer.trolley = StartHub.GiveTrolley();
+                DButer.TakeTrolleyIn(StartHub.GiveTrolley());
                 TargetHub = DButer.trolley.PeekFirstPlant().DestinationHub;
                 Trolley = TargetHub.PeekFirstTrolley();
                 DButer.TravelToTrolley(Trolley);
@@ -71,11 +71,16 @@ namespace FloorSimulation
             {
                 TargetHub.TakeVTrolleyIn(Trolley, DButer.RDPoint);
                 DButer.WW.unoccupie_by_tiles(DButer.trolley.RPoint, DButer.trolley.GetRSize()); // drop the trolley of from the distributer
-                DButer.trolley = null;
+                DButer.GiveTrolley();
                 Goal = "TakeFullTrolley"; //New goal
                 Travelling = false;
                 InTask = false;
             }
+        }
+
+        public void FailRoute()
+        {
+            DButer.TravelToTrolley(Trolley);
         }
 
         public void DistributionCompleted()
