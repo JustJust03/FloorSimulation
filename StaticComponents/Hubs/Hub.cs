@@ -39,12 +39,12 @@ namespace FloorSimulation
             DanishTrolley DummyTrolley = new DanishTrolley(433, floor, IsVertical_: true);
             if (vertical_trolleys)
             {
-                max_trolleys = RHubSize.Width / (Rslack + DummyTrolley.VRTrolleySize.Width);
+                max_trolleys = RHubSize.Width / (Rslack + DummyTrolley.GetRSize().Width);
                 InitVTrolleys(initial_trolleys);
             }
             else
             {
-                max_trolleys = RHubSize.Height / Rslack + DummyTrolley.HRTrolleySize.Height;
+                max_trolleys = RHubSize.Height / Rslack + DummyTrolley.GetRSize().Height;
                 InitHTrolleys(initial_trolleys);
             }
 
@@ -68,11 +68,11 @@ namespace FloorSimulation
                 DanishTrolley DT = new DanishTrolley(i, floor, IsVertical_: false);
 
                 int trolleyY = UpperY + Rslack; 
-                UpperY += DT.HRTrolleySize.Height + Rslack;
+                UpperY += DT.GetRSize().Height + Rslack;
                 int trolleyX = RFloorPoint.X + Rslack; 
 
                 DT.TeleportTrolley(new Point(trolleyX, trolleyY));
-                WW.fill_tiles(DT.RPoint, DT.GetSize());
+                WW.fill_tiles(DT.RPoint, DT.GetRSize());
                 HubTrolleys.Add(DT);
             }
         }
@@ -89,11 +89,11 @@ namespace FloorSimulation
                 DanishTrolley DT = new DanishTrolley(i, floor, IsVertical_: true);
 
                 int trolleyX = LeftX + Rslack; 
-                LeftX += DT.VRTrolleySize.Width + Rslack;
+                LeftX += DT.GetRSize().Width + Rslack;
                 int trolleyY = RFloorPoint.Y + Rslack; 
 
                 DT.TeleportTrolley(new Point(trolleyX, trolleyY));
-                WW.fill_tiles(DT.RPoint, DT.GetSize());
+                WW.fill_tiles(DT.RPoint, DT.GetRSize());
                 HubTrolleys.Add(DT);
             }
 
@@ -122,24 +122,27 @@ namespace FloorSimulation
         }
         
         /// <summary>
-        /// Peeks at the first trolley in this hub's trolley list
+        /// Peeks at the first available trolley in this hub's trolley list 
         /// </summary>
         public virtual DanishTrolley PeekFirstTrolley()
         {
             if (HubTrolleys.Count == 0) return null;
-            return HubTrolleys[0];
+                return HubTrolleys[0];
         }
 
         /// <summary>
         /// Takes the first trolley from the hub trolley list and deletes it.
+        /// AgentRPoint is only used by bufferhub to check which trolley it should give.
         /// </summary>
-        public virtual DanishTrolley GiveTrolley()
+        public virtual DanishTrolley GiveTrolley(Point AgentRPoint = default)
         {
+            if (HubTrolleys.Count == 0) return null;
             DanishTrolley FirstTrolley = HubTrolleys[0];
             HubTrolleys.RemoveAt(0);
 
             return FirstTrolley;
         }
+
         /// <summary>
         /// Takes in the trolley in it's trolley list.
         /// </summary>
@@ -147,15 +150,25 @@ namespace FloorSimulation
         {
             if (HubTrolleys.Count + 1 == max_trolleys)//Max trolleys reached, give error
                 throw new ArgumentException("Can't add more trolleys to this shop hub.");
-            HubTrolleys.Add(t); 
+            HubTrolleys.Add(t);
+        }
+
+        /// <summary>
+        /// Takes in the trolley in it's trolley list.
+        /// </summary>
+        public virtual void TakeHTrolleyIn(DanishTrolley t, Point DeliveryPoint = default)
+        {
+            if (HubTrolleys.Count + 1 == max_trolleys)//Max trolleys reached, give error
+                throw new ArgumentException("Can't add more trolleys to this shop hub.");
+            HubTrolleys.Add(t);
         }
 
         /// <summary>
         /// Returns all the open spots where a new trolley could be placed
-        /// Should only be used by the bufferhub
-        /// This is for vertical hubs
+        /// Should only be used by the bufferhub and the FullTrolleyHub
+        /// This is for both vertical and horizontal hubs
         /// </summary>
-        public virtual List<WalkTile> VOpenSpots(Distributer DButer)
+        public virtual List<WalkTile> OpenSpots(Distributer DButer)
         {
             return null;
         }

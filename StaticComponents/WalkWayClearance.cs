@@ -20,6 +20,11 @@ namespace FloorSimulation
             WW = WW_;
         }
 
+        /// <summary>
+        /// Updates the clearances using tile obj size
+        /// </summary>
+        /// <param name="DButer"></param>
+        /// <param name="ObjSize"></param>
         public void UpdateClearances(Distributer DButer, Size ObjSize)
         {
             foreach (List<WalkTile> TileCol in WW.WalkTileList)
@@ -27,54 +32,52 @@ namespace FloorSimulation
                 {
                     t.accessible = true;
                     t.IsAgentsTile = false;
+                    t.inaccessible_by_static = false;
+                    t.occupied_by = null;
+                    if (t.occupied_by != null && !t.occupied) //Makes the inaccessible tiles around the distributer occupied by nothing again.
+                        t.occupied_by = null;
                 }
 
-            Clear(DButer, ObjSize);
-
+            int[] indices = WW.TileListIndices(DButer.RDPoint, DButer.GetRDbuterSize());
+            int x = indices[0]; int y = indices[1]; int width = indices[2]; int height = indices[3];
+            ;
             foreach (List<WalkTile> TileCol in WW.WalkTileList)
                 foreach (WalkTile t in TileCol)
-                    if (t.occupied && !t.IsAgentsTile) 
-                        //If the tile is occupied and the agent is not standing on this tile, update it's accessibility
+                {
+                    if(t.TileX >= x && t.TileX < x + width && t.TileY >= y && t.TileY < y + height)
+                        UpdateTileClearance(t, ObjSize, DButer);
+                    if (t.occupied && t.occupied_by != DButer) 
                         UpdateTileClearance(t, ObjSize);
+                }
+                    
         }
         
         /// <summary>
         /// Updates the accessibility of a tile based on the object size that needs to traverse the walkway
+        /// Creates a space above and to the left of this tile which will become inaccessible
         /// </summary>
-        private void UpdateTileClearance(WalkTile t, Size ObjSize)
+        private void UpdateTileClearance(WalkTile t, Size ObjSize, Distributer DButer = null)
         {
-            int leftx = Math.Min(ObjSize.Width, t.TileX);
-            int topy = Math.Min(ObjSize.Height, t.TileY);
+            int leftx = Math.Min(ObjSize.Width, t.TileX + 1);
+            int topy = Math.Min(ObjSize.Height, t.TileY + 1);
 
-            for(int x = t.TileX; x > t.TileX - leftx; x--) 
+            for (int x = t.TileX; x > t.TileX - leftx; x--)
                 for (int y = t.TileY; y > t.TileY - topy; y--)
+                {
                     WW.WalkTileList[x][y].accessible = false;
+
+                    if (DButer != null)
+                        WW.WalkTileList[x][y].occupied_by = DButer;
+                    else
+                        WW.WalkTileList[x][y].inaccessible_by_static = true;
+                }
         }
 
-        /// <summary>
-        /// Make all tiles around the distributer accessible.
-        /// Used so the object can in fact move trough itself.
-        /// </summary>
-        /// <param name="DButer"></param>
-        /// <param name="ObjSize">Size of the distributer in tiles</param>
-        private void Clear(Distributer DButer, Size ObjSize)
+        public void ClearOccupiedBy()
         {
-            int[] dindices = WW.TileListIndices(DButer.RDPoint, DButer.RDistributerSize);
-            int dx = dindices[0]; int dy = dindices[1]; int dwidth = dindices[2]; int dheight = dindices[3];
-
-            int StartX = Math.Max(dx - ObjSize.Width, 0);
-            int EndX = Math.Min(dx + ObjSize.Width, WW.WalkTileListWidth - 1);
-
-            int StartY = Math.Max(dy - ObjSize.Height, 0);
-            int EndY = Math.Min(dy + ObjSize.Height, WW.WalkTileListHeight - 1);
-
-            for(int x = StartX; x < EndX; x++)
-                for (int y = StartY; y < EndY; y++)
-                {
-                    WW.WalkTileList[x][y].accessible = true;
-                    if(x >= dx && y >= dy)
-                        WW.WalkTileList[x][y].IsAgentsTile = true;
-                }
+            foreach (List<WalkTile> TileCol in WW.WalkTileList)
+                foreach (WalkTile t in TileCol)
+                    t.occupied_by = null;
         }
     }
 }

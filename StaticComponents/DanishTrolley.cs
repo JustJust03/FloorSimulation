@@ -17,15 +17,17 @@ namespace FloorSimulation
         public Point SimPoint; //Where in the panel Should the trolley be drawn.
         public Point RPoint;
         //Vertical
-        public Size VRTrolleySize; //Is the Real size in cm.
-        public Size VTrolleySize; //Sim trolley size
+        private Size VRTrolleySize; //Is the Real size in cm.
+        private Size VTrolleySize; //Sim trolley size
         //Horizontal
-        public Size HRTrolleySize; //Is the Real size in cm.
-        public Size HTrolleySize; //Sim trolley size
+        private Size HRTrolleySize; //Is the Real size in cm.
+        private Size HTrolleySize; //Sim trolley size
 
         public int id;
         private Floor floor;
         public bool IsVertical;
+        public bool AccessOnTopLeft;
+        public bool IsInTransport;
 
         //TODO: Keep track of maximum plants per trolley.
         public List<plant> PlantList;
@@ -50,7 +52,11 @@ namespace FloorSimulation
             HTrolleySize = floor.ConvertToSimSize(HRTrolleySize);
 
             IsVertical = IsVertical_;
+            IsInTransport = false;
             PlantList = new List<plant>();
+
+            if(RPoint != default)
+                TeleportTrolley(RPoint);
         }
 
         /// <summary>
@@ -69,7 +75,7 @@ namespace FloorSimulation
         /// Return the real size of trolley. 
         /// According to horizontal or vertical orientation.
         /// </summary>
-        public Size GetSize()
+        public Size GetRSize()
         {
             if (IsVertical)
                 return VRTrolleySize;
@@ -88,9 +94,10 @@ namespace FloorSimulation
             SimPoint = floor.ConvertToSimPoint(Rp);
         }
 
-        public void TakePlantIn(plant p)
+        public bool TakePlantIn(plant p)
         {
             PlantList.Add(p);
+            return IsFull();
         }
 
         public plant PeekFirstPlant()
@@ -106,6 +113,13 @@ namespace FloorSimulation
             plant p = PlantList[0]; 
             PlantList.RemoveAt(0);
             return p;
+        }
+
+        public bool IsFull()
+        {
+            if (PlantList.Count > 0)
+                return true;
+            return false;
         }
 
         // TODO: Create a function that assigns every new trolley an unique id.

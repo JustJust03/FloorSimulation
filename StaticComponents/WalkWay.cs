@@ -14,7 +14,7 @@ namespace FloorSimulation
     /// </summary>
     internal class WalkWay
     {
-        private Floor floor;
+        public Floor floor;
         public Point RPointWW;
         public Point PointWW;
         public Size RSizeWW;
@@ -101,7 +101,7 @@ namespace FloorSimulation
         /// </summary>
         /// <param name="Rp"></param>
         /// <param name="Rs"></param>
-        public void fill_tiles(Point Rp, Size Rs)
+        public void fill_tiles(Point Rp, Size Rs, Distributer DButer = null)
         {
             int[] indices = TileListIndices(Rp, Rs);
             int x = indices[0]; int y = indices[1]; int width = indices[2]; int height = indices[3];
@@ -111,6 +111,11 @@ namespace FloorSimulation
                 {
                     WalkTile t = WalkTileList[xi][yi];
                     t.occupied = true;
+
+                    if (DButer != null)
+                        t.occupied_by = DButer;
+                    else
+                        t.occupied_by = null;
                 }
         }
 
@@ -130,6 +135,28 @@ namespace FloorSimulation
                 {
                     WalkTile t = WalkTileList[xi][yi];
                     t.occupied = false;
+                    t.occupied_by = null;
+                    t.accessible = true;
+                    t.inaccessible_by_static = false;
+                }
+        }
+
+        /// <summary>
+        /// Clears the occupied_by value to null.
+        /// Is mainly used when a distributer lets loose of a trolley.
+        /// </summary>
+        /// <param name="Rp"></param>
+        /// <param name="Rs"></param>
+        public void unoccupie_by_tiles(Point Rp, Size Rs)
+        {
+            int[] indices = TileListIndices(Rp, Rs);
+            int x = indices[0]; int y = indices[1]; int width = indices[2]; int height = indices[3];
+
+            for (int xi = x; xi < x + width; xi++) 
+                for (int yi = y; yi < y + height; yi++)
+                {
+                    WalkTile t = WalkTileList[xi][yi];
+                    t.occupied_by = null;
                 }
         }
 

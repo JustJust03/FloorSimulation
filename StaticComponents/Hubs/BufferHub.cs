@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics.Eventing.Reader;
 
 namespace FloorSimulation
 {
@@ -20,11 +21,11 @@ namespace FloorSimulation
         public BufferHub(string name_, int id_, Point FPoint_, Floor floor_, WalkWay ww_, int initial_trolleys = 0, bool vertical_trolleys_ = true) : 
             base(name_, id_, FPoint_, floor_, ww_, new Size(2000, 200), initial_trolleys: initial_trolleys, vertical_trolleys: vertical_trolleys_)
         {
-            DummyTrolley = new DanishTrolley(433, floor, IsVertical_: true);
+            DummyTrolley = new DanishTrolley(-1, floor, IsVertical_: true);
             if (vertical_trolleys_)
-                Trolleyarr = new DanishTrolley[RHubSize.Width / (Rslack + DummyTrolley.VRTrolleySize.Width)];
+                Trolleyarr = new DanishTrolley[RHubSize.Width / (Rslack + DummyTrolley.GetRSize().Width)];
             else
-                Trolleyarr = new DanishTrolley[RHubSize.Height / (Rslack + DummyTrolley.HRTrolleySize.Height)];
+                Trolleyarr = new DanishTrolley[RHubSize.Height / (Rslack + DummyTrolley.GetRSize().Height)];
 
 
             //TODO: This ALWAYS puts the distributer at the top of the trolley
@@ -32,18 +33,27 @@ namespace FloorSimulation
             HubAccessPointsX = new int[Trolleyarr.Length];
             for (int i = 0; i < Trolleyarr.Length; i++)
             {
-                int trolleyX = RFloorPoint.X + Rslack + i * (Rslack + DummyTrolley.VRTrolleySize.Width); //this point + how far in the line it is
-                int trolleyY = RFloorPoint.Y + Rslack - floor.FirstDistr.RDistributerSize.Height;
+                int trolleyX = RFloorPoint.X + Rslack + i * (Rslack + DummyTrolley.GetRSize().Width); //this point + how far in the line it is
+                int trolleyY = RFloorPoint.Y + floor.FirstDistr.RDistributerSize.Height;
 
                 HubAccessPoints[i] = WW.GetTile(new Point(trolleyX, trolleyY));
                 HubAccessPointsX[i] = HubAccessPoints[i].Rpoint.X;
+            }
+
+            //Creates 5 initial empty trolleys to the bufferhub
+            for(int i  = Trolleyarr.Length - 5; i < Trolleyarr.Length; i++)
+            {
+                Point p = HubAccessPoints[i].Rpoint;
+                DanishTrolley t = new DanishTrolley(100 + i, floor, p, true);
+                WW.fill_tiles(t.RPoint, t.GetRSize());
+                Trolleyarr[i] = t;
             }
         }
 
         /// <summary>
         /// To which tile should the distributer walk to drop off this trolley.
         /// </summary>
-        public override List<WalkTile> VOpenSpots(Distributer DButer)
+        public override List<WalkTile> OpenSpots(Distributer DButer)
         {
             List<WalkTile> OpenSpots = new List<WalkTile>();
             
@@ -54,10 +64,26 @@ namespace FloorSimulation
             return OpenSpots;
         }
 
-        
+        public override DanishTrolley PeekFirstTrolley()
+        {
+            for (int i = 0; i < Trolleyarr.Length; i++)
+            {
+                if (Trolleyarr[i] != null)
+                    return Trolleyarr[i];
+            }
+            return null;
+        }
 
+        public override DanishTrolley GiveTrolley(Point AgentRPoint)
+        {
+            int ArrIndex = Array.IndexOf(HubAccessPointsX, AgentRPoint.X);
+            if (ArrIndex == -1) return null;
+            DanishTrolley t = Trolleyarr[ArrIndex];
+            Trolleyarr[ArrIndex] = null;
 
-        
+            return t;
+        }
+
         /// <summary>
         /// Takes a trolley in at the right index in the trolley array.
         /// Uses the distributer point to dertermine where this trolley is placed.
