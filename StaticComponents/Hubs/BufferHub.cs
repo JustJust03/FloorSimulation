@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics.Eventing.Reader;
 
 namespace FloorSimulation
 {
@@ -38,6 +39,15 @@ namespace FloorSimulation
                 HubAccessPoints[i] = WW.GetTile(new Point(trolleyX, trolleyY));
                 HubAccessPointsX[i] = HubAccessPoints[i].Rpoint.X;
             }
+
+            //Creates 5 initial empty trolleys to the bufferhub
+            for(int i  = Trolleyarr.Length - 5; i < Trolleyarr.Length; i++)
+            {
+                Point p = HubAccessPoints[i].Rpoint;
+                DanishTrolley t = new DanishTrolley(100 + i, floor, p, true);
+                WW.fill_tiles(t.RPoint, t.GetRSize());
+                Trolleyarr[i] = t;
+            }
         }
 
         /// <summary>
@@ -53,7 +63,27 @@ namespace FloorSimulation
 
             return OpenSpots;
         }
-        
+
+        public override DanishTrolley PeekFirstTrolley()
+        {
+            for (int i = 0; i < Trolleyarr.Length; i++)
+            {
+                if (Trolleyarr[i] != null)
+                    return Trolleyarr[i];
+            }
+            return null;
+        }
+
+        public override DanishTrolley GiveTrolley(Point AgentRPoint)
+        {
+            int ArrIndex = Array.IndexOf(HubAccessPointsX, AgentRPoint.X);
+            if (ArrIndex == -1) return null;
+            DanishTrolley t = Trolleyarr[ArrIndex];
+            Trolleyarr[ArrIndex] = null;
+
+            return t;
+        }
+
         /// <summary>
         /// Takes a trolley in at the right index in the trolley array.
         /// Uses the distributer point to dertermine where this trolley is placed.

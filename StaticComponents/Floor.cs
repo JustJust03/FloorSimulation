@@ -56,7 +56,7 @@ namespace FloorSimulation
             FirstDistr = new Distributer(0, this, FirstWW, Rpoint_: new Point(600, 70));
             SecondDistr = new Distributer(1, this, FirstWW, Rpoint_: new Point(800, 70));
             BuffHub = new BufferHub("Buffer hub", 1, new Point(0, 40), this, FirstWW);
-            FTHub = new FullTrolleyHub("Full Trolley Hub", 1, new Point(300, 340), this, FirstWW, new Size(200, 1400));
+            FTHub = new FullTrolleyHub("Full Trolley Hub", 1, new Point(400, 340), this, FirstWW, new Size(200, 1400));
             HubList.Add(BuffHub);
             HubList.Add(FTHub);
             init_shops();
@@ -114,7 +114,7 @@ namespace FloorSimulation
         {
             int UpperY = 340;
             int LowerY = 1400;
-            int StreetWidth = 400;
+            int StreetWidth = 500;
 
             int x = 0;
             int y = UpperY;

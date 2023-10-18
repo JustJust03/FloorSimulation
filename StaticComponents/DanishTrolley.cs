@@ -54,6 +54,9 @@ namespace FloorSimulation
             IsVertical = IsVertical_;
             IsInTransport = false;
             PlantList = new List<plant>();
+
+            if(RPoint != default)
+                TeleportTrolley(RPoint);
         }
 
         /// <summary>

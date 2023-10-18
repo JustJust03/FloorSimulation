@@ -132,8 +132,9 @@ namespace FloorSimulation
 
         /// <summary>
         /// Takes the first trolley from the hub trolley list and deletes it.
+        /// AgentRPoint is only used by bufferhub to check which trolley it should give.
         /// </summary>
-        public virtual DanishTrolley GiveTrolley()
+        public virtual DanishTrolley GiveTrolley(Point AgentRPoint = default)
         {
             if (HubTrolleys.Count == 0) return null;
             DanishTrolley FirstTrolley = HubTrolleys[0];

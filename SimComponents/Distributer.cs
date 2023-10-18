@@ -32,7 +32,7 @@ namespace FloorSimulation
         private Task MainTask;
         public DanishTrolley trolley;
         private bool IsVertical;
-        private bool TrolleyOnTopLeft; //True when the trolley is to the left or on top of the distributer
+        public bool TrolleyOnTopLeft; //True when the trolley is to the left or on top of the distributer
 
         private DijkstraWalkWays DWW;
         public WalkWay WW;
@@ -195,33 +195,67 @@ namespace FloorSimulation
         {
             trolley = t;
 
+            //Rotate the distributer if the trolley to take in is not his orientation
             if (IsVertical != trolley.IsVertical)
             {
-                RotateDistributer();
-                if (RDPoint.X < t.RPoint.X || RDPoint.Y < t.RPoint.Y)
+                RotateDistributerOnly();
+                if (RDPoint.X < trolley.RPoint.X)
                     TrolleyOnTopLeft = true;
                 else //Switches the trolley and the distributer
                 {
                     //TODO: Rebuild your system so trolleys can also be transported from the bottom right.
-                    WW.unfill_tiles(trolley.RPoint, trolley.GetRSize());
-                    WW.unfill_tiles(RDPoint, GetRDbuterSize());
-
-                    TrolleyOnTopLeft = false;
-                    RDPoint = trolley.RPoint;
-                    if (IsVertical)
-                        trolley.RPoint.Y = RDPoint.Y - VRDistributerSize.Height;
-                    else
-                        trolley.RPoint.X = RDPoint.X + HRDistributerSize.Width;
-                    DPoint = floor.ConvertToSimPoint(RDPoint);
-                    trolley.SimPoint = floor.ConvertToSimPoint(trolley.RPoint);
-
-                    WW.fill_tiles(RDPoint, GetDButerTileSize());
+                    SwitchDistributerTrolley();
                 }
             }
             trolley.IsInTransport = true;
 
             WW.unfill_tiles(trolley.RPoint, trolley.GetRSize());
             WW.fill_tiles(trolley.RPoint, trolley.GetRSize(), this);
+        }
+
+        public void SwitchDistributerTrolley()
+        {
+            if (RDPoint.X < trolley.RPoint.X)
+                SwitchDistrToRightOfTrolley();
+            else
+                SwitchDistrToLeftOfTrolley();
+
+
+        }
+
+        private void SwitchDistrToLeftOfTrolley()
+        {
+            WW.unfill_tiles(trolley.RPoint, trolley.GetRSize());
+            WW.unfill_tiles(RDPoint, GetRDbuterSize());
+
+            TrolleyOnTopLeft = false;
+            RDPoint = trolley.RPoint;
+            if (IsVertical)
+                trolley.RPoint.Y = RDPoint.Y + VRDistributerSize.Height; //TODO: This doesn't work and is never run
+            else
+                trolley.RPoint.X = RDPoint.X + HRDistributerSize.Width;
+            DPoint = floor.ConvertToSimPoint(RDPoint);
+            trolley.SimPoint = floor.ConvertToSimPoint(trolley.RPoint);
+
+            WW.fill_tiles(RDPoint, GetDButerTileSize());
+        }
+
+        private void SwitchDistrToRightOfTrolley()
+        {
+            WW.unfill_tiles(trolley.RPoint, trolley.GetRSize());
+            WW.unfill_tiles(RDPoint, GetRDbuterSize());
+
+            TrolleyOnTopLeft = true;
+            trolley.RPoint.X = RDPoint.X;
+            if (IsVertical)
+                trolley.RPoint.Y = RDPoint.Y - VRDistributerSize.Height; //TODO: This doesn't work and is never run
+            else
+                RDPoint.X = trolley.RPoint.X + trolley.GetRSize().Width + 10;
+            DPoint = floor.ConvertToSimPoint(RDPoint);
+            trolley.SimPoint = floor.ConvertToSimPoint(trolley.RPoint);
+
+            WW.fill_tiles(RDPoint, GetDButerTileSize());
+
         }
 
         /// <summary>
@@ -281,7 +315,7 @@ namespace FloorSimulation
 
         }
 
-        public void RotateDistributer()
+        private void RotateDistributerOnly()
         {
             WW.unfill_tiles(RDPoint, RDistributerSize);
             IsVertical = !IsVertical;
@@ -291,6 +325,25 @@ namespace FloorSimulation
                 RDistributerSize = HRDistributerSize;
             DistributerSize = floor.ConvertToSimSize(RDistributerSize);
             WW.fill_tiles(RDPoint, RDistributerSize, this);
+        }
+        public void RotateDistributerAndTrolley()
+        {
+            WW.unfill_tiles(RDPoint, RDistributerSize);
+            WW.unfill_tiles(trolley.RPoint, trolley.GetRSize());
+            IsVertical = !IsVertical;
+            trolley.IsVertical = !trolley.IsVertical;
+            if (IsVertical)
+                RDistributerSize = VRDistributerSize;
+            else 
+                RDistributerSize = HRDistributerSize;
+
+            trolley.RPoint.X = RDPoint.X + RDistributerSize.Width;
+            trolley.RPoint.Y = RDPoint.Y;
+            trolley.SimPoint = floor.ConvertToSimPoint(trolley.RPoint);
+
+            DistributerSize = floor.ConvertToSimSize(RDistributerSize);
+            WW.fill_tiles(RDPoint, RDistributerSize, this);
+            WW.fill_tiles(trolley.RPoint, trolley.GetRSize(), this);
         }
     }
 }

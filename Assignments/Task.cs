@@ -14,6 +14,7 @@ namespace FloorSimulation
         public Hub TargetHub;
         private Hub OldTargetHub; //Is only used to save which Shop you were working on when delivering a full trolley.
         private WalkTile OldWalkTile; //Is only used to save on which spot you picked up a finished trolley.
+        public bool WasOnTopLeft;
         public Hub StartHub;
         private Distributer DButer;
 
@@ -24,8 +25,10 @@ namespace FloorSimulation
         public readonly List<string> TargetIsHubGoals = new List<string>
         {
             "DistributePlants",
-            "DeliveringEmptyTrolley",
-            "DeliverEmptyTrolleyToShop"
+        };
+        public readonly List<string> TargetIsOldWalktile = new List<string>
+        {
+            "DeliverEmptyTrolleyToShop",
         };
 
 
@@ -71,7 +74,13 @@ namespace FloorSimulation
             if (Goal == "TakeFullTrolley") //Old goal
             {
                 //TODO: Check to see to which trolley you should deliver to
-                DanishTrolley t = StartHub.GiveTrolley();
+                if(TargetHub.PeekFirstTrolley() != Trolley) // If the targeted trolley isn't in the hub anymore chose another trolley to target.
+                {
+                    InTask = false;
+                    Travelling = false;
+                    return;
+                }
+                DanishTrolley t = TargetHub.GiveTrolley();
                 if (t == null) //If the start hub has no more trolleys stop.
                 {
                     InTask = false;
@@ -125,8 +134,9 @@ namespace FloorSimulation
 
             else if (Goal == "TakeFinishedTrolley") //Old goal
             {
-                OldWalkTile = DButer.WW.GetTile(DButer.RDPoint);
+                OldWalkTile = DButer.WW.GetTile(Trolley.RPoint);
                 DButer.TakeTrolleyIn(TargetHub.GiveTrolley());
+                WasOnTopLeft = DButer.TrolleyOnTopLeft;
                 Trolley = DButer.trolley;
                 TargetHub = DButer.floor.FTHub;
                 DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
@@ -138,6 +148,7 @@ namespace FloorSimulation
                 Travelling = true;
             }
 
+            //Uses the First trolley of target hub as target
             else if (Goal == "DeliverFullTrolley")
             {
                 TargetHub.TakeHTrolleyIn(Trolley, DButer.RDPoint);
@@ -155,13 +166,25 @@ namespace FloorSimulation
                 Travelling = true;
             }
 
-            //Uses OldTargetTile as target
+            //Uses OldTargetTile + the width of the distributer as target
             else if (Goal == "TakeEmptyTrolley")
             {
-                DanishTrolley t = TargetHub.GiveTrolley();
+                DanishTrolley t = TargetHub.GiveTrolley(DButer.RDPoint);
+                //The trolley in buffhub was already taken
+                if (t == null)
+                {
+                    Trolley = TargetHub.PeekFirstTrolley();
+                    DButer.TravelToTrolley(Trolley);
+                    if (DButer.route == null) //Route was not possible at this point. Try again later.
+                        return;
+                    return;
+                }
                 Trolley = t;
                 DButer.TakeTrolleyIn(t);
+                DButer.RotateDistributerAndTrolley(); //Rotate the distributer and the trolley to fit into the shop.
 
+                if(WasOnTopLeft)
+                    OldWalkTile = DButer.WW.GetTile(new Point (OldWalkTile.Rpoint.X - DButer.RDistributerSize.Width + 10, OldWalkTile.Rpoint.Y)); //Because dbuter is on the left of the trolley.
                 DButer.TravelToTile(OldWalkTile);
                 TargetHub = OldTargetHub;
 
@@ -173,6 +196,12 @@ namespace FloorSimulation
             //Uses Trolley as target
             else if (Goal == "DeliverEmptyTrolleyToShop")
             {
+                if(!WasOnTopLeft)
+                    DButer.SwitchDistributerTrolley();
+                else
+                {
+                    ;
+                }
                 TargetHub.TakeVTrolleyIn(Trolley);
                 DButer.GiveTrolley();
 
@@ -219,6 +248,10 @@ namespace FloorSimulation
             {
                 DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
             }
+            else if (TargetIsOldWalktile.Contains(Goal))
+            {
+                DButer.TravelToTile(OldWalkTile);
+            }
             else
             {
                 if (Trolley.IsInTransport) //The trolley you want to reach was taken by someone else. Look for another trolley in the targethub.
@@ -239,7 +272,7 @@ namespace FloorSimulation
                 plant p = DButer.trolley.GiveFirstPlant();
                 if (Trolley.TakePlantIn(p)) //Transports plant from the distributer's trolley to the shop trolley. True when the shop trolley became full.
                 {
-                    DButer.TravelToTile(DButer.WW.GetTile(new Point(DButer.RDPoint.X, DButer.RDPoint.Y + 30)));
+                    DButer.TravelToTile(DButer.WW.GetTile(new Point(DButer.RDPoint.X, DButer.RDPoint.Y + 40)));
 
                     Goal = "PushTrolleyAway";
                     InTask = true;
