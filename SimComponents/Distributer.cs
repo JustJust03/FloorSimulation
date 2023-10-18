@@ -18,8 +18,8 @@ namespace FloorSimulation
         private Point DPoint; // Sim distributer point
         public Size RDistributerSize; //Is the real size in cm.
         private Size DistributerSize;
-        private Size HRDistributerSize;
-        private Size VRDistributerSize;
+        public Size HRDistributerSize;
+        public Size VRDistributerSize;
         public int id;
         public Floor floor;
 
@@ -31,8 +31,10 @@ namespace FloorSimulation
         private int distributionms = 0; // How many ms have you been distributing
         private Task MainTask;
         public DanishTrolley trolley;
+        public LangeHarry Harry;
         private bool IsVertical;
         public bool TrolleyOnTopLeft; //True when the trolley is to the left or on top of the distributer
+        public bool IsOnHarry;
 
         private DijkstraWalkWays DWW;
         public WalkWay WW;
@@ -45,6 +47,7 @@ namespace FloorSimulation
             RDPoint = Rpoint_;
             WW = WW_;
             IsVertical = IsVertical_;
+            IsOnHarry = false;
 
             VDistributerIMG = Image.FromFile(Program.rootfolder + @"\SimImages\Distributer_vertical.png");
             VRDistributerSize = new Size(VDistributerIMG.Width, VDistributerIMG.Height);
@@ -74,14 +77,20 @@ namespace FloorSimulation
             MainTask.PerformTask();
         }
 
-        public void DrawObject(Graphics g)
+        public void DrawObject(Graphics g,  Point p = default)
         {
+            Point DrawPoint;
+            if (p != default)
+                DrawPoint = p;
+            else
+                DrawPoint = DPoint;
+
             if (trolley != null)
                 trolley.DrawObject(g);
             if(IsVertical)
-                g.DrawImage(VDistributerIMG, new Rectangle(DPoint, DistributerSize));
+                g.DrawImage(VDistributerIMG, new Rectangle(DrawPoint, DistributerSize));
             else
-                g.DrawImage(HDistributerIMG, new Rectangle(DPoint, DistributerSize));
+                g.DrawImage(HDistributerIMG, new Rectangle(DrawPoint, DistributerSize));
         }
 
         /// <summary>
@@ -105,10 +114,17 @@ namespace FloorSimulation
         /// <summary>
         /// Makes the distributer walk towards the target tile using a shortest path algorithm.
         /// </summary>
-        /// <param name="target_tile"></param>
         public void TravelToTrolley(DanishTrolley target_trolley)
         {
             route = DWW.RunAlgoDistrToTrolley(target_trolley);
+        }
+
+        /// <summary>
+        /// Makes the distributer walk towards LangeHarry using it's accesspoints.
+        /// </summary>
+        public void TravelToHarry(LangeHarry Harry)
+        {
+            route = DWW.RunAlgoDistrToHarry(Harry);
         }
         
         /// <summary>
@@ -139,6 +155,7 @@ namespace FloorSimulation
                     WW.WWC.UpdateClearances(this, GetDButerTileSize());
 
                     WalkTile destination = route[0];
+
                     if (!DWW.IsTileAccessible(destination)) //Route failed, there was something occupying the calculated route
                     {
                         ticktravel -= travel_dist_per_tick;
@@ -151,7 +168,9 @@ namespace FloorSimulation
                     RDPoint = floor.ConvertToRealPoint(DPoint);
                     WW.fill_tiles(RDPoint, RDistributerSize, this);
 
-                    if (trolley != null) //If you have a trolley, drag it with you.
+                    if (IsOnHarry) //If you are on LangeHarry travel Harry too.
+                        TravelHarry();
+                    else if (trolley != null) //If you have a trolley, drag it with you.
                         TravelTrolley();
 
                     ticktravel -= WalkWay.WALK_TILE_WIDTH;
@@ -160,6 +179,14 @@ namespace FloorSimulation
             }
             else // Route is empty, thus target has been reached.
                 MainTask.RouteCompleted(); 
+        }
+
+        private void TravelHarry()
+        {
+            WW.unfill_tiles(Harry.RPoint, GetRDbuterSize());
+            Harry.RPoint = RDPoint;
+            Harry.SimPoint = DPoint;
+            WW.fill_tiles(Harry.RPoint, GetRDbuterSize(), this);
         }
 
         private void TravelTrolley()
@@ -219,8 +246,6 @@ namespace FloorSimulation
                 SwitchDistrToRightOfTrolley();
             else
                 SwitchDistrToLeftOfTrolley();
-
-
         }
 
         private void SwitchDistrToLeftOfTrolley()
@@ -306,6 +331,8 @@ namespace FloorSimulation
         /// <returns>The Real distributer Size</returns>
         public Size GetRDbuterSize()
         {
+            if (IsOnHarry)
+                return Harry.GetRSize();
             if (trolley == null)
                 return RDistributerSize;
             if(trolley.IsVertical)
@@ -345,5 +372,20 @@ namespace FloorSimulation
             WW.fill_tiles(RDPoint, RDistributerSize, this);
             WW.fill_tiles(trolley.RPoint, trolley.GetRSize(), this);
         }
-    }
+
+        public void MountHarry(LangeHarry Harry_)
+        {
+            Harry = Harry_;
+            if (IsVertical != Harry.IsVertical)
+                RotateDistributerOnly();
+
+            WW.unfill_tiles(RDPoint, GetRDbuterSize());
+            WW.unfill_tiles(Harry.RPoint, Harry.GetRSize());
+            IsOnHarry = true;
+            Harry.DButer = this;
+            RDPoint = Harry.RPoint;
+
+            WW.fill_tiles(RDPoint, GetRDbuterSize(), this);
+        }
+}
 }

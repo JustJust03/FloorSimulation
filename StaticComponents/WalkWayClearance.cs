@@ -46,7 +46,11 @@ namespace FloorSimulation
                 {
                     if(t.TileX >= x && t.TileX < x + width && t.TileY >= y && t.TileY < y + height)
                         UpdateTileClearance(t, ObjSize, DButer);
-                    if (t.occupied && t.occupied_by != DButer) 
+                    if (t.occupied && t.occupied_by != DButer)
+                        UpdateTileClearance(t, ObjSize);
+                    else if (t.TileX == WW.WalkTileListWidth - 1)
+                        UpdateTileClearance(t, ObjSize);
+                    else if (t.TileY == WW.WalkTileListHeight - 1)
                         UpdateTileClearance(t, ObjSize);
                 }
                     
