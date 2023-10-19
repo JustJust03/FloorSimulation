@@ -19,7 +19,7 @@ namespace FloorSimulation
         private WalkTile[] HubAccessPoints; //The Points in the hub where you can drop of trolleys
         private int[] HubAccessPointsY; //The Points in the hub where you can drop of trolleys
         private WalkTile[] HarryHubAccessPoints; //The Points in the hub where Lange Harry can pick up trolleys
-        private int[] HarryHubAccessPointsX; //The Points in the hub where you can drop of trolleys
+        private int[] HarryHubAccessPointsY; //The Points in the hub where you can drop of trolleys
 
         /// <summary>
         /// The full trolley hub is usually placed inbetween the street
@@ -37,7 +37,7 @@ namespace FloorSimulation
 
             HubAccessPoints = new WalkTile[Trolleyarr.Length];
             HubAccessPointsY = new int[Trolleyarr.Length];
-            int trolleyX = RFloorPoint.X + RHubSize.Width / 2  - (DummyTrolley.GetRSize().Width / 2 + DummyDistributer.GetRDbuterSize().Width / 2); //Place the trolley exactly in the middle
+            int trolleyX = RFloorPoint.X + RHubSize.Width / 2  - (DummyTrolley.GetRSize().Width / 2 + DummyDistributer.GetRDbuterSize().Width - 10); //Place the trolley exactly in the middle
 
             for (int i = 0; i < Trolleyarr.Length; i++)
             {
@@ -48,14 +48,14 @@ namespace FloorSimulation
             }
 
             HarryHubAccessPoints = new WalkTile[Trolleyarr.Length];
-            HarryHubAccessPointsX = new int[Trolleyarr.Length];
+            HarryHubAccessPointsY = new int[Trolleyarr.Length];
             trolleyX = RFloorPoint.X + RHubSize.Width / 2  - (DummyTrolley.GetRSize().Width / 2); //Place the trolley exactly in the middle
             for (int i = 0; i < Trolleyarr.Length; i++)
             {
                 int trolleyY = RFloorPoint.Y + (i + 1) * (Rslack + DummyTrolley.GetRSize().Height);
 
                 HarryHubAccessPoints[i] = WW.GetTile(new Point(trolleyX, trolleyY));
-                HarryHubAccessPointsX[i] = HarryHubAccessPoints[i].Rpoint.X;
+                HarryHubAccessPointsY[i] = HarryHubAccessPoints[i].Rpoint.Y;
             }
         }
 
@@ -105,7 +105,7 @@ namespace FloorSimulation
         /// <returns></returns>
         public override DanishTrolley GiveTrolley(Point AgentRPoint = default)
         {
-            int ArrIndex = Array.IndexOf(HarryHubAccessPointsX, AgentRPoint.X);
+            int ArrIndex = Array.IndexOf(HarryHubAccessPointsY, AgentRPoint.Y);
             if (ArrIndex == -1) return null;
             DanishTrolley t = Trolleyarr[ArrIndex];
             Trolleyarr[ArrIndex] = null;
