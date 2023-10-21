@@ -18,6 +18,19 @@ namespace FloorSimulation
         public WalkWayClearance(WalkWay WW_)
         {
             WW = WW_;
+
+            foreach (List<WalkTile> TileCol in WW.WalkTileList)
+                foreach (WalkTile t in TileCol)
+                {
+                    t.accessible = true;
+                    t.IsAgentsTile = false;
+                    t.inaccessible_by_static = false;
+                    t.occupied_by = null;
+                    if (t.occupied_by != null && !t.occupied) //Makes the inaccessible tiles around the distributer occupied by nothing again.
+                        t.occupied_by = null;
+                    if (t.TileY == WW.WalkTileListHeight - 1 || t.TileX == WW.WalkTileListWidth - 1) //Occupie the borders of the walkway
+                        t.occupied = true;
+                }
         }
 
         /// <summary>
@@ -30,26 +43,28 @@ namespace FloorSimulation
             foreach (List<WalkTile> TileCol in WW.WalkTileList)
                 foreach (WalkTile t in TileCol)
                 {
+                    if (t.accessible)
+                        continue;
                     t.accessible = true;
                     t.IsAgentsTile = false;
                     t.inaccessible_by_static = false;
                     t.occupied_by = null;
                     if (t.occupied_by != null && !t.occupied) //Makes the inaccessible tiles around the distributer occupied by nothing again.
                         t.occupied_by = null;
+                    if(t.TileY == WW.WalkTileListHeight - 1|| t.TileX == WW.WalkTileListWidth - 1) //Occupie the borders of the walkway
+                        UpdateTileClearance(t, ObjSize);
                 }
 
             int[] indices = WW.TileListIndices(DButer.RDPoint, DButer.GetRDbuterSize());
             int x = indices[0]; int y = indices[1]; int width = indices[2]; int height = indices[3];
-            ;
             foreach (List<WalkTile> TileCol in WW.WalkTileList)
                 foreach (WalkTile t in TileCol)
                 {
                     if(t.TileX >= x && t.TileX < x + width && t.TileY >= y && t.TileY < y + height)
                         UpdateTileClearance(t, ObjSize, DButer);
-                    if (t.occupied && t.occupied_by != DButer) 
+                    else if (t.occupied && t.occupied_by != DButer) 
                         UpdateTileClearance(t, ObjSize);
                 }
-                    
         }
         
         /// <summary>
@@ -61,15 +76,22 @@ namespace FloorSimulation
             int leftx = Math.Min(ObjSize.Width, t.TileX + 1);
             int topy = Math.Min(ObjSize.Height, t.TileY + 1);
 
+            WalkTile targett;
             for (int x = t.TileX; x > t.TileX - leftx; x--)
                 for (int y = t.TileY; y > t.TileY - topy; y--)
                 {
-                    WW.WalkTileList[x][y].accessible = false;
+                    targett = WW.WalkTileList[x][y];
+                    if (targett == t && DButer == null)
+                        continue;
+                    if(targett.occupied && DButer == null)
+                        topy = t.TileY - targett.TileY;
+
+                    targett.accessible = false;
 
                     if (DButer != null)
-                        WW.WalkTileList[x][y].occupied_by = DButer;
+                        targett.occupied_by = DButer;
                     else
-                        WW.WalkTileList[x][y].inaccessible_by_static = true;
+                        targett.inaccessible_by_static = true;
                 }
         }
 
