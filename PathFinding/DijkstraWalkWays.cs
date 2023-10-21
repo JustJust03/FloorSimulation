@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace FloorSimulation
 {
@@ -60,6 +61,39 @@ namespace FloorSimulation
                     TargetTiles.Add(WW.WalkTileList[rightpoint][ty]); //bot accesspoint to trolley
                 if (leftpoint > 0)
                     TargetTiles.Add(WW.WalkTileList[leftpoint][ty]); //top accesspoint to trolley
+            }
+
+            return RunAlgo(StartTile, TargetTiles);
+        }
+
+        public List<WalkTile> RunAlgoDistrToHarry(LangeHarry Harry)
+        {
+            WalkTile StartTile = WW.GetTile(DButer.RDPoint);
+            int[] hindices = WW.TileListIndices(Harry.RPoint, Harry.GetRSize());
+            int hx = hindices[0]; int hy = hindices[1]; int hwidth = hindices[2]; int hheight = hindices[3];
+            int[] dindices = WW.TileListIndices(DButer.RDPoint, DButer.RDistributerSize);
+            int dx = dindices[0]; int dy = dindices[1]; int dwidth = dindices[2]; int dheight = dindices[3];
+
+            List<WalkTile> TargetTiles = new List<WalkTile>();
+            if (Harry.IsVertical)
+            {
+                int leftpoint = hx - dwidth;
+                int rightpoint = hx + hwidth;
+
+                if (leftpoint > 0)
+                    TargetTiles.Add(WW.WalkTileList[leftpoint][hy + 171 / WalkWay.WALK_TILE_HEIGHT]); //top accesspoint to trolley
+                if (rightpoint < WW.WalkTileList[0].Count)
+                    TargetTiles.Add(WW.WalkTileList[rightpoint][hy + 171 / WalkWay.WALK_TILE_HEIGHT]); //bot accesspoint to trolley
+            }
+            else
+            {
+                int toppoint = hy - dheight;
+                int botpoint = hy + hheight;
+
+                if (toppoint > 0)
+                    TargetTiles.Add(WW.WalkTileList[hx + 20 / WalkWay.WALK_TILE_WIDTH][toppoint]); //top accesspoint to trolley
+                if (botpoint < WW.WalkTileList[0].Count)
+                    TargetTiles.Add(WW.WalkTileList[hx + 20 / WalkWay.WALK_TILE_WIDTH][botpoint]); //bot accesspoint to trolley
             }
 
             return RunAlgo(StartTile, TargetTiles);

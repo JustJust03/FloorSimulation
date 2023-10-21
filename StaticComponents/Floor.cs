@@ -30,6 +30,7 @@ namespace FloorSimulation
         public FullTrolleyHub FTHub;
         public Distributer FirstDistr;
         public Distributer SecondDistr;
+        public LangeHarry FirstHarry;
         private WalkWay FirstWW;
 
         /// <summary>
@@ -53,6 +54,7 @@ namespace FloorSimulation
             FirstWW = new WalkWay(new Point(0, 0), new Size(2000, 2000), this);
             FirstStartHub = new StartHub("Start hub", 0, new Point(200, 1800), this, FirstWW, initial_trolleys_: 5, vertical_trolleys_: true);
             HubList.Add(FirstStartHub);
+            FirstHarry = new LangeHarry(0, this, FirstWW, new Point(1500, 1700));
             FirstDistr = new Distributer(0, this, FirstWW, Rpoint_: new Point(600, 70));
             SecondDistr = new Distributer(1, this, FirstWW, Rpoint_: new Point(800, 70));
             BuffHub = new BufferHub("Buffer hub", 1, new Point(0, 40), this, FirstWW);
@@ -103,8 +105,11 @@ namespace FloorSimulation
             FirstWW.DrawObject(g, DrawOccupiance: true);
             PaintHubs(g);
             PaintTrolleys(g);
-            FirstDistr.DrawObject(g);
-            SecondDistr.DrawObject(g);
+            FirstHarry.DrawObject(g);
+            if(!FirstDistr.IsOnHarry)
+                FirstDistr.DrawObject(g);
+            if(!SecondDistr.IsOnHarry)
+                SecondDistr.DrawObject(g);
         }
         
         /// <summary>

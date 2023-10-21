@@ -172,5 +172,21 @@ namespace FloorSimulation
         {
             return null;
         }
+
+        /// <summary>
+        /// Returns all the spots where trolleys are placed
+        /// Should only be called by LangeHarry
+        /// Should only be used by the bufferhub and the FullTrolleyHub
+        /// This is for both vertical and horizontal hubs
+        /// </summary>
+        public virtual List<WalkTile> FilledSpots(Distributer DButer)
+        {
+            return null;
+        }
+
+        public virtual int AmountOfTrolleys()
+        {
+            return HubTrolleys.Count();
+        }
     }
 }

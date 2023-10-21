@@ -52,7 +52,7 @@
     <Compile Include="Assignments\Task.cs" />
     <Compile Include="PathFinding\DijkstraWalkWays.cs" />
     <Compile Include="SimComponents\Distributer.cs" />
-    <Compile Include="SimComponents\LangeHarryDistributer.cs" />
+    <Compile Include="SimComponents\LangeHarry.cs" />
     <Compile Include="SmoothPanel.cs">
       <SubType>Component</SubType>
     </Compile>
