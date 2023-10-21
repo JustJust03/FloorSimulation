@@ -78,6 +78,7 @@ namespace FloorSimulation
             TilesChanged = 0;
             TilesReset = 0;
 
+            //ClearAccessibility(new Size (ObjSize.Width + WalkWay.WALK_TILE_WIDTH, ObjSize.Height + WalkWay.WALK_TILE_HEIGHT));
             ClearAccessibility(ObjSize);
 
             int[] indices = WW.TileListIndices(DButer.RDPoint, DButer.GetRDbuterSize());
@@ -87,8 +88,8 @@ namespace FloorSimulation
             int boty = ObjSize.Height;
 
             WalkTile t;
-            for (int x = TargetTile.TileX; x < TargetTile.TileX + rightx; x++)
-                for (int y = TargetTile.TileY; y < TargetTile.TileY + boty; y++)
+            for (int x = TargetTile.TileX - 1; x < TargetTile.TileX + rightx; x++)
+                for (int y = TargetTile.TileY - 1; y < TargetTile.TileY + boty; y++)
                 {
                     t = WW.WalkTileList[x][y];
                     TilesChecked++;
@@ -117,9 +118,9 @@ namespace FloorSimulation
                 for (int y = t.TileY; y > t.TileY - topy; y--)
                 {
                     targett = WW.WalkTileList[x][y];
-                    if (targett == t && DButer == null)
+                    if (targett == t)
                         continue;
-                    if(targett.occupied && DButer == null)
+                    if(targett.occupied)
                         topy = t.TileY - targett.TileY;
 
                     TilesChanged++;

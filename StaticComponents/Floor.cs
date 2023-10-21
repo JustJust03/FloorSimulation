@@ -51,7 +51,7 @@ namespace FloorSimulation
             TrolleyList = new List<DanishTrolley>();
             HubList = new List<Hub>();
 
-            FirstWW = new WalkWay(new Point(0, 0), new Size(2000, 2000), this);
+            FirstWW = new WalkWay(new Point(0, 0), new Size(2000, 2000), this, DevTools_: true);
             FirstStartHub = new StartHub("Start hub", 0, new Point(200, 1800), this, FirstWW, initial_trolleys_: 5, vertical_trolleys_: true);
             HubList.Add(FirstStartHub);
             FirstHarry = new LangeHarry(0, this, FirstWW, new Point(1500, 1700));
@@ -102,7 +102,7 @@ namespace FloorSimulation
             Graphics g = pea.Graphics;
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
-            FirstWW.DrawObject(g, DrawOccupiance: true);
+            FirstWW.DrawObject(g);
             PaintHubs(g);
             PaintTrolleys(g);
             FirstHarry.DrawObject(g);
