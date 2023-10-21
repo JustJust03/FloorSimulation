@@ -52,7 +52,7 @@ namespace FloorSimulation
             WWTilePen = new Pen(Color.Red);
 
             InitWalkTiles();
-            WWC = new WalkWayClearance(this);
+            WWC = new WalkWayClearance(this, log_: true);
         }
 
         /// <summary>
