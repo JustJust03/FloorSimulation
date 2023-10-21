@@ -136,9 +136,9 @@ namespace FloorSimulation
                         break;
                     }
 
-                    WW.WWC.UpdateClearances(this, GetDButerTileSize());
-
                     WalkTile destination = route[0];
+                    WW.WWC.UpdateLocalClearances(this, GetDButerTileSize(), destination);
+
                     if (!DWW.IsTileAccessible(destination)) //Route failed, there was something occupying the calculated route
                     {
                         ticktravel -= travel_dist_per_tick;
