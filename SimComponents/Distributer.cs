@@ -15,7 +15,7 @@ namespace FloorSimulation
         private Image HDistributerIMG;
         private Image VDistributerIMG;
         public Point RDPoint; // Real distributer point
-        private Point DPoint; // Sim distributer point
+        public Point DPoint; // Sim distributer point
         public Size RDistributerSize; //Is the real size in cm.
         private Size DistributerSize;
         public Size HRDistributerSize;
@@ -169,7 +169,7 @@ namespace FloorSimulation
                     WW.fill_tiles(RDPoint, RDistributerSize, this);
 
                     if (IsOnHarry) //If you are on LangeHarry travel Harry too.
-                        TravelHarry();
+                        Harry.TravelHarry();
                     else if (trolley != null) //If you have a trolley, drag it with you.
                         TravelTrolley();
 
@@ -179,14 +179,6 @@ namespace FloorSimulation
             }
             else // Route is empty, thus target has been reached.
                 MainTask.RouteCompleted(); 
-        }
-
-        private void TravelHarry()
-        {
-            WW.unfill_tiles(Harry.RPoint, GetRDbuterSize());
-            Harry.RPoint = RDPoint;
-            Harry.SimPoint = DPoint;
-            WW.fill_tiles(Harry.RPoint, GetRDbuterSize(), this);
         }
 
         private void TravelTrolley()
@@ -373,19 +365,54 @@ namespace FloorSimulation
             WW.fill_tiles(trolley.RPoint, trolley.GetRSize(), this);
         }
 
+        public void RotateDistributerAndHarry()
+        {
+            WW.unfill_tiles(RDPoint, GetRDbuterSize());
+            IsVertical = !IsVertical;
+            Harry.IsVertical = !Harry.IsVertical;
+            if (IsVertical)
+                RDistributerSize = VRDistributerSize;
+            else 
+                RDistributerSize = HRDistributerSize;
+            DistributerSize = floor.ConvertToSimSize(RDistributerSize);
+
+            Harry.RotateTrolleys();
+
+            WW.fill_tiles(RDPoint, GetRDbuterSize(), this);
+        }
+
         public void MountHarry(LangeHarry Harry_)
         {
-            Harry = Harry_;
-            if (IsVertical != Harry.IsVertical)
+            if (IsVertical != Harry_.IsVertical)
                 RotateDistributerOnly();
+            Harry = Harry_;
 
             WW.unfill_tiles(RDPoint, GetRDbuterSize());
             WW.unfill_tiles(Harry.RPoint, Harry.GetRSize());
             IsOnHarry = true;
+            Harry.IsInUse = true;
             Harry.DButer = this;
             RDPoint = Harry.RPoint;
 
             WW.fill_tiles(RDPoint, GetRDbuterSize(), this);
         }
-}
+        
+        public void DisMountHarry()
+        {
+            WW.unfill_tiles(RDPoint, GetRDbuterSize());
+
+            Harry.DButer = null;
+            Harry.IsInUse = false;
+            if (IsVertical)
+                RDPoint = new Point(Harry.RPoint.X - VRDistributerSize.Width, Harry.RPoint.Y + 57 * 3);
+            else
+                RDPoint = new Point(Harry.RPoint.X + 20, Harry.RPoint.Y - HRDistributerSize.Height);
+            DPoint = floor.ConvertToSimPoint(RDPoint);
+
+            WW.fill_tiles(Harry.RPoint, Harry.GetRSize());
+            Harry = null;
+            IsOnHarry = false;
+            WW.fill_tiles(RDPoint, GetRDbuterSize(), this);
+        }
+    }
 }
