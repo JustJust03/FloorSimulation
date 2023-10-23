@@ -31,19 +31,22 @@ namespace FloorSimulation
         public const int WALK_TILE_WIDTH = 10; //cm
         public const int WALK_TILE_HEIGHT = 10; //cm
 
+        private bool DevTools;
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="RP"></param>
         /// <param name="RS">Should always be devisable by Walk tile width and height</param>
         /// <param name="floor_"></param>
-        public WalkWay(Point RP, Size RS, Floor floor_)  
+        public WalkWay(Point RP, Size RS, Floor floor_, bool DevTools_ = false)  
         {
             floor = floor_;
             RPointWW = RP;
             PointWW = floor.ConvertToSimPoint(RP);
             RSizeWW = RS;
             SizeWW = floor.ConvertToSimSize(RS);
+            DevTools = DevTools_;
 
             WalkTileListWidth = RSizeWW.Width / WALK_TILE_WIDTH;
             WalkTileListHeight = RSizeWW.Height / WALK_TILE_HEIGHT;
@@ -52,7 +55,7 @@ namespace FloorSimulation
             WWTilePen = new Pen(Color.Red);
 
             InitWalkTiles();
-            WWC = new WalkWayClearance(this, log_: true);
+            WWC = new WalkWayClearance(this, log_: DevTools);
         }
 
         /// <summary>
@@ -62,7 +65,7 @@ namespace FloorSimulation
         public void DrawObject(Graphics g, bool DrawOccupiance = false)
         {
             g.FillRectangle(WWBrush, new Rectangle(PointWW, SizeWW));
-            if (DrawOccupiance)
+            if (DevTools || DrawOccupiance)
             {
                 foreach(List<WalkTile> l in WalkTileList)
                     foreach(WalkTile t in l)

@@ -116,6 +116,13 @@ namespace FloorSimulation
         public bool TakeTrolleyIn(DanishTrolley dt)
         {
             TrolleyList.Add(dt);
+            if (IsVertical)
+            {
+                dt.RPoint = new Point(RPoint.X, RPoint.Y + (3 - TrolleyList.Count()) * 57);
+                dt.SimPoint = floor.ConvertToSimPoint(dt.RPoint);
+            }
+            else
+                throw new Exception("Harry can't take in tolleys in horizontal mode yet");
             return TrolleyList.Count() >= 3;
         }
 
@@ -126,5 +133,56 @@ namespace FloorSimulation
             return dtlist;
         }
         
+        public DanishTrolley DropTrolley()
+        {
+            DanishTrolley t = TrolleyList[TrolleyList.Count - 1];
+
+            if (t.IsVertical)
+                t.RPoint.X += 57 * (4 - TrolleyList.Count);
+            else
+                t.RPoint.Y -= 57 * (4 - TrolleyList.Count);
+            t.SimPoint = floor.ConvertToSimPoint(t.RPoint);
+            WW.fill_tiles(t.RPoint, t.GetRSize());
+
+            TrolleyList.RemoveAt(TrolleyList.Count - 1);
+            return t;
+        }
+        
+        public void TravelHarry()
+        {
+            WW.unfill_tiles(RPoint, GetRSize());
+            RPoint = DButer.RDPoint;
+            SimPoint = DButer.DPoint;
+            WW.fill_tiles(RPoint, GetRSize(), DButer);
+
+            for (int i = 0; i < TrolleyList.Count; i++)
+            {
+                if (IsVertical)
+                {
+                    DanishTrolley t = TrolleyList[i];
+                    t.RPoint = new Point(RPoint.X, RPoint.Y + 57 * (2 - i));
+                    t.SimPoint = floor.ConvertToSimPoint(t.RPoint);
+                }
+                else
+                {
+                    DanishTrolley t = TrolleyList[i];
+                    t.RPoint = new Point(RPoint.X + 53 + 57 * i, RPoint.Y);
+                    t.SimPoint = floor.ConvertToSimPoint(t.RPoint);
+                }
+            }
+        }
+
+        public void RotateTrolleys()
+        {
+            for (int i = 0; i < TrolleyList.Count; i++)
+            {
+                DanishTrolley t = TrolleyList[i];
+                t.IsVertical = !t.IsVertical;
+                if (t.IsVertical)
+                    t.RPoint = new Point(RPoint.X + GetRSize().Width - 57 * (3 - i), RPoint.Y);
+                else
+                    throw new Exception("YOU SHOULDN'T ROTATE THIS TO HORIZONTAL WHEN THERE ARE TROLLEYS ON HARRY");
+            }
+        }
     }
 }

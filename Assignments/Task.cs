@@ -36,7 +36,8 @@ namespace FloorSimulation
         public readonly List<string> TargetIsOpenSpots = new List<string>
         {
             "DeliveringEmptyTrolley",
-            "DeliverFullTrolley"
+            "DeliverFullTrolley",
+            "LHDeliverFinishedTrolleys"
         };
         public readonly List<string> TargetIsFilledSpots = new List<string>
         {
@@ -123,6 +124,10 @@ namespace FloorSimulation
             else if (Goal == "LHTakeFinishedTrolley")
                 LHTakeFinishedTrolley();
 
+            //Targethub.OpenSpots(DButer)
+            else if (Goal == "LHDeliverFinishedTrolleys")
+                LHDeliverFinishedTrolleys();
+
             //Trolley
             else if (Goal == "TakeEmptyTrolley")
                 TakeEmptyTrolley();
@@ -139,7 +144,7 @@ namespace FloorSimulation
         public void FailRoute()
         {
             if      (TargetIsHubGoals.Contains(Goal))
-                DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
+                DButer.TravelToTrolley(TargetHub.PeekFirstTrolley());
             else if (TargetIsOldWalktile.Contains(Goal))
                 DButer.TravelToTile(OldWalkTile);
             else if (TargetIsOpenSpots.Contains(Goal))
@@ -148,10 +153,9 @@ namespace FloorSimulation
                 DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
             else if (TargetIsHarry.Contains(Goal))
                 DButer.TravelToHarry(Harry);
-
             else
             {
-                if (Trolley.IsInTransport) //The trolley you want to reach was taken by someone else. Look for another trolley in the targethub.
+                if (Trolley == null || Trolley.IsInTransport || Trolley.IsFull()) //The trolley you want to reach was taken by someone else. Look for another trolley in the targethub.
                     Trolley = TargetHub.PeekFirstTrolley();
                 DButer.TravelToTrolley(Trolley);
             }
@@ -207,8 +211,11 @@ namespace FloorSimulation
             TargetHub = DButer.trolley.PeekFirstPlant().DestinationHub;
             Trolley = TargetHub.PeekFirstTrolley();
             DButer.TravelToTrolley(Trolley);
-            if(DButer.route == null) //Route was not possible at this point. Try again later.
+            if(DButer.route == null)//Route was not possible at this point. Try again later.
+            {
+                FailRoute();
                 return;
+            } 
 
             Goal = "DistributePlants"; //New goal
             InTask = true;
@@ -255,7 +262,10 @@ namespace FloorSimulation
             OldTargetHub = TargetHub;
             DButer.TravelToTrolley(TargetHub.PeekFirstTrolley());
             if (DButer.route == null) //Route was not possible at this point. Try again later.
-            return;
+            {
+                FailRoute();
+                return;
+            }
             
             Goal = "TakeFinishedTrolley"; //New goal
             InTask = true;
@@ -298,7 +308,10 @@ namespace FloorSimulation
             {
                 DButer.TravelToHarry(Harry);
                 if (DButer.route == null)
+                {
+                    FailRoute();
                     return;
+                }
 
                 Goal = "TakeLangeHarry";
                 InTask = true;
@@ -310,7 +323,10 @@ namespace FloorSimulation
             Trolley = TargetHub.PeekFirstTrolley();
             DButer.TravelToTrolley(Trolley);
             if (DButer.route == null) //Route was not possible at this point. Try again later.
+            {
+                FailRoute();
                 return;
+            }
 
             Goal = "TakeEmptyTrolley"; //New goal
 
@@ -319,16 +335,43 @@ namespace FloorSimulation
             Travelling = true;
         }
 
+        /// <summary>
+        /// Uses Harry as target
+        /// </summary>
         private void TakeLangeHarry()
         {
+            if (Harry.IsInUse)
+            {
+                TargetHub = DButer.floor.BuffHub;
+                Trolley = TargetHub.PeekFirstTrolley();
+                DButer.TravelToTrolley(Trolley);
+                if (DButer.route == null) //Route was not possible at this point. Try again later.
+                    FailRoute();
+
+                Goal = "TakeEmptyTrolley"; //New goal
+
+
+                InTask = true;
+                Travelling = true;
+
+                return;
+            }
+
             DButer.MountHarry(Harry);
 
             TargetHub = DButer.floor.FTHub;
             if(Harry.IsVertical)
+            {
                 DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
+                if (DButer.route == null) //Route was not possible at this point
+                    FailRoute();
+            }
             else
             {
-                throw new Exception("Harry should be rotated first");
+                DButer.RotateDistributerAndHarry();
+                DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
+                if (DButer.route == null)
+                    FailRoute();
             }
 
             Goal = "LHTakeFinishedTrolley";
@@ -336,9 +379,61 @@ namespace FloorSimulation
             Travelling = true;
         }
 
+        /// <summary>
+        /// Uses Target hub (FullTrolleyHub) and FilledSpots(DButer)
+        /// </summary>
         private void LHTakeFinishedTrolley()
         {
-            ;//TODO: Programm this part next.
+            Harry.TakeTrolleyIn(TargetHub.GiveTrolley(DButer.RDPoint));
+
+            if (TargetHub.AmountOfTrolleys() > 0 && Harry.TrolleyList.Count < 2)
+            {
+                DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
+                if (DButer.route == null) //Route was not possible at this point
+                    FailRoute();
+            }
+            else
+            {
+                TargetHub = DButer.floor.TrHub;
+                DButer.RotateDistributerAndHarry();
+                DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
+                Goal = "LHDeliverFinishedTrolleys";
+                if (DButer.route == null) //Route was not possible
+                    FailRoute();
+            }
+
+            InTask = true;
+            Travelling = true;
+        }
+
+        /// <summary>
+        /// Uses target hub and OpenSpots as travel tile
+        /// </summary>
+        private void LHDeliverFinishedTrolleys()
+        {
+            DanishTrolley t = Harry.DropTrolley();
+            TargetHub.TakeVTrolleyIn(t, DButer.RDPoint);
+
+            if(Harry.TrolleyList.Count < 1)
+            {
+                DButer.DisMountHarry();
+                TargetHub = DButer.floor.BuffHub;
+                Trolley = TargetHub.PeekFirstTrolley();
+                DButer.TravelToTrolley(Trolley);
+                if (DButer.route == null) //Route was not possible at this point. Try again later.
+                    FailRoute();
+
+                Goal = "TakeEmptyTrolley"; //New goal
+            }
+            else
+            {
+                DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
+                if (DButer.route == null) //Route was not possible
+                    FailRoute();
+            }
+
+            InTask = true;
+            Travelling = true;
         }
 
         /// <summary>
@@ -355,7 +450,7 @@ namespace FloorSimulation
                 Trolley = TargetHub.PeekFirstTrolley();
                 DButer.TravelToTrolley(Trolley);
                 if (DButer.route == null) //Route was not possible at this point. Try again later.
-                    return;
+                    FailRoute();
                 return;
             }
             Trolley = t;
@@ -385,7 +480,7 @@ namespace FloorSimulation
             Trolley = OldTrolley;
             DButer.TravelToTrolley(Trolley);
             if (DButer.route == null) //Route was not possible at this point. Try again later.
-                return;
+                FailRoute();
             
             Goal = "TakeOldTrolley"; //New goal
             InTask = true;
@@ -414,7 +509,7 @@ namespace FloorSimulation
             Trolley = TargetHub.PeekFirstTrolley();
             DButer.TravelToTrolley(Trolley);
             if (DButer.route == null) //Route was not possible at this point. Try again later.
-                return;
+                FailRoute();
 
             Goal = "DistributePlants"; //New goal
             InTask = true;
@@ -458,7 +553,10 @@ namespace FloorSimulation
             Trolley = TargetHub.PeekFirstTrolley();
             DButer.TravelToTrolley(Trolley);
             if (DButer.route == null) //Route was not possible at this point. Try again later.
+            {
                 FailRoute();
+                return;
+            }
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using FloorSimulation.StaticComponents.Hubs;
 
 namespace FloorSimulation
 {
@@ -28,6 +29,7 @@ namespace FloorSimulation
         public StartHub FirstStartHub;
         public BufferHub BuffHub;
         public FullTrolleyHub FTHub;
+        public TruckHub TrHub;
         public Distributer FirstDistr;
         public Distributer SecondDistr;
         public LangeHarry FirstHarry;
@@ -51,16 +53,18 @@ namespace FloorSimulation
             TrolleyList = new List<DanishTrolley>();
             HubList = new List<Hub>();
 
-            FirstWW = new WalkWay(new Point(0, 0), new Size(2000, 2000), this);
+            FirstWW = new WalkWay(new Point(0, 0), new Size(2000, 2000), this, DevTools_: true);
             FirstStartHub = new StartHub("Start hub", 0, new Point(200, 1800), this, FirstWW, initial_trolleys_: 5, vertical_trolleys_: true);
             HubList.Add(FirstStartHub);
             FirstHarry = new LangeHarry(0, this, FirstWW, new Point(1500, 1700));
             FirstDistr = new Distributer(0, this, FirstWW, Rpoint_: new Point(600, 70));
             SecondDistr = new Distributer(1, this, FirstWW, Rpoint_: new Point(800, 70));
             BuffHub = new BufferHub("Buffer hub", 1, new Point(0, 40), this, FirstWW);
-            FTHub = new FullTrolleyHub("Full Trolley Hub", 1, new Point(400, 340), this, FirstWW, new Size(200, 1400));
+            FTHub = new FullTrolleyHub("Full Trolley Hub", 2, new Point(400, 340), this, FirstWW, new Size(200, 1400));
+            TrHub = new TruckHub("Truck Hub", 3, new Point(980, 500), this, FirstWW);
             HubList.Add(BuffHub);
             HubList.Add(FTHub);
+            HubList.Add(TrHub);
             init_shops();
 
             FirstStartHub.InitFirstTrolley();
@@ -102,7 +106,7 @@ namespace FloorSimulation
             Graphics g = pea.Graphics;
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
-            FirstWW.DrawObject(g, DrawOccupiance: true);
+            FirstWW.DrawObject(g);
             PaintHubs(g);
             PaintTrolleys(g);
             FirstHarry.DrawObject(g);

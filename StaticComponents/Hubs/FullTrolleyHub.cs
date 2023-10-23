@@ -52,7 +52,7 @@ namespace FloorSimulation
             trolleyX = RFloorPoint.X + RHubSize.Width / 2  - (DummyTrolley.GetRSize().Width / 2); //Place the trolley exactly in the middle
             for (int i = 0; i < Trolleyarr.Length; i++)
             {
-                int trolleyY = RFloorPoint.Y + (i + 1) * (Rslack + DummyTrolley.GetRSize().Height);
+                int trolleyY = RFloorPoint.Y + (i + 1) * (Rslack + DummyTrolley.GetRSize().Height) + 10;
 
                 HarryHubAccessPoints[i] = WW.GetTile(new Point(trolleyX, trolleyY));
                 HarryHubAccessPointsY[i] = HarryHubAccessPoints[i].Rpoint.Y;
@@ -100,6 +100,7 @@ namespace FloorSimulation
 
         /// <summary>
         /// Gives a trolley away to lange harry.
+        /// Uses the real point of the distributer riding the Lange harry
         /// </summary>
         /// <param name="AgentRPoint"></param>
         /// <returns></returns>
@@ -109,6 +110,7 @@ namespace FloorSimulation
             if (ArrIndex == -1) return null;
             DanishTrolley t = Trolleyarr[ArrIndex];
             Trolleyarr[ArrIndex] = null;
+            WW.unfill_tiles(t.RPoint, t.GetRSize());
 
             return t;
         }
