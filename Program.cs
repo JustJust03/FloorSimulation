@@ -19,8 +19,11 @@ namespace FloorSimulation
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.Run(new MainDisplay());
+
+            //Application.EnableVisualStyles();
+            //Application.Run(new MainDisplay());
+            ReadData rd = new ReadData();
+            rd.ReadBoxHistoryToTrolleys("2023-07-18");
         }
     }
 }
