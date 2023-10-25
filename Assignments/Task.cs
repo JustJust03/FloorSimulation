@@ -163,7 +163,10 @@ namespace FloorSimulation
             if (DButer.route == null || DButer.route.Count == 0)
                 Waiting = true;
             else
+            {
+                DButer.TickWalk();
                 Waiting = false;
+            }
         }
 
         public void DistributionCompleted()
@@ -304,7 +307,7 @@ namespace FloorSimulation
             TargetHub.TakeHTrolleyIn(Trolley, DButer.RDPoint);
             DButer.WW.unoccupie_by_tiles(DButer.trolley.RPoint, DButer.trolley.GetRSize()); // drop the trolley of from the distributer
             DButer.GiveTrolley();
-            if (TargetHub.AmountOfTrolleys() >= 2 && !Harry.IsInUse)
+            if (TargetHub.AmountOfTrolleys() >= 3 && !Harry.IsInUse)
             {
                 DButer.TravelToHarry(Harry);
                 if (DButer.route == null)

@@ -1,0 +1,14 @@
+{
+  "Hubs":
+  [
+    "174-NEUNKIRCHE-DI": {
+      "Name": "174-NEUNKIRCHE",
+      "Id": 174,
+      "Day": "DI"
+      },
+    "048-NEUOETTING-DI"{
+      "Name": "048-NEUOETTING",
+      "Id": 048,
+      "Day": "DI"
+      }]
+}

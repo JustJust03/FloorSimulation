@@ -24,8 +24,8 @@ namespace FloorSimulation
         /// <summary>
         /// The full trolley hub is usually placed inbetween the street
         /// </summary>
-        public FullTrolleyHub(string name_, int id_, Point FPoint_, Floor floor_, WalkWay ww_, Size RHubSize_, int initial_trolleys = 0, bool vertical_trolleys_ = false) : 
-            base(name_, id_, FPoint_, floor_, ww_, RHubSize_, initial_trolleys: initial_trolleys, vertical_trolleys: vertical_trolleys_)
+        public FullTrolleyHub(string name_, int id_, Point FPoint_, Floor floor_, Size RHubSize_, int initial_trolleys = 0, bool vertical_trolleys_ = false) : 
+            base(name_, id_, FPoint_, floor_, RHubSize_, initial_trolleys: initial_trolleys, vertical_trolleys: vertical_trolleys_)
         {
             DummyTrolley = new DanishTrolley(-1, floor, IsVertical_: false);
             DummyDistributer = new Distributer(-1, floor, WW, IsVertical_: false);

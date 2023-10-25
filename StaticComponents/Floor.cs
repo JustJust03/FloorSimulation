@@ -13,16 +13,19 @@ namespace FloorSimulation
     /// </summary>
     internal class Floor : SmoothPanel
     {
-        MainDisplay Display;
+        public MainDisplay Display;
         readonly Color FloorColor = Color.FromArgb(255, 180, 180, 180); //Concrete gray
         public readonly Pen BPen = new Pen(Color.Black);
+        public int Ticks = 0;
+        public double MilisecondsPerTick;
+        public TimeSpan ElapsedSimTime = TimeSpan.Zero;
+        public int SpeedMultiplier;
 
         // Real size: 4000 cm x 4000 cm
-        public const int RealFloorWidth = 2000; //cm
-        public const int RealFloorHeight = 2000; //cm
-        public const float ScaleFactor = 0.4f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
-
-        private int Nshops = 16;
+        public const int RealFloorWidth = 4000; //cm
+        public const int RealFloorHeight = 4000; //cm
+        public const float ScaleFactor = 0.3f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
+        public string Layout;
 
         public List<DanishTrolley> TrolleyList; // A list with all the trolleys that are on the floor.
         public List<Hub> HubList; // A list with all the hubs that are on the floor (starthub: 0, shophubs >= 1)
@@ -32,8 +35,11 @@ namespace FloorSimulation
         public TruckHub TrHub;
         public Distributer FirstDistr;
         public Distributer SecondDistr;
+        public Distributer ThirdDistr;
+        public Distributer FourthDistr;
         public LangeHarry FirstHarry;
-        private WalkWay FirstWW;
+        public WalkWay FirstWW;
+
 
         /// <summary>
         /// Sets the pixel floor size by using the ScaleFactor.
@@ -49,25 +55,25 @@ namespace FloorSimulation
             this.Location = PanelLocation;
             this.Size = PixelFloorSize;
             this.BackColor = FloorColor;
+            MilisecondsPerTick = (1.0 / Program.TICKS_PER_SECOND) * 1000;
 
             TrolleyList = new List<DanishTrolley>();
             HubList = new List<Hub>();
 
-            FirstWW = new WalkWay(new Point(0, 0), new Size(2000, 2000), this, DevTools_: true);
-            FirstStartHub = new StartHub("Start hub", 0, new Point(200, 1800), this, FirstWW, initial_trolleys_: 5, vertical_trolleys_: true);
+            FirstWW = new WalkWay(new Point(0, 0), new Size(4000, 4000), this, DevTools_: true);
+            FirstStartHub = new StartHub("Start hub", 0, new Point(200, 3800), this, vertical_trolleys_: true);
             HubList.Add(FirstStartHub);
-            FirstHarry = new LangeHarry(0, this, FirstWW, new Point(1500, 1700));
+            FirstHarry = new LangeHarry(0, this, FirstWW, new Point(3500, 1700));
             FirstDistr = new Distributer(0, this, FirstWW, Rpoint_: new Point(600, 70));
             SecondDistr = new Distributer(1, this, FirstWW, Rpoint_: new Point(800, 70));
-            BuffHub = new BufferHub("Buffer hub", 1, new Point(0, 40), this, FirstWW);
-            FTHub = new FullTrolleyHub("Full Trolley Hub", 2, new Point(400, 340), this, FirstWW, new Size(200, 1400));
-            TrHub = new TruckHub("Truck Hub", 3, new Point(980, 500), this, FirstWW);
+            ThirdDistr = new Distributer(2, this, FirstWW, Rpoint_: new Point(1000, 70));
+            FourthDistr = new Distributer(3, this, FirstWW, Rpoint_: new Point(1200, 70));
+            BuffHub = new BufferHub("Buffer hub", 1, new Point(0, 40), this);
+            FTHub = new FullTrolleyHub("Full Trolley Hub", 2, new Point(400, 340), this, new Size(200, 3400));
+            TrHub = new TruckHub("Truck Hub", 3, new Point(2980, 500), this);
             HubList.Add(BuffHub);
             HubList.Add(FTHub);
             HubList.Add(TrHub);
-            init_shops();
-
-            FirstStartHub.InitFirstTrolley();
 
             this.Paint += PaintFloor;
             this.Invalidate();
@@ -75,8 +81,13 @@ namespace FloorSimulation
 
         public void TickButton(object sender, EventArgs e)
         {
+            Ticks += SpeedMultiplier;
+            ElapsedSimTime = ElapsedSimTime.Add(TimeSpan.FromMilliseconds(MilisecondsPerTick * SpeedMultiplier));
             FirstDistr.Tick();
             SecondDistr.Tick();
+            ThirdDistr.Tick();
+            FourthDistr.Tick();
+            Display.Invalidate();
             Invalidate();
         }
 
@@ -114,38 +125,50 @@ namespace FloorSimulation
                 FirstDistr.DrawObject(g);
             if(!SecondDistr.IsOnHarry)
                 SecondDistr.DrawObject(g);
+            if(!ThirdDistr.IsOnHarry)
+                ThirdDistr.DrawObject(g);
+            if(!FourthDistr.IsOnHarry)
+                FourthDistr.DrawObject(g);
         }
         
-        /// <summary>
-        /// Lays down the shops in rows with 4 m in between them
-        /// </summary>
-        public void init_shops()
+
+        public void PlaceShops(List<ShopHub> Shops, string shape = "S-Patern")
         {
-            int UpperY = 340;
-            int LowerY = 1400;
+            int UpperY = 440;
+            int LowerY = 3480; // This diff should be devisable by the height of a shop (160)
             int StreetWidth = 500;
+            Layout = shape;
+
+            if (!(shape == "S-Patern"))
+                throw new Exception("Haven't implemented another layout than the S layout");
 
             int x = 0;
-            int y = UpperY;
+            int y = LowerY;
             int two_per_row = 1; //Keeps track of how many cols are placed without space between them
-            for (int i = 0; i < Nshops;  i++) 
+            for (int i = 0; i < Shops.Count;  i++) 
             { 
-                Hub Shop = new ShopHub("Shop: " + i, 1, new Point(x, y), this, FirstWW, initial_trolleys: 2);
-                if (y < LowerY)
+                ShopHub Shop = Shops[i];
+                Shop.TeleportHub(new Point(x, y));
+
+                if (two_per_row == 1 && y > UpperY)
+                    y -= 160;
+                else if (two_per_row == 2 && y < LowerY)
                     y += 160;
                 else
                 {
-                    y = UpperY;
-
                     two_per_row++;
-                    if (two_per_row <= 2) 
+                    if (two_per_row <= 2)
+                    {
                         x += StreetWidth + 200;
+                        y = UpperY;
+                    }
                     else
                     {
                         x += 160;
                         two_per_row = 1;
                     }
                 }
+
                 HubList.Add(Shop);
             }
         }

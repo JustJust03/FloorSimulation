@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.IO;
+using System.Collections.Generic;
 
 namespace FloorSimulation
 {
@@ -19,11 +20,8 @@ namespace FloorSimulation
         [STAThread]
         static void Main()
         {
-
-            //Application.EnableVisualStyles();
-            //Application.Run(new MainDisplay());
-            ReadData rd = new ReadData();
-            rd.ReadBoxHistoryToTrolleys("2023-07-18");
+            Application.EnableVisualStyles();
+            Application.Run(new MainDisplay());
         }
     }
 }

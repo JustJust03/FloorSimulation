@@ -143,7 +143,7 @@ namespace FloorSimulation
 
             if (route.Count > 0)
             {
-                ticktravel += travel_dist_per_tick;
+                ticktravel += travel_dist_per_tick * floor.SpeedMultiplier;
                 while(ticktravel > WalkWay.WALK_TILE_WIDTH)
                 {
                     if(route.Count == 0)
@@ -158,7 +158,7 @@ namespace FloorSimulation
 
                     if (!DWW.IsTileAccessible(destination)) //Route failed, there was something occupying the calculated route
                     {
-                        ticktravel -= travel_dist_per_tick;
+                        ticktravel = 0;
                         MainTask.FailRoute();
                         return;
                     }
@@ -197,10 +197,10 @@ namespace FloorSimulation
 
         public void TickDistribute()
         {
-            distributionms += distributionms_per_tick ;
+            distributionms += distributionms_per_tick * floor.SpeedMultiplier;
             if (distributionms >= trolley.PlantList[0].ReorderTime)
             {
-                distributionms -= trolley.PlantList[0].ReorderTime;
+                distributionms = 0;
                 MainTask.DistributionCompleted();
             }
         }
