@@ -13,11 +13,13 @@ namespace FloorSimulation
     internal class StartHub: Hub
     {
         private List<DanishTrolley> UndistributedTrolleys;
+        public bool StartHubEmpty;
 
         public StartHub(string name_, int id_, Point FPoint_, Floor floor_, int initial_trolleys_ = 0, bool vertical_trolleys_ = true) : 
             base(name_, id_, FPoint_, floor_, new Size(400, 200), initial_trolleys:initial_trolleys_, vertical_trolleys:vertical_trolleys_)
         {
             UndistributedTrolleys = new List<DanishTrolley>();
+            StartHubEmpty = false;
         }
 
         public void AddUndistributedTrolleys(List<DanishTrolley> UT)
@@ -41,6 +43,8 @@ namespace FloorSimulation
 
                 PlaceTrolleys();
             }
+            if (UndistributedTrolleys.Count == 0)
+                StartHubEmpty = true;
             return base.GiveTrolley(AgentRPoint);
         }
 

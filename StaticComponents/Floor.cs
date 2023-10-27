@@ -20,15 +20,17 @@ namespace FloorSimulation
         public double MilisecondsPerTick;
         public TimeSpan ElapsedSimTime = TimeSpan.Zero;
         public int SpeedMultiplier;
+        public FinishedDistribution FinishedD;
 
         // Real size: 4000 cm x 4000 cm
         public const int RealFloorWidth = 4000; //cm
         public const int RealFloorHeight = 4000; //cm
-        public const float ScaleFactor = 0.3f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
+        public const float ScaleFactor = 0.2f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
         public string Layout;
 
         public List<DanishTrolley> TrolleyList; // A list with all the trolleys that are on the floor.
         public List<Hub> HubList; // A list with all the hubs that are on the floor (starthub: 0, shophubs >= 1)
+        public List<Distributer> DistrList; // A list with all the distributers that are on the floor.
         public StartHub FirstStartHub;
         public BufferHub BuffHub;
         public FullTrolleyHub FTHub;
@@ -56,6 +58,7 @@ namespace FloorSimulation
             this.Size = PixelFloorSize;
             this.BackColor = FloorColor;
             MilisecondsPerTick = (1.0 / Program.TICKS_PER_SECOND) * 1000;
+            FinishedD = new FinishedDistribution(this);
 
             TrolleyList = new List<DanishTrolley>();
             HubList = new List<Hub>();
@@ -63,17 +66,26 @@ namespace FloorSimulation
             FirstWW = new WalkWay(new Point(0, 0), new Size(4000, 4000), this, DevTools_: true);
             FirstStartHub = new StartHub("Start hub", 0, new Point(200, 3800), this, vertical_trolleys_: true);
             HubList.Add(FirstStartHub);
-            FirstHarry = new LangeHarry(0, this, FirstWW, new Point(3500, 1700));
+
+            DistrList = new List<Distributer>();
             FirstDistr = new Distributer(0, this, FirstWW, Rpoint_: new Point(600, 70));
             SecondDistr = new Distributer(1, this, FirstWW, Rpoint_: new Point(800, 70));
             ThirdDistr = new Distributer(2, this, FirstWW, Rpoint_: new Point(1000, 70));
             FourthDistr = new Distributer(3, this, FirstWW, Rpoint_: new Point(1200, 70));
+            DistrList.Add(FirstDistr);
+            DistrList.Add(SecondDistr);
+            DistrList.Add(ThirdDistr);
+            DistrList.Add(FourthDistr);
+            
+            FirstHarry = new LangeHarry(0, this, FirstWW, new Point(3500, 1700));
             BuffHub = new BufferHub("Buffer hub", 1, new Point(0, 40), this);
             FTHub = new FullTrolleyHub("Full Trolley Hub", 2, new Point(400, 340), this, new Size(200, 3400));
             TrHub = new TruckHub("Truck Hub", 3, new Point(2980, 500), this);
             HubList.Add(BuffHub);
             HubList.Add(FTHub);
             HubList.Add(TrHub);
+
+
 
             this.Paint += PaintFloor;
             this.Invalidate();
@@ -83,10 +95,8 @@ namespace FloorSimulation
         {
             Ticks += SpeedMultiplier;
             ElapsedSimTime = ElapsedSimTime.Add(TimeSpan.FromMilliseconds(MilisecondsPerTick * SpeedMultiplier));
-            FirstDistr.Tick();
-            SecondDistr.Tick();
-            ThirdDistr.Tick();
-            FourthDistr.Tick();
+            foreach (Distributer d in DistrList)
+                d.Tick();
             Display.Invalidate();
             Invalidate();
         }
@@ -121,14 +131,9 @@ namespace FloorSimulation
             PaintHubs(g);
             PaintTrolleys(g);
             FirstHarry.DrawObject(g);
-            if(!FirstDistr.IsOnHarry)
-                FirstDistr.DrawObject(g);
-            if(!SecondDistr.IsOnHarry)
-                SecondDistr.DrawObject(g);
-            if(!ThirdDistr.IsOnHarry)
-                ThirdDistr.DrawObject(g);
-            if(!FourthDistr.IsOnHarry)
-                FourthDistr.DrawObject(g);
+            foreach(Distributer d in DistrList)
+                if(!d.IsOnHarry)
+                    d.DrawObject(g);
         }
         
 

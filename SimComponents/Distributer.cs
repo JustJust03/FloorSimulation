@@ -24,12 +24,12 @@ namespace FloorSimulation
         public Floor floor;
 
         public List<WalkTile> route;
-        private const float WALKSPEED = 1000f; // cm/s
+        private const float WALKSPEED = 142f; // cm/s
         private float travel_dist_per_tick;
         private int distributionms_per_tick; // plant distribution per tick in ms
         private float ticktravel = 0f; //The distance that has been traveled, but not registered to walkway yet
         private int distributionms = 0; // How many ms have you been distributing
-        private Task MainTask;
+        public Task MainTask;
         public DanishTrolley trolley;
         public LangeHarry Harry;
         private bool IsVertical;
@@ -65,7 +65,7 @@ namespace FloorSimulation
 
             travel_dist_per_tick = WALKSPEED / Program.TICKS_PER_SECOND;
             distributionms_per_tick = (int)(1000f / Program.TICKS_PER_SECOND);
-            MainTask = new Task(floor.FirstStartHub, this, "TakeFullTrolley");
+            MainTask = new Task(floor.FirstStartHub, this, "TakeFullTrolley", floor.FinishedD);
             trolley = null;
 
             DWW = new DijkstraWalkWays(WW, this);

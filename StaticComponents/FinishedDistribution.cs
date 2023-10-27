@@ -14,13 +14,18 @@ namespace FloorSimulation
         public string DistributionDate;
         public string Layout;
         public string TotalTime;
+        Floor floor;
 
+        public FinishedDistribution(Floor Floor)
+        {
+            floor = Floor;
+        }
 
-        public void DistributionCompleted(Floor floor)
+        public void DistributionCompleted()
         {
             Completed = true;
             MainDisplay m = floor.Display;
-            if (m.isSimulating)
+            if (m.isSimulating) //Stop the timer from ticking
             {
                 m.timer.Stop();
                 m.ss_button.Text = "Start";
@@ -37,8 +42,21 @@ namespace FloorSimulation
         {
             string json = JsonConvert.SerializeObject(this, Formatting.Indented);
 
-            string FilePath = Program.rootfolder + @"\Results\data.json";
+            string FilePath = Program.rootfolder + @"\Results\0data.json";
             File.WriteAllText(FilePath, json);  
+        }
+
+        public bool CheckFinishedDistribution()
+        {
+            if (!floor.FirstStartHub.StartHubEmpty)
+                return false;
+
+            foreach(Distributer d in floor.DistrList)
+                if (!(d.MainTask.Goal == "TakeFullTrolley"))
+                    return false; // One of the distributers is not trying to take a new trolley i.e. Is not finished with the distribution cycle.
+
+            DistributionCompleted();
+            return true;
         }
 
     }
