@@ -19,6 +19,7 @@ namespace FloorSimulation
         public bool WasOnTopLeft;
         public Hub StartHub;
         private Distributer DButer;
+        private FinishedDistribution FinishedD;
 
         public bool InTask = false;
         private bool Travelling = false;
@@ -49,13 +50,14 @@ namespace FloorSimulation
         };
 
 
-        public Task(Hub TargetHub_,  Distributer DButer_, string Goal_, DanishTrolley trolley_ = default)
+        public Task(Hub TargetHub_,  Distributer DButer_, string Goal_, FinishedDistribution FinishedD_, DanishTrolley trolley_ = default)
         {
             Trolley = trolley_;
             StartHub = TargetHub_;
             DButer = DButer_;
             Goal = Goal_;
             Harry = DButer.floor.FirstHarry;
+            FinishedD = FinishedD_;
 
         }
 
@@ -163,7 +165,10 @@ namespace FloorSimulation
             if (DButer.route == null || DButer.route.Count == 0)
                 Waiting = true;
             else
+            {
+                DButer.TickWalk();
                 Waiting = false;
+            }
         }
 
         public void DistributionCompleted()
@@ -199,14 +204,9 @@ namespace FloorSimulation
                 Travelling = false;
                 return;
             }
-            DanishTrolley t = TargetHub.GiveTrolley();
-            if (t == null) //If the start hub has no more trolleys stop.
-            {
-                InTask = false;
-                Travelling = false;
-                return;
-            }
+            Goal = "DistributePlants"; //New goal
 
+            DanishTrolley t = TargetHub.GiveTrolley();
             DButer.TakeTrolleyIn(t);
             TargetHub = DButer.trolley.PeekFirstPlant().DestinationHub;
             Trolley = TargetHub.PeekFirstTrolley();
@@ -217,7 +217,6 @@ namespace FloorSimulation
                 return;
             } 
 
-            Goal = "DistributePlants"; //New goal
             InTask = true;
             Travelling = true;
 
@@ -235,6 +234,7 @@ namespace FloorSimulation
         }
 
         /// <summary>
+        /// Finished distributing this trolley and deliverd it to the bufferhub.
         /// Targethub is buffhub
         /// Uses OpenSpots to determine TargetTiles
         /// uses target tiles as target
@@ -248,6 +248,7 @@ namespace FloorSimulation
             Goal = "TakeFullTrolley"; //New goal
             InTask = false;
             Travelling = false;
+            FinishedD.CheckFinishedDistribution();
         }
 
         /// <summary>
@@ -304,7 +305,7 @@ namespace FloorSimulation
             TargetHub.TakeHTrolleyIn(Trolley, DButer.RDPoint);
             DButer.WW.unoccupie_by_tiles(DButer.trolley.RPoint, DButer.trolley.GetRSize()); // drop the trolley of from the distributer
             DButer.GiveTrolley();
-            if (TargetHub.AmountOfTrolleys() >= 2 && !Harry.IsInUse)
+            if (TargetHub.AmountOfTrolleys() >= 3 && !Harry.IsInUse)
             {
                 DButer.TravelToHarry(Harry);
                 if (DButer.route == null)
@@ -469,6 +470,7 @@ namespace FloorSimulation
 
         /// <summary>
         /// Uses OldWalktile as target
+        /// Delivered a new empty trolley to the shop
         /// </summary>
         private void DeliverEmptyTrolleyToShop()
         { 

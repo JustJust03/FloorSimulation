@@ -24,14 +24,14 @@ namespace FloorSimulation
         protected int max_trolleys;     //How many trolleys can be placed in this hub
         protected int Rslack = 20;
 
-        public Hub(string name_, int id_, Point FPoint_, Floor floor_, WalkWay ww_, Size RHubSize_, int initial_trolleys = 0, 
+        public Hub(string name_, int id_, Point FPoint_, Floor floor_, Size RHubSize_, int initial_trolleys = 0, 
                    bool vertical_trolleys = false)
         {
             name = name_;
             id = id_;
             RFloorPoint = FPoint_;
             floor = floor_;
-            WW = ww_;
+            WW = floor.FirstWW;
             RHubSize = RHubSize_;   
 
 
@@ -119,6 +119,29 @@ namespace FloorSimulation
             //Trolleys
             foreach (DanishTrolley DT in HubTrolleys)
                 DT.DrawObject(g);
+        }
+
+        /// <summary>
+        /// Teleports the hub to a new point
+        /// Also teleports his trolleys with it and it's occupiances
+        /// </summary>
+        public virtual void TeleportHub(Point NewRPoint)
+        {
+            List<Point> DiffPoints = new List<Point>(); //distance from top left of shophub to each trolley
+            foreach(DanishTrolley t in HubTrolleys)
+            {
+                DiffPoints.Add(new Point(t.RPoint.X - RFloorPoint.X, t.RPoint.Y - RFloorPoint.Y));
+                WW.unfill_tiles(t.RPoint, t.GetRSize());
+            }
+
+            RFloorPoint = NewRPoint;
+            FloorPoint = floor.ConvertToSimPoint(RFloorPoint); 
+
+            for (int i = 0; i < DiffPoints.Count; i++)
+            {
+                HubTrolleys[i].TeleportTrolley(new Point(RFloorPoint.X + DiffPoints[i].X, RFloorPoint.Y + DiffPoints[i].Y));
+                WW.fill_tiles(HubTrolleys[i].RPoint, HubTrolleys[i].GetRSize());
+            }
         }
         
         /// <summary>

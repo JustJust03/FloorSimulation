@@ -24,6 +24,7 @@ namespace FloorSimulation
         private Size HTrolleySize; //Sim trolley size
 
         public int id;
+        public string TransactieId;
         private Floor floor;
         public bool IsVertical;
         public bool AccessOnTopLeft;
@@ -36,7 +37,7 @@ namespace FloorSimulation
         /// Constructer initializing the variables
         /// Use the image to generate the sim and real sizes.
         /// </summary>
-        public DanishTrolley(int id_, Floor floor_, Point RPoint_ = default, bool IsVertical_ = false)
+        public DanishTrolley(int id_, Floor floor_, Point RPoint_ = default, bool IsVertical_ = false, string transactieId_ = null)
         {
             RPoint = RPoint_;
 
@@ -53,9 +54,10 @@ namespace FloorSimulation
 
             IsVertical = IsVertical_;
             IsInTransport = false;
+            TransactieId = transactieId_;
             PlantList = new List<plant>();
 
-            if(RPoint != default)
+            if (RPoint != default)
                 TeleportTrolley(RPoint);
         }
 
@@ -117,7 +119,7 @@ namespace FloorSimulation
 
         public bool IsFull()
         {
-            if (PlantList.Count > 0)
+            if (PlantList.Count > 10)
                 return true;
             return false;
         }

@@ -86,10 +86,12 @@ namespace FloorSimulation
 
             int rightx = ObjSize.Width;
             int boty = ObjSize.Height;
+            int minx = Math.Max(0, TargetTile.TileX - 1);
+            int miny = Math.Max(0, TargetTile.TileY - 1);
 
             WalkTile t;
-            for (int x = TargetTile.TileX - 1; x < TargetTile.TileX + rightx; x++)
-                for (int y = TargetTile.TileY - 1; y < TargetTile.TileY + boty; y++)
+            for (int x = minx; x < TargetTile.TileX + rightx; x++)
+                for (int y = miny; y < TargetTile.TileY + boty; y++)
                 {
                     t = WW.WalkTileList[x][y];
                     TilesChecked++;
