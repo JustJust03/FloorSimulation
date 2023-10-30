@@ -29,6 +29,10 @@ namespace FloorSimulation
         public bool IsVertical;
         public bool AccessOnTopLeft;
         public bool IsInTransport;
+        private int Units; //Every unit of a plant, 1 plant can contain 12 units (it was on a tray)
+        public readonly int MaxUnits = 110;
+
+        public const float TrolleyTravelSpeed = 100f; //cm/s
 
         //TODO: Keep track of maximum plants per trolley.
         public List<plant> PlantList;
@@ -98,6 +102,7 @@ namespace FloorSimulation
 
         public bool TakePlantIn(plant p)
         {
+            Units += p.units;
             PlantList.Add(p);
             return IsFull();
         }
@@ -119,7 +124,7 @@ namespace FloorSimulation
 
         public bool IsFull()
         {
-            if (PlantList.Count > 10)
+            if (Units >= MaxUnits)
                 return true;
             return false;
         }

@@ -16,6 +16,8 @@ namespace FloorSimulation
         public MainDisplay Display;
         readonly Color FloorColor = Color.FromArgb(255, 180, 180, 180); //Concrete gray
         public readonly Pen BPen = new Pen(Color.Black);
+        public readonly Pen BluePen = new Pen(Color.Blue);
+        public readonly Pen YellowPen = new Pen(Color.Yellow);
         public int Ticks = 0;
         public double MilisecondsPerTick;
         public TimeSpan ElapsedSimTime = TimeSpan.Zero;
@@ -30,11 +32,11 @@ namespace FloorSimulation
 
         public List<DanishTrolley> TrolleyList; // A list with all the trolleys that are on the floor.
         public List<Hub> HubList; // A list with all the hubs that are on the floor (starthub: 0, shophubs >= 1)
-        public List<Distributer> DistrList; // A list with all the distributers that are on the floor.
         public StartHub FirstStartHub;
         public BufferHub BuffHub;
         public FullTrolleyHub FTHub;
         public TruckHub TrHub;
+        public List<Distributer> DistrList; // A list with all the distributers that are on the floor.
         public Distributer FirstDistr;
         public Distributer SecondDistr;
         public Distributer ThirdDistr;
@@ -66,6 +68,7 @@ namespace FloorSimulation
             FirstWW = new WalkWay(new Point(0, 0), new Size(4000, 4000), this, DevTools_: true);
             FirstStartHub = new StartHub("Start hub", 0, new Point(200, 3800), this, vertical_trolleys_: true);
             HubList.Add(FirstStartHub);
+            FirstHarry = new LangeHarry(0, this, FirstWW, new Point(3500, 1700));
 
             DistrList = new List<Distributer>();
             FirstDistr = new Distributer(0, this, FirstWW, Rpoint_: new Point(600, 70));
@@ -76,10 +79,9 @@ namespace FloorSimulation
             DistrList.Add(SecondDistr);
             DistrList.Add(ThirdDistr);
             DistrList.Add(FourthDistr);
-            
-            FirstHarry = new LangeHarry(0, this, FirstWW, new Point(3500, 1700));
+
             BuffHub = new BufferHub("Buffer hub", 1, new Point(0, 40), this);
-            FTHub = new FullTrolleyHub("Full Trolley Hub", 2, new Point(400, 340), this, new Size(200, 3400));
+            FTHub = new FullTrolleyHub("Full Trolley Hub", 2, new Point(400, 440), this, new Size(200, 3000));
             TrHub = new TruckHub("Truck Hub", 3, new Point(2980, 500), this);
             HubList.Add(BuffHub);
             HubList.Add(FTHub);
@@ -131,17 +133,16 @@ namespace FloorSimulation
             PaintHubs(g);
             PaintTrolleys(g);
             FirstHarry.DrawObject(g);
-            foreach(Distributer d in DistrList)
-                if(!d.IsOnHarry)
+            foreach (Distributer d in DistrList)
+                if (!d.IsOnHarry)
                     d.DrawObject(g);
         }
-        
 
         public void PlaceShops(List<ShopHub> Shops, string shape = "S-Patern")
         {
             int UpperY = 440;
             int LowerY = 3480; // This diff should be devisable by the height of a shop (160)
-            int StreetWidth = 500;
+            int StreetWidth = 600;
             Layout = shape;
 
             if (!(shape == "S-Patern"))

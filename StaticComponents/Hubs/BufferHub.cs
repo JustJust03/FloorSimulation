@@ -18,8 +18,8 @@ namespace FloorSimulation
         private WalkTile[] HubAccessPoints; //The Points in the hub where you can drop of trolleys
         private int[] HubAccessPointsX; //The Points in the hub where you can drop of trolleys
 
-        public BufferHub(string name_, int id_, Point FPoint_, Floor floor_, int initial_trolleys = 0, bool vertical_trolleys_ = true) : 
-            base(name_, id_, FPoint_, floor_, new Size(4000, 200), initial_trolleys: initial_trolleys, vertical_trolleys: vertical_trolleys_)
+        public BufferHub(string name_, int id_, Point FPoint_, Floor floor_, int initial_trolleys = 5, bool vertical_trolleys_ = true) : 
+            base(name_, id_, FPoint_, floor_, new Size(3800, 200), initial_trolleys: 0, vertical_trolleys: vertical_trolleys_)
         {
             DummyTrolley = new DanishTrolley(-1, floor, IsVertical_: true);
             if (vertical_trolleys_)
@@ -34,14 +34,14 @@ namespace FloorSimulation
             for (int i = 0; i < Trolleyarr.Length; i++)
             {
                 int trolleyX = RFloorPoint.X + Rslack + i * (Rslack + DummyTrolley.GetRSize().Width); //this point + how far in the line it is
-                int trolleyY = RFloorPoint.Y + floor.FirstDistr.RDistributerSize.Height;
+                int trolleyY = RFloorPoint.Y;
 
                 HubAccessPoints[i] = WW.GetTile(new Point(trolleyX, trolleyY));
                 HubAccessPointsX[i] = HubAccessPoints[i].Rpoint.X;
             }
 
             //Creates 5 initial empty trolleys to the bufferhub
-            for(int i  = Trolleyarr.Length - 5; i < Trolleyarr.Length; i++)
+            for (int i = Trolleyarr.Length - initial_trolleys; i < Trolleyarr.Length; i++)
             {
                 Point p = HubAccessPoints[i].Rpoint;
                 DanishTrolley t = new DanishTrolley(100 + i, floor, p, true);

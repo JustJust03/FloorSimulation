@@ -20,8 +20,15 @@ namespace FloorSimulation
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.Run(new MainDisplay());
+            bool RunSimpleCalculation = false;
+
+            if (RunSimpleCalculation)
+                SimpleCalculation.GetPlantsPerTrolley("2023-07-19 Export");
+            else
+            {
+                Application.EnableVisualStyles();
+                Application.Run(new MainDisplay());
+            }
         }
     }
 }

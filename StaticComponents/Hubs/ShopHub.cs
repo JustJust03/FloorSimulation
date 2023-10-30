@@ -17,6 +17,7 @@ namespace FloorSimulation
     internal class ShopHub : Hub
     {
         public string ColliPlusDay;
+        public string day;
 
         /// <summary>
         /// Shop hub has a standard size: (200cm x 200cm)
@@ -26,12 +27,37 @@ namespace FloorSimulation
             base(name_, id_, FPoint_, floor_, new Size(160, 160), initial_trolleys: initial_trolleys)
         {
             ColliPlusDay = ColliPlusDay_;
+            int nstrips = ColliPlusDay.Split('-').Length;
+            day = ColliPlusDay.Split('-')[nstrips - 1];
         }
 
         public override string ToString() 
         {
-            string day = ColliPlusDay.Split('-')[2];
             return "Name: " + this.name + " \n\tID: " + this.id + "\n\tDay: " + day;
+        }
+
+        /// <summary>
+        /// Draw the components (trolleys) to the screen.
+        /// optionally draw the outline of the hub for better visualization.
+        /// </summary>
+        /// <param name="g"></param>
+        /// <param name="DrawOutline"></param>
+        public override void DrawHub(Graphics g, bool DrawOutline = false)
+        {
+            //outline
+            if (DrawOutline)
+            {
+                if(day == "DI")
+                    g.DrawRectangle(floor.YellowPen, new Rectangle(FloorPoint, HubSize));
+                else if (day == "WO")
+                    g.DrawRectangle(floor.BluePen, new Rectangle(FloorPoint, HubSize));
+                else
+                    g.DrawRectangle(floor.BPen, new Rectangle(FloorPoint, HubSize));
+            }
+
+            //Trolleys
+            foreach (DanishTrolley DT in HubTrolleys)
+                DT.DrawObject(g);
         }
 
     }
