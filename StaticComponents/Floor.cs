@@ -25,7 +25,7 @@ namespace FloorSimulation
         // Real size: 4000 cm x 4000 cm
         public const int RealFloorWidth = 4000; //cm
         public const int RealFloorHeight = 4000; //cm
-        public const float ScaleFactor = 0.2f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
+        public const float ScaleFactor = 0.3f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
         public string Layout;
 
         public List<DanishTrolley> TrolleyList; // A list with all the trolleys that are on the floor.
