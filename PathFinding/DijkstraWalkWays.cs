@@ -123,6 +123,20 @@ namespace FloorSimulation
         /// <returns>The route to take (List of WalkTiles)</returns>
         private List<WalkTile> RunAlgo(WalkTile start_tile, List<WalkTile> target_tiles) 
         {
+            //Remove inaccessible target tiles.
+            List<int> tiles_to_remove = new List<int>();
+            for (int i = 0; i < target_tiles.Count; i++)
+            {
+                WW.WWC.UpdateLocalClearances(DButer, DButer.GetDButerTileSize(), target_tiles[i]);
+                if (!IsTileAccessible(target_tiles[i]))
+                    tiles_to_remove.Add(i);
+            }
+            for(int i = tiles_to_remove.Count - 1; i >= 0; i--)
+                target_tiles.RemoveAt(tiles_to_remove[i]);
+            if (target_tiles.Count == 0)
+                return null;
+
+
             TileQueue.Clear();
             ResetTravelCosts();
             //TODO: update the clearances costs too much time right now.

@@ -86,8 +86,8 @@ namespace FloorSimulation
 
             int rightx = ObjSize.Width;
             int boty = ObjSize.Height;
-            int minx = Math.Max(0, TargetTile.TileX - 1);
-            int miny = Math.Max(0, TargetTile.TileY - 1);
+            int minx = TargetTile.TileX;
+            int miny = TargetTile.TileY;
 
             WalkTile t;
             for (int x = minx; x < TargetTile.TileX + rightx; x++)
@@ -112,8 +112,8 @@ namespace FloorSimulation
         /// </summary>
         private void UpdateTileClearance(WalkTile t, Size ObjSize, Distributer DButer = null)
         {
-            int leftx = Math.Min(ObjSize.Width, t.TileX + 1);
-            int topy = Math.Min(ObjSize.Height, t.TileY + 1);
+            int leftx = Math.Min(ObjSize.Width, t.TileX);
+            int topy = Math.Min(ObjSize.Height, t.TileY);
 
             WalkTile targett;
             for (int x = t.TileX; x > t.TileX - leftx; x--)
@@ -121,8 +121,19 @@ namespace FloorSimulation
                 {
                     targett = WW.WalkTileList[x][y];
                     if (targett == t)
+                    {
+                        if (targett.occupied)
+                        {
+                            targett.accessible = false;
+                            if (DButer != null)
+                                targett.occupied_by = DButer;
+                            else
+                                targett.inaccessible_by_static = true;
+                        }
                         continue;
-                    if(targett.occupied)
+                    }
+
+                    if(targett.occupied && (targett.occupied_by == DButer))
                         topy = t.TileY - targett.TileY;
 
                     TilesChanged++;

@@ -34,19 +34,10 @@ namespace FloorSimulation
             for (int i = 0; i < Trolleyarr.Length; i++)
             {
                 int trolleyX = RFloorPoint.X + Rslack + i * (Rslack + DummyTrolley.GetRSize().Width); //this point + how far in the line it is
-                int trolleyY = RFloorPoint.Y + floor.FirstDistr.RDistributerSize.Height;
+                int trolleyY = RFloorPoint.Y;
 
                 HubAccessPoints[i] = WW.GetTile(new Point(trolleyX, trolleyY));
                 HubAccessPointsX[i] = HubAccessPoints[i].Rpoint.X;
-            }
-
-            //Creates 5 initial empty trolleys to the bufferhub
-            for(int i  = Trolleyarr.Length - 5; i < Trolleyarr.Length; i++)
-            {
-                Point p = HubAccessPoints[i].Rpoint;
-                DanishTrolley t = new DanishTrolley(100 + i, floor, p, true);
-                WW.fill_tiles(t.RPoint, t.GetRSize());
-                Trolleyarr[i] = t;
             }
         }
 

@@ -56,12 +56,25 @@ namespace FloorSimulation
                 }
             }
 
-            UsedShopHubs = UsedShopHubs.Distinct().ToList();    
+            UsedShopHubs = UsedShopHubs.Distinct().ToList();
+            UsedShopHubs = UsedShopHubs.Where(obj => obj.day == "DI" || obj.day == "WO").ToList();
+            UsedShopHubs = UsedShopHubs
+                .OrderBy(obj => obj.day)
+                .ThenBy(obj => obj.id).ToList();
 
             foreach(BoxActivity b in ActivityList)
                 AddToTrolley(b, floor);
 
-            return TransactieIdToTrolley.Values.ToList();
+            List<DanishTrolley> dtList = new List<DanishTrolley>();
+            foreach(DanishTrolley t in TransactieIdToTrolley.Values.ToList())
+            {
+                t.PlantList = t.PlantList
+                    .OrderBy(obj => obj.DestinationHub.day)
+                    .ThenBy(obj => obj.DestinationHub.id).ToList();
+                dtList.Add(t);
+            }
+
+            return dtList;
         }
 
         public void AddToTrolley(BoxActivity b, Floor floor)
@@ -72,8 +85,12 @@ namespace FloorSimulation
             DanishTrolley t = TransactieIdToTrolley[b.Transactieid];
             for (int planti = 0; planti < b.Nplants; planti++) 
             { 
-                plant p = new plant(b.Destination, name_: b.Product_omschrijving_1);
-                t.TakePlantIn(p);
+                //TODO: This Should be removed
+                if(b.Destination.day == "DI" || b.Destination.day == "WO")
+                {
+                    plant p = new plant(b.Destination, name_: b.Product_omschrijving_1);
+                    t.TakePlantIn(p);
+                }
             }
         }
 

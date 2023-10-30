@@ -14,7 +14,7 @@ namespace FloorSimulation
     {
         protected List<DanishTrolley> HubTrolleys;
         protected string name;
-        protected int id;
+        public int id;
         protected Point RFloorPoint;    //Real point on the floor. In cm.
         protected Point FloorPoint;
         protected Size RHubSize;        //Real size of the hub. In cm.
@@ -113,7 +113,7 @@ namespace FloorSimulation
         public virtual void DrawHub(Graphics g, bool DrawOutline = false)
         {
             //outline
-            if (DrawOutline)
+            
                 g.DrawRectangle(floor.BPen, new Rectangle(FloorPoint, HubSize));
 
             //Trolleys

@@ -119,7 +119,7 @@ namespace FloorSimulation
 
         public bool IsFull()
         {
-            if (PlantList.Count > 10)
+            if (PlantList.Count > 4)
                 return true;
             return false;
         }

@@ -1,0 +1,37 @@
+{
+  "Completed": true,
+  "DistributionDate": "2023-07-18",
+  "Layout": "S-Patern",
+  "TotalTime": "00:03:43",
+  "Distributers": {
+    "Distributer 1": {
+      "ID": 0,
+      "VerdeelTijd": "00:02:41",
+      "WachtTijd": "00:00:00",
+      "VerspilTijd": "00:00:09"
+    },
+    "Distributer 2": {
+      "ID": 1,
+      "VerdeelTijd": "00:00:50",
+      "WachtTijd": "00:00:00",
+      "VerspilTijd": "00:00:04"
+    },
+    "Distributer 3": {
+      "ID": 2,
+      "VerdeelTijd": "00:02:11",
+      "WachtTijd": "00:00:17",
+      "VerspilTijd": "00:00:03"
+    },
+    "Distributer 4": {
+      "ID": 3,
+      "VerdeelTijd": "00:00:10",
+      "WachtTijd": "00:00:00",
+      "VerspilTijd": "00:00:18"
+    },
+    "Totals": {
+      "VerdeelTijd": 39.59,
+      "WachtTijd": 2.0,
+      "VerspilTijd": 3.99
+    }
+  }
+}
