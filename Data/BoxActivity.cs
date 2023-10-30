@@ -32,6 +32,11 @@ namespace FloorSimulation
             Destination = DestPlusDayToHub[Relatie_collicode + "-" + Opmerking5];
             return Destination;
         }
+
+        public int GetUnits()
+        {
+            return int.Parse(Beladings_aantallen.Split('x')[1]);
+        }
     }
 
     internal class BoxActivityMap : ClassMap<BoxActivity>

@@ -29,6 +29,7 @@ namespace FloorSimulation
 
         public List<WalkTile> route;
         private const float WALKSPEED = 142f; // cm/s
+        private float TravelSpeed = WALKSPEED;
         private float travel_dist_per_tick;
         public int distributionms_per_tick; // plant distribution per tick in ms
         private float ticktravel = 0f; //The distance that has been traveled, but not registered to walkway yet
@@ -67,7 +68,7 @@ namespace FloorSimulation
             if(id == -1)
                 return;
 
-            travel_dist_per_tick = WALKSPEED / Program.TICKS_PER_SECOND;
+            travel_dist_per_tick = TravelSpeed / Program.TICKS_PER_SECOND;
             distributionms_per_tick = (int)(1000f / Program.TICKS_PER_SECOND);
             MainTask = new Task(floor.FirstStartHub, this, "TakeFullTrolley", floor.FinishedD);
             trolley = null;
@@ -223,6 +224,7 @@ namespace FloorSimulation
         /// <param name="t">Trolley to take in</param>
         public void TakeTrolleyIn(DanishTrolley t)
         {
+            ChangeTravelSpeed(DanishTrolley.TrolleyTravelSpeed);
             trolley = t;
 
             //Rotate the distributer if the trolley to take in is not his orientation
@@ -293,6 +295,7 @@ namespace FloorSimulation
         /// <returns></returns>
         public DanishTrolley GiveTrolley()
         {
+            ChangeTravelSpeed(WALKSPEED);
             WW.unfill_tiles(RDPoint, GetDButerTileSize());
             trolley.IsInTransport = false;
 
@@ -394,6 +397,7 @@ namespace FloorSimulation
 
         public void MountHarry(LangeHarry Harry_)
         {
+            ChangeTravelSpeed(LangeHarry.HarryTravelSpeed);
             if (IsVertical != Harry_.IsVertical)
                 RotateDistributerOnly();
             Harry = Harry_;
@@ -410,6 +414,7 @@ namespace FloorSimulation
         
         public void DisMountHarry()
         {
+            ChangeTravelSpeed(WALKSPEED);
             WW.unfill_tiles(RDPoint, GetRDbuterSize());
 
             Harry.DButer = null;
@@ -424,6 +429,12 @@ namespace FloorSimulation
             Harry = null;
             IsOnHarry = false;
             WW.fill_tiles(RDPoint, GetRDbuterSize(), this);
+        }
+
+        private void ChangeTravelSpeed(float speed)
+        {
+            TravelSpeed = speed;
+            travel_dist_per_tick = TravelSpeed / Program.TICKS_PER_SECOND;
         }
     }
 }

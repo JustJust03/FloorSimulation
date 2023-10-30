@@ -17,10 +17,12 @@ namespace FloorSimulation
         public string name;//Assign plant names here 
         public ShopHub DestinationHub;
         public int ReorderTime; //ms
+        public int units;
 
-        public plant(ShopHub desthub, string name_ = "Plant_Name_Here", int ReorderTime_ = 10000) 
+        public plant(ShopHub desthub, int units_, string name_ = "Plant_Name_Here", int ReorderTime_ = 15200) 
         { 
             DestinationHub = desthub;
+            units = units_;
             name = name_;
             ReorderTime = ReorderTime_;
         }

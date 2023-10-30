@@ -88,7 +88,7 @@ namespace FloorSimulation
                 //TODO: This Should be removed
                 if(b.Destination.day == "DI" || b.Destination.day == "WO")
                 {
-                    plant p = new plant(b.Destination, name_: b.Product_omschrijving_1);
+                    plant p = new plant(b.Destination, b.GetUnits(), name_: b.Product_omschrijving_1);
                     t.TakePlantIn(p);
                 }
             }
