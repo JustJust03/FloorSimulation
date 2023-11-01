@@ -15,7 +15,7 @@ namespace FloorSimulation
         protected List<DanishTrolley> HubTrolleys;
         protected string name;
         public int id;
-        protected Point RFloorPoint;    //Real point on the floor. In cm.
+        public Point RFloorPoint;    //Real point on the floor. In cm.
         protected Point FloorPoint;
         protected Size RHubSize;        //Real size of the hub. In cm.
         protected Size HubSize;

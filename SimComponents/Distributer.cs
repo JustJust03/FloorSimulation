@@ -27,11 +27,19 @@ namespace FloorSimulation
         public TimeSpan WachtTijd;
         public TimeSpan VerspilTijd;
 
+        public const float OddsOfBord = 0.065f;
+        public const float OddsOfLaag = 0.094f;
+        public const float OddsOfHer = 0.25f;
+        public const int BordTime = 34000; //ms
+        public const int LaagTime = 22000; //ms
+        public const int HerTime = 16000; //ms
+
         public List<WalkTile> route;
         private const float WALKSPEED = 142f; // cm/s
         private float TravelSpeed = WALKSPEED;
         private float travel_dist_per_tick;
         public int distributionms_per_tick; // plant distribution per tick in ms
+        public int SideActivityMsLeft; // Amount of ticks left of performing the side activity
         private float ticktravel = 0f; //The distance that has been traveled, but not registered to walkway yet
         private int distributionms = 0; // How many ms have you been distributing
         public Task MainTask;
@@ -104,6 +112,8 @@ namespace FloorSimulation
         /// <param name="target_tile"></param>
         public void TravelToTile(WalkTile target_tile)
         {
+            if (RDPoint == target_tile.Rpoint)
+                return;
             route = DWW.RunAlgoTile(WW.GetTile(RDPoint), target_tile);
         }
 
@@ -175,8 +185,8 @@ namespace FloorSimulation
                     }
 
                     WW.unfill_tiles(RDPoint, RDistributerSize);
-                    DPoint = route[0].Simpoint;
-                    RDPoint = floor.ConvertToRealPoint(DPoint);
+                    RDPoint = route[0].Rpoint;
+                    DPoint = floor.ConvertToSimPoint(RDPoint);
                     WW.fill_tiles(RDPoint, RDistributerSize, this);
 
                     if (IsOnHarry) //If you are on LangeHarry travel Harry too.
@@ -208,13 +218,52 @@ namespace FloorSimulation
 
         public void TickDistribute()
         {
+            if(SideActivityMsLeft > 0)
+            {
+                TickSideActivity();
+                return;
+            }
+
             VerdeelTijd = VerdeelTijd.Add(TimeSpan.FromMilliseconds(distributionms_per_tick * floor.SpeedMultiplier));
             distributionms += distributionms_per_tick * floor.SpeedMultiplier;
             if (distributionms >= trolley.PlantList[0].ReorderTime)
             {
                 distributionms = 0;
+                if (RollForSideActivity())
+                    return;
                 MainTask.DistributionCompleted();
             }
+        }
+
+        public void TickSideActivity()
+        {
+            SideActivityMsLeft -= distributionms_per_tick * floor.SpeedMultiplier;
+            if (SideActivityMsLeft <= 0)
+                MainTask.DistributionCompleted();
+        }
+
+        /// <summary>
+        /// Uses random to determine if you need to perform a side activity.
+        /// Adds the amount of time to SideActivityMsLeft.
+        /// </summary>
+        private bool RollForSideActivity()
+        {
+            //Nieuw bord
+            int r = floor.rand.Next(0, 1000);
+            if (r <= OddsOfBord * 1000)
+                SideActivityMsLeft += BordTime;
+            //Nieuwe laag bijzetten
+            r = floor.rand.Next(0, 1000);
+            if (r <= OddsOfLaag * 1000)
+                SideActivityMsLeft += LaagTime;
+            //De kar herindelen
+            r = floor.rand.Next(0, 1000);
+            if (r <= OddsOfHer * 1000)
+                SideActivityMsLeft += HerTime;
+
+            if (SideActivityMsLeft > 0)
+                return true;
+            return false;
         }
 
         /// <summary>
@@ -247,10 +296,12 @@ namespace FloorSimulation
 
         public void SwitchDistributerTrolley()
         {
-            if (RDPoint.X < trolley.RPoint.X)
+            if (trolley.RPoint.X - RDPoint.X > 10) //Distributer is on the left of the trolley
                 SwitchDistrToRightOfTrolley();
-            else
+            else if(RDPoint.X - trolley.RPoint.X > 10) //Distributer is on the right of the trolley
                 SwitchDistrToLeftOfTrolley();
+            else if(RDPoint.Y - trolley.RPoint.Y > 10) //Distributer is on the bottom of the trolley
+                SwitchDistrToTopOfTrolley();
         }
 
         private void SwitchDistrToLeftOfTrolley()
@@ -260,10 +311,8 @@ namespace FloorSimulation
 
             TrolleyOnTopLeft = false;
             RDPoint = trolley.RPoint;
-            if (IsVertical)
-                trolley.RPoint.Y = RDPoint.Y + VRDistributerSize.Height; //TODO: This doesn't work and is never run
-            else
-                trolley.RPoint.X = RDPoint.X + HRDistributerSize.Width;
+
+            trolley.RPoint.X = RDPoint.X + HRDistributerSize.Width;
             DPoint = floor.ConvertToSimPoint(RDPoint);
             trolley.SimPoint = floor.ConvertToSimPoint(trolley.RPoint);
 
@@ -277,15 +326,24 @@ namespace FloorSimulation
 
             TrolleyOnTopLeft = true;
             trolley.RPoint.X = RDPoint.X;
-            if (IsVertical)
-                trolley.RPoint.Y = RDPoint.Y - VRDistributerSize.Height; //TODO: This doesn't work and is never run
-            else
-                RDPoint.X = trolley.RPoint.X + trolley.GetRSize().Width + 10;
+
+            RDPoint.X = trolley.RPoint.X + trolley.GetRSize().Width + 10;
             DPoint = floor.ConvertToSimPoint(RDPoint);
             trolley.SimPoint = floor.ConvertToSimPoint(trolley.RPoint);
 
             WW.fill_tiles(RDPoint, GetDButerTileSize());
+        }
 
+        private void SwitchDistrToTopOfTrolley()
+        {
+            TrolleyOnTopLeft = false;
+            RDPoint = trolley.RPoint;
+
+            trolley.RPoint.Y = RDPoint.Y + 10;
+            DPoint = floor.ConvertToSimPoint(RDPoint);
+            trolley.SimPoint = floor.ConvertToSimPoint(trolley.RPoint);
+
+            WW.fill_tiles(RDPoint, GetDButerTileSize());
         }
 
         /// <summary>
@@ -419,6 +477,7 @@ namespace FloorSimulation
 
             Harry.DButer = null;
             Harry.IsInUse = false;
+            Harry.IsTargeted = false;
             if (IsVertical)
                 RDPoint = new Point(Harry.RPoint.X - VRDistributerSize.Width, Harry.RPoint.Y + 57 * 3);
             else

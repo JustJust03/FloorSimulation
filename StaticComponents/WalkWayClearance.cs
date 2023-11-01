@@ -34,8 +34,14 @@ namespace FloorSimulation
                     t.occupied_by = null;
                     if (t.occupied_by != null && !t.occupied) //Makes the inaccessible tiles around the distributer occupied by nothing again.
                         t.occupied_by = null;
-                    if (t.TileY == WW.WalkTileListHeight - 1 || t.TileX == WW.WalkTileListWidth - 1) //Occupie the borders of the walkway
+                    if (t.TileY == WW.WalkTileListHeight - 1 || t.TileX == WW.WalkTileListWidth - 1 ||
+                        t.TileY == 0 || t.TileX == 0) //Occupie the borders of the walkway
+                    {
                         t.occupied = true;
+                        t.accessible = false;
+                        t.inaccessible_by_static = true;
+                        t.IsStatic = true;
+                    }
                 }
         }
 
@@ -71,6 +77,7 @@ namespace FloorSimulation
 
         /// <summary>
         /// Only updates the necessary tiles for an object to walk to 1 tile
+        /// Size is in tiles
         /// </summary>
         public void UpdateLocalClearances(Distributer DButer, Size ObjSize, WalkTile TargetTile)
         {
@@ -86,8 +93,8 @@ namespace FloorSimulation
 
             int rightx = ObjSize.Width;
             int boty = ObjSize.Height;
-            int minx = TargetTile.TileX;
-            int miny = TargetTile.TileY;
+            int minx = Math.Max(0, TargetTile.TileX);
+            int miny = Math.Max(0, TargetTile.TileY);
 
             WalkTile t;
             for (int x = minx; x < TargetTile.TileX + rightx; x++)
@@ -155,7 +162,7 @@ namespace FloorSimulation
             foreach (List<WalkTile> TileCol in WW.WalkTileList)
                 foreach (WalkTile t in TileCol)
                 {
-                    if (t.accessible)
+                    if (t.accessible || t.IsStatic)
                         continue;
                     TilesReset++;
                     t.accessible = true;

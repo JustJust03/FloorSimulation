@@ -3,16 +3,18 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
+using System.ComponentModel;
 
 namespace FloorSimulation
 {
     /// <summary>
     /// The main display to Paint on.
     /// </summary>
-    public partial class MainDisplay : Form
+    internal partial class MainDisplay : Form
     {
         public Button tick_button;
         public Button ss_button;
+        public Button ShowOccupiance_button;
         public TrackBar SpeedTrackBar;
         public Timer timer;
         private Floor floor;
@@ -21,6 +23,7 @@ namespace FloorSimulation
         private Brush StandardWhiteBrush;
         public bool isSimulating = false;
         public string date = "2023-07-18";
+        public MetaInfo InfoPanel;
         
         public MainDisplay()
         {
@@ -28,7 +31,6 @@ namespace FloorSimulation
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             UpdateStyles();
-
 
             this.Size = new Size(1422, 840); //40px for the top bar.
             this.BackColor = Color.DarkSlateGray;
@@ -46,6 +48,12 @@ namespace FloorSimulation
             tick_button.Location = new Point(1500, 200);
             tick_button.Click += new EventHandler(floor.TickButton);
 
+            //ShowOccupiance Button
+            ShowOccupiance_button = new Button();
+            ShowOccupiance_button.Text = "Draw Occupiance";
+            ShowOccupiance_button.Location = new Point(1300, 300);
+            ShowOccupiance_button.Click += new EventHandler(floor.DrawOccupiance);
+
             //Start/Stop button
             InitTimer();
             ss_button = new Button();
@@ -56,11 +64,18 @@ namespace FloorSimulation
             //Trackbar
             InitTrackBar();
 
+
             Controls.Add(floor);
             Controls.Add(tick_button);
+            Controls.Add(ShowOccupiance_button);
             Controls.Add(ss_button);
 
             InitData();
+
+            //MetaInfo
+            InfoPanel = new MetaInfo(new Point(floor.Width, (int)(2000 * Floor.ScaleFactor)), this, floor);
+            Controls.Add(InfoPanel);
+
             Paint += PaintMainDisplay;
         }
 
@@ -72,12 +87,18 @@ namespace FloorSimulation
             g.DrawString(" 1  2  3  4  5  6  7  8  9", BiggerSFont, StandardWhiteBrush, new Point(1500, 150));
         }
 
+        public void InvalInfo()
+        {
+            InfoPanel.Inval();
+        }
+
         private void InitData()
         {
             ReadData rd = new ReadData();
             List<ShopHub> shops = rd.ReadHubData(floor);
 
-            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys("2023-07-18", floor, length: "short");
+            //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys("2023-07-18", floor, length: "short");
+            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys("2023-07-18", floor);
             floor.PlaceShops(rd.UsedShopHubs);
             floor.FirstStartHub.AddUndistributedTrolleys(L);
         }

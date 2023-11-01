@@ -14,9 +14,10 @@ namespace FloorSimulation
     {
         private List<DanishTrolley> UndistributedTrolleys;
         public bool StartHubEmpty;
+        public const int MaxStartHubTrolleys = 8;
 
         public StartHub(string name_, int id_, Point FPoint_, Floor floor_, int initial_trolleys_ = 0, bool vertical_trolleys_ = true) : 
-            base(name_, id_, FPoint_, floor_, new Size(400, 200), initial_trolleys:initial_trolleys_, vertical_trolleys:vertical_trolleys_)
+            base(name_, id_, FPoint_, floor_, new Size(800, 200), initial_trolleys:initial_trolleys_, vertical_trolleys:vertical_trolleys_)
         {
             UndistributedTrolleys = new List<DanishTrolley>();
             StartHubEmpty = false;
@@ -26,25 +27,32 @@ namespace FloorSimulation
         {
             UndistributedTrolleys = UndistributedTrolleys.Union(UT).ToList();
 
-            int take_amount = Math.Min(5, UndistributedTrolleys.Count);
+            int take_amount = Math.Min(MaxStartHubTrolleys, UndistributedTrolleys.Count);
             HubTrolleys = UndistributedTrolleys.Take(take_amount).ToList();
             UndistributedTrolleys.RemoveRange(0, take_amount);
 
             PlaceTrolleys();
         }
 
-        public override DanishTrolley GiveTrolley(Point AgentRPoint = default)
+        public override DanishTrolley PeekFirstTrolley()
         {
-            if(HubTrolleys.Count == 1 && UndistributedTrolleys.Count > 0)
+            if(HubTrolleys.Count == 0 && UndistributedTrolleys.Count > 0)
             {
-                int take_amount = Math.Min(4, UndistributedTrolleys.Count);
+                int take_amount = Math.Min(MaxStartHubTrolleys, UndistributedTrolleys.Count);
                 HubTrolleys = UndistributedTrolleys.Take(take_amount).ToList();
                 UndistributedTrolleys.RemoveRange(0, take_amount);
 
                 PlaceTrolleys();
             }
+
+            return base.PeekFirstTrolley();
+        }
+
+        public override DanishTrolley GiveTrolley(Point AgentRPoint = default)
+        {
             if (UndistributedTrolleys.Count == 0)
                 StartHubEmpty = true;
+            floor.Display.InvalInfo();
             return base.GiveTrolley(AgentRPoint);
         }
 
@@ -64,6 +72,11 @@ namespace FloorSimulation
                 t.TeleportTrolley(new Point(trolleyX, trolleyY));
                 WW.fill_tiles(t.RPoint, t.GetRSize());
             }
+        }
+
+        public int TotalUndistributedTrolleys()
+        {
+            return UndistributedTrolleys.Count + HubTrolleys.Count;
         }
     }
 }
