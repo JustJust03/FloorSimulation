@@ -129,6 +129,11 @@ namespace FloorSimulation
             return false;
         }
 
+        public override string ToString()
+        {
+            return TransactieId + " plants: " + PlantList.Count;
+        }
+
         // TODO: Create a function that assigns every new trolley an unique id.
     }
 }

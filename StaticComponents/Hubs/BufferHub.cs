@@ -18,8 +18,8 @@ namespace FloorSimulation
         private WalkTile[] HubAccessPoints; //The Points in the hub where you can drop of trolleys
         private int[] HubAccessPointsX; //The Points in the hub where you can drop of trolleys
 
-        public BufferHub(string name_, int id_, Point FPoint_, Floor floor_, int initial_trolleys = 5, bool vertical_trolleys_ = true) : 
-            base(name_, id_, FPoint_, floor_, new Size(3800, 200), initial_trolleys: 0, vertical_trolleys: vertical_trolleys_)
+        public BufferHub(string name_, int id_, Point FPoint_, Floor floor_, int initial_trolleys = 0, bool vertical_trolleys_ = true) : 
+            base(name_, id_, FPoint_, floor_, new Size(floor_.FirstWW.RSizeWW.Width - 200, 200), initial_trolleys: 0, vertical_trolleys: vertical_trolleys_)
         {
             DummyTrolley = new DanishTrolley(-1, floor, IsVertical_: true);
             if (vertical_trolleys_)

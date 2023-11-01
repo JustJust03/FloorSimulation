@@ -31,7 +31,7 @@ namespace FloorSimulation
         public const int WALK_TILE_WIDTH = 10; //cm
         public const int WALK_TILE_HEIGHT = 10; //cm
 
-        private bool DevTools;
+        public bool DevTools;
 
         /// <summary>
         /// 

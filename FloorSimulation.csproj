@@ -91,6 +91,9 @@
     <Compile Include="Data\BoxActivity.cs" />
     <Compile Include="Data\HubData.cs" />
     <Compile Include="Data\ReadData.cs" />
+    <Compile Include="MetaInfo.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="PathFinding\DijkstraWalkWays.cs" />
     <Compile Include="SimComponents\Distributer.cs" />
     <Compile Include="SimComponents\LangeHarry.cs" />

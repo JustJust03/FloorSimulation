@@ -22,20 +22,18 @@ namespace FloorSimulation
         public int Entry {  get; set; }
         public DateTime Date { get; set; }
         public ShopHub Destination { get; set; }
-        public int Nplants { get; set; }
 
         public ShopHub InitActivity(Dictionary<string, ShopHub> DestPlusDayToHub)
         {
             Beladings_aantallen = Beladings_aantallen.Replace("[", "").Replace("]", "");
             Date = new DateTime(Datum.Year, Datum.Month, Datum.Day, Tijd.Hour, Tijd.Minute, Tijd.Second);
-            Nplants = int.Parse(Beladings_aantallen.Split('x')[0]);
             Destination = DestPlusDayToHub[Relatie_collicode + "-" + Opmerking5];
             return Destination;
         }
 
         public int GetUnits()
         {
-            return int.Parse(Beladings_aantallen.Split('x')[1]);
+            return int.Parse(Beladings_aantallen.Split('x')[1]) * int.Parse(Beladings_aantallen.Split('x')[0]);
         }
     }
 

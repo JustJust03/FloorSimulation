@@ -25,6 +25,7 @@ namespace FloorSimulation
         private WalkWay WW;
         public bool IsVertical;
         public bool IsInUse;
+        public bool IsTargeted;
         public Distributer DButer;
         public const float HarryTravelSpeed = 300f; //cm/s
 
