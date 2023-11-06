@@ -36,6 +36,27 @@ namespace FloorSimulation
             return "Name: " + this.name + " \n\tID: " + this.id + "\n\tDay: " + day;
         }
 
+        public override DanishTrolley PeekFirstTrolley()
+        {
+            int lowestY = int.MaxValue;
+            DanishTrolley t = null;
+            foreach(DanishTrolley dt in HubTrolleys)
+                if (dt.RPoint.Y < lowestY)
+                {
+                    t = dt;
+                    lowestY = t.RPoint.Y;
+                }
+            return t;
+        }
+
+        public override void TeleportHub(Point NewRPoint)
+        {
+            WalkTile t = WW.GetTile(new Point(NewRPoint.X + RHubSize.Width - 10, NewRPoint.Y + RHubSize.Height));
+            t.IsStatic = true;
+            t.occupied = true;
+            base.TeleportHub(NewRPoint);
+        }
+
         /// <summary>
         /// Draw the components (trolleys) to the screen.
         /// optionally draw the outline of the hub for better visualization.

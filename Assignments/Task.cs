@@ -178,7 +178,7 @@ namespace FloorSimulation
 
         public void FailRoute()
         {
-            if (TargetIsHubGoals.Contains(Goal)) //If the shophub is block by something, try to walk 10 tiles to the right and down of this.
+            if (TargetIsHubGoals.Contains(Goal)) //If the shophub is blocked by something, try to walk 10 tiles to the right and down of this.
             {
                 DButer.TravelToTrolley(TargetHub.PeekFirstTrolley());
                 if (DButer.route == null)
