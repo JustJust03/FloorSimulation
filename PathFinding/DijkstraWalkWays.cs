@@ -113,6 +113,7 @@ namespace FloorSimulation
         /// </summary>
         public List<WalkTile> RunAlgoTiles(WalkTile StartTile, List<WalkTile> TargetTiles)
         {
+            TargetTiles.RemoveAll(i => i == null);
             return RunAlgo(StartTile, TargetTiles);
         }
 

@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
 using System.Collections.Generic;
+using System.Net.Mail;
 
 namespace FloorSimulation
 {
@@ -150,7 +151,10 @@ namespace FloorSimulation
         public void TickWalk()
         {
             if (route == null)
+            {
+                MainTask.FailRoute();
                 return;
+            }
 
             // TODO: develop non square tile tickwalks.
             if (WalkWay.WALK_TILE_WIDTH != WalkWay.WALK_TILE_HEIGHT)

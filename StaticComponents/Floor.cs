@@ -27,7 +27,7 @@ namespace FloorSimulation
 
         // Real size: 4000 cm x 4000 cm
         public const int RealFloorWidth = 5000; //cm
-        public const int RealFloorHeight = 4000; //cm
+        public const int RealFloorHeight = 5000; //cm
         public const float ScaleFactor = 0.25f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
         public string Layout;
 
@@ -76,7 +76,7 @@ namespace FloorSimulation
             HubList = new List<Hub>();
 
             FirstWW = new WalkWay(new Point(0, 0), new Size(RealFloorWidth, RealFloorHeight), this, DevTools_: false);
-            FirstStartHub = new StartHub("Start hub", 0, new Point(200, 3750), this, vertical_trolleys_: true);
+            FirstStartHub = new StartHub("Start hub", 0, new Point(200, 4570), this, vertical_trolleys_: true);
             HubList.Add(FirstStartHub);
             FirstHarry = new LangeHarry(0, this, FirstWW, new Point(4500, 1700));
 
@@ -99,10 +99,10 @@ namespace FloorSimulation
             DistrList.Add(EightDistr);
 
             FTHubs = new List<FullTrolleyHub>();
-            FTHub0 = new FullTrolleyHub("Full Trolley Hub", 2, new Point(400, 440), this, new Size(200, 3000));
-            FTHub1 = new FullTrolleyHub("Full Trolley Hub", 3, new Point(1350, 440), this, new Size(200, 3000));
-            FTHub2 = new FullTrolleyHub("Full Trolley Hub", 4, new Point(2300, 440), this, new Size(200, 3000));
-            FTHub3 = new FullTrolleyHub("Full Trolley Hub", 5, new Point(3250, 440), this, new Size(200, 3000));
+            FTHub0 = new FullTrolleyHub("Full Trolley Hub", 2, new Point(400, 640), this, new Size(200, 3500));
+            FTHub1 = new FullTrolleyHub("Full Trolley Hub", 3, new Point(1350, 640), this, new Size(200, 3500));
+            FTHub2 = new FullTrolleyHub("Full Trolley Hub", 4, new Point(2300, 640), this, new Size(200, 3500));
+            FTHub3 = new FullTrolleyHub("Full Trolley Hub", 5, new Point(3250, 640), this, new Size(200, 3500));
             FTHubs.Add(FTHub0);
             FTHubs.Add(FTHub1);
             FTHubs.Add(FTHub2);
@@ -174,8 +174,8 @@ namespace FloorSimulation
 
         public void PlaceShops(List<ShopHub> Shops, string shape = "S-Patern")
         {
-            int UpperY = 440;
-            int LowerY = 3480; // This diff should be devisable by the height of a shop (160)
+            int UpperY = 640;
+            int LowerY = 4060; // This diff should be devisable by the height of a shop (160)
             int StreetWidth = 600;
             Layout = shape;
 
@@ -196,15 +196,15 @@ namespace FloorSimulation
                 {
                     placed_shops_in_a_row = 0;
                     if (two_per_row == 1)
-                        y -= 320;
+                        y -= 360;
                     else
-                        y += 320;
+                        y += 360;
                 }
 
                 if (two_per_row == 1 && y > UpperY)
-                    y -= 160;
+                    y -= 180;
                 else if (two_per_row == 2 && y < LowerY)
-                    y += 160;
+                    y += 180;
                 else
                 {
                     placed_shops_in_a_row = 0;
@@ -216,7 +216,7 @@ namespace FloorSimulation
                     }
                     else
                     {
-                        y -= 320; // Because the middle section was placed at the bottom
+                        y -= 360; // Because the middle section was placed at the bottom
                         x += 160;
                         two_per_row = 1;
                     }
@@ -233,7 +233,7 @@ namespace FloorSimulation
         {
             FullTrolleyHub ClosestHub = FTHubs[0];
             foreach (FullTrolleyHub FThub in FTHubs)
-                if (Math.Abs(db.RDPoint.X + 150 - FThub.RFloorPoint.X) < Math.Abs(db.RDPoint.X + 150 - ClosestHub.RFloorPoint.X))
+                if (Math.Abs(db.RDPoint.X - FThub.RFloorPoint.X) < Math.Abs(db.RDPoint.X - ClosestHub.RFloorPoint.X))
                     ClosestHub = FThub;
 
             return ClosestHub;
