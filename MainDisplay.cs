@@ -18,12 +18,13 @@ namespace FloorSimulation
         public TrackBar SpeedTrackBar;
         public Timer timer;
         private Floor floor;
-        private Font StandardFont;
-        private Font BiggerSFont;
-        private Brush StandardWhiteBrush;
+        public Font StandardFont;
+        public Font BiggerSFont;
+        public Brush StandardWhiteBrush;
         public bool isSimulating = false;
         public string date = "2023-07-18";
         public MetaInfo InfoPanel;
+        public ControlInfo ControlPanel;
         
         public MainDisplay()
         {
@@ -41,34 +42,11 @@ namespace FloorSimulation
 
             //Floor
             floor = new Floor(new Point(0, 0), this);
-
-            //Tick Button
-            tick_button = new Button();
-            tick_button.Text = "Tick";
-            tick_button.Location = new Point(1500, 200);
-            tick_button.Click += new EventHandler(floor.TickButton);
-
-            //ShowOccupiance Button
-            ShowOccupiance_button = new Button();
-            ShowOccupiance_button.Text = "Draw Occupiance";
-            ShowOccupiance_button.Location = new Point(1300, 300);
-            ShowOccupiance_button.Click += new EventHandler(floor.DrawOccupiance);
-
-            //Start/Stop button
-            InitTimer();
-            ss_button = new Button();
-            ss_button.Text = "Start";
-            ss_button.Location = new Point(1500, 300);
-            ss_button.Click += new EventHandler(ToggleSimButton);
-
-            //Trackbar
-            InitTrackBar();
-
-
             Controls.Add(floor);
-            Controls.Add(tick_button);
-            Controls.Add(ShowOccupiance_button);
-            Controls.Add(ss_button);
+
+            //ControlInfo
+            ControlPanel = new ControlInfo(new Point(floor.Width, floor.Location.X), this, floor);
+            Controls.Add(ControlPanel);
 
             InitData();
 
@@ -81,15 +59,12 @@ namespace FloorSimulation
 
         private void PaintMainDisplay(object sender, PaintEventArgs e)
         {
-            Graphics g = e.Graphics;
-            g.DrawString(floor.ElapsedSimTime.ToString(@"hh\:mm\:ss"), StandardFont, StandardWhiteBrush, new Point(1400, 50));
-            g.DrawString("Speed Multiplier", StandardFont, StandardWhiteBrush, new Point(1500, 50));
-            g.DrawString(" 1  3  5  7  9  11  13  15  17", BiggerSFont, StandardWhiteBrush, new Point(1500, 150));
+            ControlPanel.Invalidate();
         }
 
         public void InvalInfo()
         {
-            InfoPanel.Inval();
+            InfoPanel.Invalidate();
         }
 
         private void InitData()
@@ -101,50 +76,6 @@ namespace FloorSimulation
             List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys("2023-07-18", floor);
             floor.PlaceShops(rd.UsedShopHubs);
             floor.FirstStartHub.AddUndistributedTrolleys(L);
-        }
-
-        private void InitTimer()
-        {
-            timer = new Timer();
-            timer.Interval = Program.TICKS_PER_SECOND;
-            timer.Tick += floor.TickButton;
-        }
-
-        private void InitTrackBar()
-        {
-            SpeedTrackBar = new TrackBar
-            {
-                Location = new Point(1500, 100),
-                Width = 250,
-                Minimum = 1,
-                Maximum = 18,
-                Value = 1,
-            };
-            Text = "TrackBar Example";
-            SpeedTrackBar.Scroll += SpeedTBScroll;
-            floor.SpeedMultiplier = SpeedTrackBar.Value;
-
-            Controls.Add(SpeedTrackBar); // Add the TrackBar to the form
-        }
-
-        private void SpeedTBScroll(object sender, EventArgs e)
-        {
-            floor.SpeedMultiplier = SpeedTrackBar.Value;
-        }
-
-        private void ToggleSimButton(object sender, EventArgs e)
-        {
-            if (isSimulating)
-            {
-                timer.Stop();
-                ss_button.Text = "Start";
-            }
-            else
-            {
-                timer.Start();
-                ss_button.Text = "Stop";
-            }
-            isSimulating = !isSimulating;
         }
     }
 }

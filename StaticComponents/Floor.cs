@@ -127,6 +127,7 @@ namespace FloorSimulation
             ElapsedSimTime = ElapsedSimTime.Add(TimeSpan.FromMilliseconds(MilisecondsPerTick * SpeedMultiplier));
             foreach (Distributer d in DistrList)
                 d.Tick();
+
             Display.Invalidate();
             Invalidate();
         }
