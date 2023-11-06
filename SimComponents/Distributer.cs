@@ -340,9 +340,12 @@ namespace FloorSimulation
 
         private void SwitchDistrToTopOfTrolley()
         {
+            WW.unfill_tiles(trolley.RPoint, trolley.GetRSize());
+            WW.unfill_tiles(RDPoint, new Size(HRDistributerSize.Width + 10, VRDistributerSize.Height));
+
             TrolleyOnTopLeft = false;
             RDPoint = trolley.RPoint;
-
+            
             trolley.RPoint.Y = RDPoint.Y + 10;
             DPoint = floor.ConvertToSimPoint(RDPoint);
             trolley.SimPoint = floor.ConvertToSimPoint(trolley.RPoint);

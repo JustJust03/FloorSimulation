@@ -94,6 +94,7 @@
     <Compile Include="MetaInfo.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="PathFinding\AstarWalkWays.cs" />
     <Compile Include="PathFinding\DijkstraWalkWays.cs" />
     <Compile Include="SimComponents\Distributer.cs" />
     <Compile Include="SimComponents\LangeHarry.cs" />

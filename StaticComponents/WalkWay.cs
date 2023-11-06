@@ -174,7 +174,7 @@ namespace FloorSimulation
 
             int width = (int)Math.Ceiling((double)Rs.Width / WalkTile.Rwidth);
             int height = (int)Math.Ceiling((double)Rs.Height / WalkTile.Rheight);
-            int[] result = { x, y, width, height };
+            int[] result = { x, y, width, height};
 
             return result;
 
