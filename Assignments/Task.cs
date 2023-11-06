@@ -348,8 +348,6 @@ namespace FloorSimulation
             Trolley = DButer.trolley;
             TargetHub = DButer.floor.ClosestFTHub(DButer);
             DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
-            if (DButer.route == null) //Route was not possible at this point. Try again later. 
-                return;
 
             Goal = "DeliverFullTrolley"; //New goal
             InTask = true;

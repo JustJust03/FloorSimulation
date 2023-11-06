@@ -84,7 +84,7 @@ namespace FloorSimulation
             Graphics g = e.Graphics;
             g.DrawString(floor.ElapsedSimTime.ToString(@"hh\:mm\:ss"), StandardFont, StandardWhiteBrush, new Point(1400, 50));
             g.DrawString("Speed Multiplier", StandardFont, StandardWhiteBrush, new Point(1500, 50));
-            g.DrawString(" 1  2  3  4  5  6  7  8  9", BiggerSFont, StandardWhiteBrush, new Point(1500, 150));
+            g.DrawString(" 1  3  5  7  9  11  13  15  17", BiggerSFont, StandardWhiteBrush, new Point(1500, 150));
         }
 
         public void InvalInfo()
@@ -115,9 +115,9 @@ namespace FloorSimulation
             SpeedTrackBar = new TrackBar
             {
                 Location = new Point(1500, 100),
-                Width = 200,
+                Width = 250,
                 Minimum = 1,
-                Maximum = 9,
+                Maximum = 18,
                 Value = 1,
             };
             Text = "TrackBar Example";

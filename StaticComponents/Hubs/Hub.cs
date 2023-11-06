@@ -83,7 +83,6 @@ namespace FloorSimulation
                 throw new ArgumentException("Can't add more trolleys to this shop hub.");
 
             int LeftX = RFloorPoint.X; //Start from the left of the hub, and keep track of where to place the trolley.
-            int Rslack = 20; //The real slack in all dimensions.
             for (int i = 0; i < initial_trolleys; i++)
             {
                 DanishTrolley DT = new DanishTrolley(i, floor, IsVertical_: true);

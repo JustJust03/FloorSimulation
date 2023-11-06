@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Collections.Generic;
 using System.Net.Mail;
+using FloorSimulation.PathFinding;
 
 namespace FloorSimulation
 {
@@ -50,7 +51,7 @@ namespace FloorSimulation
         public bool TrolleyOnTopLeft; //True when the trolley is to the left or on top of the distributer
         public bool IsOnHarry;
 
-        private DijkstraWalkWays DWW;
+        private AstarWalkWays AWW;
         public WalkWay WW;
 
         
@@ -82,7 +83,7 @@ namespace FloorSimulation
             MainTask = new Task(floor.FirstStartHub, this, "TakeFullTrolley", floor.FinishedD);
             trolley = null;
 
-            DWW = new DijkstraWalkWays(WW, this);
+            AWW = new AstarWalkWays(WW, this);
             WW.fill_tiles(RDPoint, RDistributerSize, this);
         }
 
@@ -115,7 +116,7 @@ namespace FloorSimulation
         {
             if (RDPoint == target_tile.Rpoint)
                 return;
-            route = DWW.RunAlgoTile(WW.GetTile(RDPoint), target_tile);
+            route = AWW.RunAlgoTile(WW.GetTile(RDPoint), target_tile);
         }
 
         /// <summary>
@@ -124,7 +125,7 @@ namespace FloorSimulation
         /// <param name="target_tile"></param>
         public void TravelToClosestTile(List<WalkTile> target_tiles)
         {
-            route = DWW.RunAlgoTiles(WW.GetTile(RDPoint), target_tiles);
+            route = AWW.RunAlgoTiles(WW.GetTile(RDPoint), target_tiles);
         }
 
         /// <summary>
@@ -132,7 +133,7 @@ namespace FloorSimulation
         /// </summary>
         public void TravelToTrolley(DanishTrolley target_trolley)
         {
-            route = DWW.RunAlgoDistrToTrolley(target_trolley);
+            route = AWW.RunAlgoDistrToTrolley(target_trolley);
         }
 
         /// <summary>
@@ -140,7 +141,7 @@ namespace FloorSimulation
         /// </summary>
         public void TravelToHarry(LangeHarry Harry)
         {
-            route = DWW.RunAlgoDistrToHarry(Harry);
+            route = AWW.RunAlgoDistrToHarry(Harry);
         }
         
         /// <summary>
@@ -181,7 +182,7 @@ namespace FloorSimulation
                     }
                     WW.WWC.UpdateLocalClearances(this, GetDButerTileSize(), destination);
 
-                    if (!DWW.IsTileAccessible(destination)) //Route failed, there was something occupying the calculated route
+                    if (!AWW.IsTileAccessible(destination)) //Route failed, there was something occupying the calculated route
                     {
                         ticktravel = 0;
                         MainTask.FailRoute();
@@ -340,9 +341,12 @@ namespace FloorSimulation
 
         private void SwitchDistrToTopOfTrolley()
         {
+            WW.unfill_tiles(trolley.RPoint, trolley.GetRSize());
+            WW.unfill_tiles(RDPoint, new Size(HRDistributerSize.Width + 10, VRDistributerSize.Height));
+
             TrolleyOnTopLeft = false;
             RDPoint = trolley.RPoint;
-
+            
             trolley.RPoint.Y = RDPoint.Y + 10;
             DPoint = floor.ConvertToSimPoint(RDPoint);
             trolley.SimPoint = floor.ConvertToSimPoint(trolley.RPoint);
