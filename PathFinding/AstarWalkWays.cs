@@ -1,32 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Drawing;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
+using Priority_Queue;
 
-namespace FloorSimulation
+namespace FloorSimulation.PathFinding
 {
-    /// <summary>
-    /// A class which's actions should be performed by simulation components like distributers.
-    /// Uses Walkway to find shortest paths.
-    /// </summary>
-    // TODO: Convert this to an A* algorithm
-    internal class DijkstraWalkWays
-    {
+    internal class AstarWalkWays
+    { 
         private WalkWay WW;
-        private Queue<WalkTile> TileQueue;
+        private SimplePriorityQueue<WalkTile> TileQueue;
         private Distributer DButer;
+        private WalkTile ClosesTargetTile;
 
-        public DijkstraWalkWays(WalkWay WW_, Distributer distributer_)
+        public AstarWalkWays(WalkWay WW_, Distributer distributer_)
         {
             WW = WW_;
             DButer = distributer_; 
-            TileQueue = new Queue<WalkTile>();
+            TileQueue = new SimplePriorityQueue<WalkTile>();
         }
 
+        private int SquaredHeuristic(WalkTile tile)
+        {
+            // You can adjust the heuristic based on your specific requirements.
+            // Here's an example of the Euclidean distance heuristic:
+            int x = tile.TileX - ClosesTargetTile.TileX;
+            int y = tile.TileY - ClosesTargetTile.TileY;
+            return x * x + y * y;
+        }
+
+        private void AssignClosestTargetTile(WalkTile tile, List<WalkTile> targetTiles)
+        {
+            // You can adjust the heuristic based on your specific requirements.
+            // Here's an example of the Euclidean distance heuristic:
+            int mincost = int.MaxValue;
+            foreach(WalkTile t in targetTiles)
+            {
+                int cost = Math.Abs(tile.TileX - t.TileX) + Math.Abs(tile.TileY - t.TileY);
+                if (cost < mincost)
+                {
+                    ClosesTargetTile = t;
+                    mincost = cost;
+                }
+            }
+        }
         /// <summary>
         /// returns shortest path to a trolley.
         /// Access points are at the top or bottom for vertical trolleys and at the right and left of horizontal trolleys
@@ -140,80 +159,78 @@ namespace FloorSimulation
 
             TileQueue.Clear();
             ResetTravelCosts();
-            //TODO: update the clearances costs too much time right now.
             WW.WWC.UpdateClearances(DButer, DButer.GetDButerTileSize());
  
             start_tile.TravelCost = 0;
             start_tile.visited = true;
-            TileQueue.Enqueue(start_tile);
+            TileQueue.Enqueue(start_tile, 0);
+
+            WalkTile tileA = null;
+            WalkTile tileB = null;
+            WalkTile tileL = null;
+            WalkTile tileR = null;
+
+            WalkTile[] neighbours = new WalkTile[]
+            {
+                tileA,
+                tileB,
+                tileL,
+                tileR
+            };
+
+            AssignClosestTargetTile(start_tile, target_tiles); 
 
             int nodesSearched = 0;
 
             while(TileQueue.Count > 0) 
             {
                 nodesSearched++;
-
                 WalkTile tile = TileQueue.Dequeue();
+                //Target tile was found:
+                if (target_tiles.Contains(tile))
+                {
+                    //Trace back from the target tile to it's parent to calculate the route.
+                    List<WalkTile> Route = new List<WalkTile>();
+                    WalkTile ptile = tile;
+
+                    Route.Insert(0, ptile);
+                    while(ptile.Parent != null)
+                    {
+                        ptile = ptile.Parent;
+                        Route.Insert(0, ptile);
+                    }
+
+                    Route.RemoveAt(0);
+                    return Route;
+                }
+
+
                 tile.visited = true;
 
-                WalkTile tileA = tile.TileAbove();
-                WalkTile tileB = tile.TileBeneath();
-                WalkTile tileL = tile.TileLeft();
-                WalkTile tileR = tile.TileRight();
+                neighbours[0] = tile.TileAbove();
+                neighbours[1] = tile.TileBeneath();
+                neighbours[2] = tile.TileLeft();
+                neighbours[3] = tile.TileRight();
 
-                //up
-                if (IsTileAccessible(tileA) && tileA.TravelCost > tile.TravelCost + 1)
+                int newCost;
+
+                //Add neighbours to priority queue
+                for (int i = 0; i < neighbours.Length; i++)
                 {
-                    tileA.TravelCost = tile.TravelCost + 1;
-                    tileA.Parent = tile;
-                    if (!tileA.visited)
-                        TileQueue.Enqueue(tileA);
-                }
-                //down
-                if (IsTileAccessible(tileB) && tileB.TravelCost > tile.TravelCost + 1)
-                {
-                    tileB.TravelCost = tile.TravelCost + 1;
-                    tileB.Parent = tile;
-                    if (!tileB.visited)
-                        TileQueue.Enqueue(tileB);
-                }
-                //left
-                if (IsTileAccessible(tileL) && tileL.TravelCost > tile.TravelCost + 1)
-                {
-                    tileL.TravelCost = tile.TravelCost + 1;
-                    tileL.Parent = tile;
-                    if (!tileL.visited)
-                        TileQueue.Enqueue(tileL);
-                }
-                //right
-                if (IsTileAccessible(tileR) && tileR.TravelCost > tile.TravelCost + 1)
-                {
-                    tileR.TravelCost = tile.TravelCost + 1;
-                    tileR.Parent = tile;
-                    if (!tileR.visited)
-                        TileQueue.Enqueue(tileR);
+                    WalkTile neighbour = neighbours[i];
+                    newCost = tile.TravelCost + SquaredHeuristic(neighbour);
+                    if (IsTileAccessible(neighbour) && neighbour.TravelCost > newCost)
+                    {
+                        neighbour.TravelCost = newCost;
+                        neighbour.Parent = tile;
+                        if (!neighbour.visited)
+                            TileQueue.Enqueue(neighbour, newCost);
+                    }
                 }
             }
-
-            WalkTile target_tile = ClosestTargetTile(target_tiles);
 
             //No route was found
-            if (target_tile == null || target_tile.TravelCost == int.MaxValue)
-                return null;
-            
-            //Trace back from the target tile to it's parent to calculate the route.
-            List<WalkTile> Route = new List<WalkTile>();
-            WalkTile ptile = target_tile;
-
-            Route.Insert(0, ptile);
-            while(ptile.Parent != null)
-            {
-                ptile = ptile.Parent;
-                Route.Insert(0, ptile);
-            }
-
-            Route.RemoveAt(0);
-            return Route;
+            return null;
         }
 
         /// <summary>
@@ -239,25 +256,6 @@ namespace FloorSimulation
         public bool IsTileAccessible(WalkTile tile)
         {
             return tile != null && (tile.accessible || tile.occupied_by == DButer) && !tile.inaccessible_by_static;
-        }
-
-        /// <summary>
-        /// From a list of target tiles return the one with the lowest travel cost (thus the one that has the shortest path)
-        /// </summary>
-        private WalkTile ClosestTargetTile(List<WalkTile> target_tiles)
-        {
-            WalkTile ClosestTile = null;
-            int shortest = int.MaxValue;
-            foreach(WalkTile TargetTile in target_tiles)
-            {
-                if (TargetTile.TravelCost < shortest)
-                {
-                    ClosestTile = TargetTile;
-                    shortest = TargetTile.TravelCost;
-                }
-            }
-
-            return ClosestTile;
         }
     }
 }

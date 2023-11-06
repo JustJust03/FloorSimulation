@@ -91,14 +91,14 @@ namespace FloorSimulation
             int[] indices = WW.TileListIndices(DButer.RDPoint, DButer.GetRDbuterSize());
             int dx = indices[0]; int dy = indices[1]; int dwidth = indices[2]; int dheight = indices[3];
 
-            int rightx = ObjSize.Width;
-            int boty = ObjSize.Height;
+            int maxx = Math.Min(TargetTile.TileX + ObjSize.Width, WW.WalkTileListWidth);
+            int maxy = Math.Min(TargetTile.TileY + ObjSize.Height, WW.WalkTileListHeight);
             int minx = Math.Max(0, TargetTile.TileX);
             int miny = Math.Max(0, TargetTile.TileY);
 
             WalkTile t;
-            for (int x = minx; x < TargetTile.TileX + rightx; x++)
-                for (int y = miny; y < TargetTile.TileY + boty; y++)
+            for (int x = minx; x < maxx; x++)
+                for (int y = miny; y < maxy; y++)
                 {
                     t = WW.WalkTileList[x][y];
                     TilesChecked++;

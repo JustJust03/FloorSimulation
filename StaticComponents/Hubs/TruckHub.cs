@@ -18,7 +18,7 @@ namespace FloorSimulation.StaticComponents.Hubs
         private int NTrolleysInRow;
 
         public TruckHub(string name_, int id_, Point FPoint_, Floor floor_, int initial_trolleys_ = 0) :
-            base(name_, id_, FPoint_, floor_, new Size(1000, 400), initial_trolleys: initial_trolleys_, vertical_trolleys:true)
+            base(name_, id_, FPoint_, floor_, new Size(1000, 1000), initial_trolleys: initial_trolleys_, vertical_trolleys:true)
         {
             DummyTrolley = new DanishTrolley(-1, floor, IsVertical_: true);
             NRows = RHubSize.Height / DummyTrolley.GetRSize().Height;
