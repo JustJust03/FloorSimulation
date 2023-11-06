@@ -147,8 +147,12 @@ namespace FloorSimulation
             start_tile.visited = true;
             TileQueue.Enqueue(start_tile);
 
+            int nodesSearched = 0;
+
             while(TileQueue.Count > 0) 
             {
+                nodesSearched++;
+
                 WalkTile tile = TileQueue.Dequeue();
                 tile.visited = true;
 

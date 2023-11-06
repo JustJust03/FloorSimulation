@@ -30,7 +30,7 @@ namespace FloorSimulation
         public bool AccessOnTopLeft;
         public bool IsInTransport;
         private int Units; //Every unit of a plant, 1 plant can contain 12 units (it was on a tray)
-        public readonly int MaxUnits = 110;
+        public readonly int MaxUnits = 100; //100 for now, find a better value
 
         public const float TrolleyTravelSpeed = 100f; //cm/s
 

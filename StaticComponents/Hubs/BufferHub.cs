@@ -69,11 +69,12 @@ namespace FloorSimulation
         {
             List<WalkTile> OpenSpots = new List<WalkTile>();
 
-            for (int rowi = 0; rowi < NRows; rowi++)
-                for (int coli = NTrolleysInRow - 1; coli >= 0; coli--)
+            for (int coli = NTrolleysInRow - 1; coli >= 0; coli--)
+                for (int rowi = 0; rowi < NRows; rowi++)
                     if (Trolleyarr[rowi, coli] == null)
                     {
                         OpenSpots.Add(HubAccessPoints[rowi, coli]);
+                        break;
                     }
 
             return OpenSpots;

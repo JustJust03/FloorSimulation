@@ -99,10 +99,10 @@ namespace FloorSimulation
             DistrList.Add(EightDistr);
 
             FTHubs = new List<FullTrolleyHub>();
-            FTHub0 = new FullTrolleyHub("Full Trolley Hub", 2, new Point(400, 640), this, new Size(200, 3500));
-            FTHub1 = new FullTrolleyHub("Full Trolley Hub", 3, new Point(1350, 640), this, new Size(200, 3500));
-            FTHub2 = new FullTrolleyHub("Full Trolley Hub", 4, new Point(2300, 640), this, new Size(200, 3500));
-            FTHub3 = new FullTrolleyHub("Full Trolley Hub", 5, new Point(3250, 640), this, new Size(200, 3500));
+            FTHub0 = new FullTrolleyHub("Full Trolley Hub", 2, new Point(400, 640), this, new Size(200, 3450));
+            FTHub1 = new FullTrolleyHub("Full Trolley Hub", 3, new Point(1350, 640), this, new Size(200, 3450));
+            FTHub2 = new FullTrolleyHub("Full Trolley Hub", 4, new Point(2300, 640), this, new Size(200, 3450));
+            FTHub3 = new FullTrolleyHub("Full Trolley Hub", 5, new Point(3250, 640), this, new Size(200, 3450));
             FTHubs.Add(FTHub0);
             FTHubs.Add(FTHub1);
             FTHubs.Add(FTHub2);
@@ -175,7 +175,7 @@ namespace FloorSimulation
         public void PlaceShops(List<ShopHub> Shops, string shape = "S-Patern")
         {
             int UpperY = 640;
-            int LowerY = 4060; // This diff should be devisable by the height of a shop (160)
+            int LowerY = 3870; // This diff should be devisable by the height of a shop (160)
             int StreetWidth = 600;
             Layout = shape;
 
@@ -196,15 +196,15 @@ namespace FloorSimulation
                 {
                     placed_shops_in_a_row = 0;
                     if (two_per_row == 1)
-                        y -= 360;
+                        y -= 340;
                     else
-                        y += 360;
+                        y += 340;
                 }
 
                 if (two_per_row == 1 && y > UpperY)
-                    y -= 180;
+                    y -= 170;
                 else if (two_per_row == 2 && y < LowerY)
-                    y += 180;
+                    y += 170;
                 else
                 {
                     placed_shops_in_a_row = 0;
@@ -216,7 +216,7 @@ namespace FloorSimulation
                     }
                     else
                     {
-                        y -= 360; // Because the middle section was placed at the bottom
+                        y -= 340; // Because the middle section was placed at the bottom
                         x += 160;
                         two_per_row = 1;
                     }
