@@ -91,6 +91,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assignments\Task.cs" />
+    <Compile Include="ControlInfo.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Data\BoxActivity.cs" />
     <Compile Include="Data\HubData.cs" />
     <Compile Include="Data\ReadData.cs" />
