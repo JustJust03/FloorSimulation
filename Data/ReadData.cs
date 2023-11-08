@@ -65,16 +65,14 @@ namespace FloorSimulation
             foreach(BoxActivity b in ActivityList)
                 AddToTrolley(b, floor);
 
-            int TotalPlants = 0;
+            floor.layout.SortPlantLists(TransactieIdToTrolley.Values.ToList());
+           
+
             List<DanishTrolley> dtList = new List<DanishTrolley>();
             foreach(DanishTrolley t in TransactieIdToTrolley.Values.ToList())
             {
                 if (t.PlantList.Count == 0)
                     continue;
-                TotalPlants += t.PlantList.Count;
-                t.PlantList = t.PlantList
-                    .OrderBy(obj => obj.DestinationHub.day)
-                    .ThenBy(obj => obj.DestinationHub.id).ToList();
                 dtList.Add(t);
             }
 
@@ -87,7 +85,6 @@ namespace FloorSimulation
                 TransactieIdToTrolley[b.Transactieid] = new DanishTrolley(-1, floor, transactieId_: b.Transactieid);
 
             DanishTrolley t = TransactieIdToTrolley[b.Transactieid];
-                //TODO: This Should be removed
             if(b.Destination.day == "DI" || b.Destination.day == "WO")
             {
                 plant p = new plant(b.Destination, b.GetUnits(), name_: b.Product_omschrijving_1);

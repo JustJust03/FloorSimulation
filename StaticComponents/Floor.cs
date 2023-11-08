@@ -29,7 +29,7 @@ namespace FloorSimulation
         public const int RealFloorWidth = 5000; //cm
         public const int RealFloorHeight = 5000; //cm
         public const float ScaleFactor = 0.25f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
-        public string Layout;
+        public Layout layout;
 
         public List<DanishTrolley> TrolleyList; // A list with all the trolleys that are on the floor.
         public List<Hub> HubList; // A list with all the hubs that are on the floor (starthub: 0, shophubs >= 1)
@@ -71,6 +71,8 @@ namespace FloorSimulation
             MilisecondsPerTick = (1.0 / Program.TICKS_PER_SECOND) * 1000;
             FinishedD = new FinishedDistribution(this);
             rand = new Random(0);
+            layout = new SLayoutDayId(this);
+            //layout = new SLayoutIdDay(this);
 
             TrolleyList = new List<DanishTrolley>();
             HubList = new List<Hub>();
@@ -173,60 +175,9 @@ namespace FloorSimulation
                     d.DrawObject(g);
         }
 
-        public void PlaceShops(List<ShopHub> Shops, string shape = "S-Patern")
+        public void PlaceShops(List<ShopHub> Shops)
         {
-            int UpperY = 640;
-            int LowerY = 3870; // This diff should be devisable by the height of a shop (160)
-            int StreetWidth = 600;
-            Layout = shape;
-
-            if (!(shape == "S-Patern"))
-                throw new Exception("Haven't implemented another layout than the S layout");
-
-            int x = 0;
-            int y = LowerY;
-            int two_per_row = 1; //Keeps track of how many cols are placed without space between them
-            int placed_shops_in_a_row = 0;
-            for (int i = 0; i < Shops.Count;  i++) 
-            { 
-                ShopHub Shop = Shops[i];
-                Shop.TeleportHub(new Point(x, y));
-                if (two_per_row == 2)
-                    Shop.HasLeftAccess = true;
-
-                placed_shops_in_a_row++;
-                if (placed_shops_in_a_row == 9)
-                {
-                    placed_shops_in_a_row = 0;
-                    if (two_per_row == 1)
-                        y -= 340;
-                    else
-                        y += 340;
-                }
-
-                if (two_per_row == 1 && y > UpperY)
-                    y -= 170;
-                else if (two_per_row == 2 && y < LowerY)
-                    y += 170;
-                else
-                {
-                    placed_shops_in_a_row = 0;
-                    two_per_row++;
-                    if (two_per_row <= 2)
-                    {
-                        x += StreetWidth + 200;
-                        y = UpperY;
-                    }
-                    else
-                    {
-                        y -= 340; // Because the middle section was placed at the bottom
-                        x += 160;
-                        two_per_row = 1;
-                    }
-                }
-
-                HubList.Add(Shop);
-            }
+            layout.PlaceShops(Shops, 640, 3870);
         }
 
         /// <summary>

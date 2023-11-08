@@ -33,13 +33,13 @@ namespace FloorSimulation
             MainDisplay m = floor.Display;
             if (m.isSimulating) //Stop the timer from ticking
             {
-                m.timer.Stop();
-                m.ss_button.Text = "Start";
+                m.ControlPanel.timer.Stop();
+                m.ControlPanel.ss_button.Text = "Start";
                 m.isSimulating = false;
             }
 
             DistributionDate = floor.Display.date;
-            Layout = floor.Layout;
+            Layout = floor.layout.ToString();
             TotalTime = floor.ElapsedSimTime.ToString(@"hh\:mm\:ss");
             WriteFile();
         }
@@ -104,7 +104,7 @@ namespace FloorSimulation
             TotalData.Merge(JOdistributers);
 
             string json = TotalData.ToString();
-            string FilePath = Program.rootfolder + @"\Results\TEST1.json";
+            string FilePath = Program.rootfolder + @"\Results\" + floor.Display.SaveFileBase + ".json";
             File.WriteAllText(FilePath, json);  
         }
 

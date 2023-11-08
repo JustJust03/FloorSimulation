@@ -250,7 +250,16 @@ namespace FloorSimulation
             else
             {
                 if (Trolley == null || Trolley.IsInTransport || Trolley.IsFull()) //The trolley you want to reach was taken by someone else. Look for another trolley in the targethub.
+                {
                     Trolley = TargetHub.PeekFirstTrolley();
+                    if (Goal == "TakeFullTrolley" && Trolley == null)
+                    {
+                        InTask = false;
+                        Travelling = false;
+                        return;
+                    }
+
+                }
                 DButer.TravelToTrolley(Trolley);
             }
 
@@ -292,7 +301,6 @@ namespace FloorSimulation
         /// </summary>
         private void TakeFullTrolley()
         {
-            //TODO: Check to see to which trolley you should deliver to
             if(TargetHub.PeekFirstTrolley() != Trolley) // If the targeted trolley isn't in the hub anymore chose another trolley to target.
             {
                 InTask = false;
@@ -376,6 +384,10 @@ namespace FloorSimulation
             DButer.floor.TrolleyList.Add(DButer.trolley);
             DButer.WW.unoccupie_by_tiles(DButer.trolley.RPoint, DButer.trolley.GetRSize()); // drop the trolley of from the distributer
             OldTrolley = DButer.GiveTrolley();
+            if(OldTrolley.PlantList.Count == 25)
+            {
+                ;
+            }
             OldTargetHub = TargetHub;
             DButer.TravelToTrolley(TargetHub.PeekFirstTrolley());
             if (DButer.route == null) //Route was not possible at this point. Try again later.
@@ -428,8 +440,6 @@ namespace FloorSimulation
                 FailRoute();
                 return;
             }
-
-
 
             InTask = true;
             Travelling = true;
@@ -589,13 +599,13 @@ namespace FloorSimulation
                 DButer.SwitchDistributerTrolley();
             TargetHub.TakeVTrolleyIn(Trolley);
             DButer.GiveTrolley();
-            
+
             Trolley = OldTrolley;
             DButer.TravelToTrolley(Trolley);
+            Goal = "TakeOldTrolley"; //New goal
             if (DButer.route == null) //Route was not possible at this point. Try again later.
                 FailRoute();
             
-            Goal = "TakeOldTrolley"; //New goal
             InTask = true;
             Travelling = true;
         }
@@ -610,6 +620,9 @@ namespace FloorSimulation
             if (DButer.trolley.PeekFirstPlant() == null) //This dropped off trolley was actually empty, so deliver it to the buffer hub
             {
                 TargetHub = DButer.floor.BuffHub;
+                if (Trolley != OldTrolley)
+                    throw new Exception("THIS TAKES THE WRONG TROLLEY!");
+
                 Trolley = DButer.trolley;
                 DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
 

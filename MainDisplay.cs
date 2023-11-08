@@ -25,6 +25,7 @@ namespace FloorSimulation
         public string date = "2023-07-18";
         public MetaInfo InfoPanel;
         public ControlInfo ControlPanel;
+        public string SaveFileBase;
         
         public MainDisplay()
         {
@@ -55,6 +56,7 @@ namespace FloorSimulation
             Controls.Add(InfoPanel);
 
             Paint += PaintMainDisplay;
+            SaveFileBase = date + "TESTER3";
         }
 
         private void PaintMainDisplay(object sender, PaintEventArgs e)
@@ -72,7 +74,7 @@ namespace FloorSimulation
             ReadData rd = new ReadData();
             List<ShopHub> shops = rd.ReadHubData(floor);
 
-            //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys("2023-07-18", floor, length: "short");
+            //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys("2023-07-18", floor, length: "mini");
             List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys("2023-07-18", floor);
             floor.PlaceShops(rd.UsedShopHubs);
             floor.FirstStartHub.AddUndistributedTrolleys(L);

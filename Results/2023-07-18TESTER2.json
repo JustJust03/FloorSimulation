@@ -1,0 +1,61 @@
+{
+  "Completed": true,
+  "DistributionDate": "2023-07-18",
+  "Layout": "S-Layout grouped by Id first and Day second",
+  "TotalTime": "00:04:32",
+  "Distributers": {
+    "Distributer 1": {
+      "ID": 0,
+      "VerdeelTijd": "00:01:32",
+      "WachtTijd": "00:00:00",
+      "VerspilTijd": "00:00:06"
+    },
+    "Distributer 2": {
+      "ID": 1,
+      "VerdeelTijd": "00:00:00",
+      "WachtTijd": "00:00:00",
+      "VerspilTijd": "00:00:00"
+    },
+    "Distributer 3": {
+      "ID": 2,
+      "VerdeelTijd": "00:00:46",
+      "WachtTijd": "00:00:00",
+      "VerspilTijd": "00:00:07"
+    },
+    "Distributer 4": {
+      "ID": 3,
+      "VerdeelTijd": "00:00:00",
+      "WachtTijd": "00:00:00",
+      "VerspilTijd": "00:00:00"
+    },
+    "Distributer 5": {
+      "ID": 4,
+      "VerdeelTijd": "00:01:56",
+      "WachtTijd": "00:00:02",
+      "VerspilTijd": "00:00:05"
+    },
+    "Distributer 6": {
+      "ID": 5,
+      "VerdeelTijd": "00:00:11",
+      "WachtTijd": "00:00:00",
+      "VerspilTijd": "00:00:14"
+    },
+    "Distributer 7": {
+      "ID": 6,
+      "VerdeelTijd": "00:00:00",
+      "WachtTijd": "00:00:00",
+      "VerspilTijd": "00:00:00"
+    },
+    "Distributer 8": {
+      "ID": 7,
+      "VerdeelTijd": "00:00:00",
+      "WachtTijd": "00:00:00",
+      "VerspilTijd": "00:00:00"
+    },
+    "Totals": {
+      "VerdeelTijd": 12.27,
+      "WachtTijd": 0.1,
+      "VerspilTijd": 1.55
+    }
+  }
+}
