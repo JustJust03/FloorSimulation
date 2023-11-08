@@ -96,7 +96,24 @@ namespace FloorSimulation
                         CSpots.Add(WW.GetTile(p));
                     }
 
+            if(CSpots.Count == 0) 
+            {
+                SpawnEmptyTrolleys(5);
+                return FilledSpots(DButer);
+            }
+
             return CSpots;
+        }
+
+        public void SpawnEmptyTrolleys(int amnt = 5)
+        {
+            for(int i = 0; i < amnt; i++)
+            {
+                Point p = new Point(HubAccessPointsX[i], HubAccessPointsY[0]);
+                DanishTrolley dt = new DanishTrolley(0, floor, p, true);
+                WW.fill_tiles(p, dt.GetRSize());
+                Trolleyarr[0, i] = dt;
+            }
         }
 
         public override DanishTrolley PeekFirstTrolley()
@@ -126,6 +143,8 @@ namespace FloorSimulation
             int ArrIndexx = Array.IndexOf(HubAccessPointsX, AgentRPoint.X);
             int ArrIndexy = Array.IndexOf(HubAccessPointsY, AgentRPoint.Y); //The lenght of the trolley
             Trolleyarr[ArrIndexy, ArrIndexx] = dt;
+            dt.Units = 0;
+            dt.IsVertical = true;
         }
 
         public override void DrawHub(Graphics g, bool DrawOutline = false)

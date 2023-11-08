@@ -102,8 +102,6 @@ namespace FloorSimulation
                 FailRoute();
                 if(DButer.route != null)
                     WaitedTicks = 0;
-                if (Goal != "DistributePlants")
-                    return;
 
                 WaitedTicks++;
 
@@ -208,6 +206,17 @@ namespace FloorSimulation
                 DButer.TravelToTrolley(TargetHub.PeekFirstTrolley());
                 if (DButer.route == null)
                 {
+                    if(TargetHub.PeekFirstTrolley() == null) //If the targethub is missing trolly, move on to the next plant.
+                    {
+                        if (DButer.ReshufflePlants())
+                        {
+                            TargetHub = DButer.trolley.PeekFirstPlant().DestinationHub;
+                            DButer.TravelToTrolley(TargetHub.PeekFirstTrolley());
+                        }
+                        if (DButer.route != null)
+                            return;
+                    }
+
                     Point targetp = TargetHub.RFloorPoint;
                     Point p;
                     if (TargetHub.HasLeftAccess)
@@ -320,7 +329,8 @@ namespace FloorSimulation
         {
             if(TargetHub.PeekFirstTrolley() == null)
             {
-                FailRoute();
+                if(DButer.ReshufflePlants())
+                    FailRoute();
                 return;
             }
             Travelling = false;
@@ -341,6 +351,15 @@ namespace FloorSimulation
 
             TargetHub = StartHub;
 
+            FullTrolleyHub h = DButer.floor.HasFullTrolleyHubFull(6);
+            if(h != null)
+            {
+                TargetHub = h;
+                DButer.TravelToHarry(Harry);
+                Harry.IsTargeted = true;
+                Goal = "TakeLangeHarry";
+                return;
+            }
 
             Goal = "TakeFullTrolley"; //New goal
             InTask = false;
@@ -400,16 +419,6 @@ namespace FloorSimulation
             TargetHub.TakeHTrolleyIn(Trolley, DButer.RDPoint);
             DButer.WW.unoccupie_by_tiles(DButer.trolley.RPoint, DButer.trolley.GetRSize()); // drop the trolley of from the distributer
             DButer.GiveTrolley();
-            if (TargetHub.AmountOfTrolleys() >= 3 && !Harry.IsTargeted)
-            {
-                DButer.TravelToHarry(Harry);
-                if (DButer.route != null)
-                {
-                    Harry.IsTargeted = true;
-                    Goal = "TakeLangeHarry";
-                    return;
-                }
-            }
 
             TargetHub = DButer.floor.BuffHub;
             DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
@@ -433,17 +442,13 @@ namespace FloorSimulation
         {
             if (Harry.IsInUse)
             {
-                TargetHub = DButer.floor.BuffHub;
-                DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
+                TargetHub = StartHub;
                 if (DButer.route == null) //Route was not possible at this point. Try again later.
                     FailRoute();
 
-                Goal = "TakeEmptyTrolley"; //New goal
-
-
-                InTask = true;
-                Travelling = true;
-
+                Goal = "TakeFullTrolley"; //New goal
+                InTask = false;
+                Travelling = false;
                 return;
             }
 
@@ -506,13 +511,22 @@ namespace FloorSimulation
 
             if(Harry.TrolleyList.Count < 1)
             {
-                DButer.DisMountHarry();
-                TargetHub = DButer.floor.BuffHub;
-                DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
-                if (DButer.route == null) //Route was not possible at this point. Try again later.
-                    FailRoute();
+                FullTrolleyHub h = DButer.floor.HasFullTrolleyHubFull(3);
+                if(h != null)
+                {
+                    TargetHub = h;
+                    Goal = "LHTakeFinishedTrolley";
+                    DButer.RotateDistributerAndHarry();
+                    DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
+                    return;
+                }
 
-                Goal = "TakeEmptyTrolley"; //New goal
+                DButer.DisMountHarry();
+                TargetHub = StartHub;
+
+                Goal = "TakeFullTrolley"; //New goal
+                InTask = false;
+                Travelling = false;
             }
             else
             {

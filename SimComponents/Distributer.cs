@@ -299,6 +299,7 @@ namespace FloorSimulation
             trolley.IsInTransport = true;
 
             WW.unfill_tiles(trolley.RPoint, trolley.GetRSize());
+            TravelTrolley();
             WW.fill_tiles(trolley.RPoint, trolley.GetRSize(), this);
         }
 
@@ -432,6 +433,7 @@ namespace FloorSimulation
         {
             WW.unfill_tiles(RDPoint, RDistributerSize);
             WW.unfill_tiles(trolley.RPoint, trolley.GetRSize());
+
             IsVertical = !IsVertical;
             trolley.IsVertical = !trolley.IsVertical;
             if (IsVertical)
@@ -505,6 +507,23 @@ namespace FloorSimulation
         {
             TravelSpeed = speed;
             travel_dist_per_tick = TravelSpeed / Program.TICKS_PER_SECOND;
+        }
+
+        /// <summary>
+        /// Reshuffles the plant list of the trolley to make sure the next plant has a targethub with a trolley.
+        /// switches the first plant in the list with the next first plant that has a targethub with a trolley.
+        /// Returns true when a reshuffle was possible, false if not.
+        /// </summary>
+        public bool ReshufflePlants()
+        {
+            for (int i = 1; i < trolley.PlantList.Count; i++)
+                if (trolley.PlantList[i].DestinationHub.PeekFirstTrolley() != null)
+                {
+                    trolley.SwitchPlants(0, i);
+                    return true;
+                }
+            return false;
+
         }
     }
 }

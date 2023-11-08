@@ -217,7 +217,10 @@ namespace FloorSimulation.PathFinding
                 //Add neighbours to priority queue
                 for (int i = 0; i < neighbours.Length; i++)
                 {
+
                     WalkTile neighbour = neighbours[i];
+                    if (neighbour == null)
+                        continue;
                     newCost = tile.TravelCost + SquaredHeuristic(neighbour);
                     if (IsTileAccessible(neighbour) && neighbour.TravelCost > newCost)
                     {

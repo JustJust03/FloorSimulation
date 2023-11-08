@@ -29,7 +29,7 @@ namespace FloorSimulation
         public bool IsVertical;
         public bool AccessOnTopLeft;
         public bool IsInTransport;
-        private int Units; //Every unit of a plant, 1 plant can contain 12 units (it was on a tray)
+        public int Units; //Every unit of a plant, 1 plant can contain 12 units (it was on a tray)
         public readonly int MaxUnits = 100; //100 for now, find a better value
 
         public const float TrolleyTravelSpeed = 100f; //cm/s
@@ -132,6 +132,13 @@ namespace FloorSimulation
         public override string ToString()
         {
             return TransactieId + " plants: " + PlantList.Count;
+        }
+
+        public void SwitchPlants(int FirsIndex, int SecondeIndex)
+        {
+            plant p = PlantList[FirsIndex];
+            PlantList[FirsIndex] = PlantList[SecondeIndex];
+            PlantList[SecondeIndex] = p;
         }
 
         // TODO: Create a function that assigns every new trolley an unique id.

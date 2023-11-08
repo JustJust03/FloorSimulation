@@ -242,6 +242,14 @@ namespace FloorSimulation
             return ClosestHub;
         }
 
+        public FullTrolleyHub HasFullTrolleyHubFull(int MinimumTrolleys)
+        {
+            foreach (FullTrolleyHub Hub in FTHubs) 
+                if(Hub.AmountOfTrolleys() >= MinimumTrolleys)
+                    return Hub;
+            return null;
+        }
+
         public Point ConvertToSimPoint(Point RPoint)
         {
             RPoint.X = (int)(RPoint.X * ScaleFactor);
