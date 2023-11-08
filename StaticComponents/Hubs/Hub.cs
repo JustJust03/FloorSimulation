@@ -17,12 +17,13 @@ namespace FloorSimulation
         public int id;
         public Point RFloorPoint;    //Real point on the floor. In cm.
         protected Point FloorPoint;
-        protected Size RHubSize;        //Real size of the hub. In cm.
+        public Size RHubSize;        //Real size of the hub. In cm.
         protected Size HubSize;
         protected Floor floor;
         protected WalkWay WW;
         protected int max_trolleys;     //How many trolleys can be placed in this hub
         protected int Rslack = 20;
+        public bool HasLeftAccess = false;
 
         public Hub(string name_, int id_, Point FPoint_, Floor floor_, Size RHubSize_, int initial_trolleys = 0, 
                    bool vertical_trolleys = false)

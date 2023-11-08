@@ -16,9 +16,10 @@ namespace FloorSimulation.StaticComponents.Hubs
         private int[] HubAccessPointsY; //The Points in the hub where you can drop of trolleys
         private int NRows;
         private int NTrolleysInRow;
+        private int YSlack = 10;
 
         public TruckHub(string name_, int id_, Point FPoint_, Floor floor_, int initial_trolleys_ = 0) :
-            base(name_, id_, FPoint_, floor_, new Size(1000, 1000), initial_trolleys: initial_trolleys_, vertical_trolleys:true)
+            base(name_, id_, FPoint_, floor_, new Size(700, 2000), initial_trolleys: initial_trolleys_, vertical_trolleys:true)
         {
             DummyTrolley = new DanishTrolley(-1, floor, IsVertical_: true);
             NRows = RHubSize.Height / DummyTrolley.GetRSize().Height;
@@ -31,7 +32,7 @@ namespace FloorSimulation.StaticComponents.Hubs
             HubAccessPointsY = new int[NRows];
             for (int Row = 0; Row < NRows; Row++)
             {
-                int trolleyY = RFloorPoint.Y + Row * DummyTrolley.GetRSize().Height;
+                int trolleyY = RFloorPoint.Y + Row * DummyTrolley.GetRSize().Height + YSlack;
                 for(int coli = 0; coli < NTrolleysInRow; coli++)
                 {
                     int trolleyX = RFloorPoint.X + (coli - 1) * DummyTrolley.GetRSize().Width - floor.FirstHarry.GetRSize().Width; //this point + how far in the line it is
@@ -71,6 +72,16 @@ namespace FloorSimulation.StaticComponents.Hubs
             int ArrIndexX = Array.IndexOf(HubAccessPointsX, AgentRPoint.X);
             int ArrIndexY = Array.IndexOf(HubAccessPointsY, AgentRPoint.Y);
             Trolleyarr[ArrIndexY, ArrIndexX] = dt;
+            if (ArrIndexX == 0)
+            {
+                Point p = dt.RPoint;
+                Size s = new Size(RHubSize.Width, dt.GetRSize().Height);
+                WW.unfill_tiles(p, s);
+                for (int i = 0; i < NTrolleysInRow; i++)
+                {
+                    Trolleyarr[ArrIndexY, i] = null;
+                }
+            }
         }
 
         public override void DrawHub(Graphics g, bool DrawOutline = false)

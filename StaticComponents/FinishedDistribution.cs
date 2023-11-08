@@ -104,7 +104,7 @@ namespace FloorSimulation
             TotalData.Merge(JOdistributers);
 
             string json = TotalData.ToString();
-            string FilePath = Program.rootfolder + @"\Results\TEST0.json";
+            string FilePath = Program.rootfolder + @"\Results\TEST1.json";
             File.WriteAllText(FilePath, json);  
         }
 

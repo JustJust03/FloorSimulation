@@ -38,16 +38,30 @@ namespace FloorSimulation
 
         public override DanishTrolley PeekFirstTrolley()
         {
-            int lowestY = int.MaxValue;
-            DanishTrolley t = null;
-            foreach(DanishTrolley dt in HubTrolleys)
-                if (dt.RPoint.Y < lowestY)
-                {
-                    t = dt;
-                    lowestY = t.RPoint.Y;
-                }
-            return t;
+            return HubTrolleys[0];
         }
+
+        public override DanishTrolley GiveTrolley(Point AgenRPoint = default)
+        {
+            DanishTrolley FirstTrolley = HubTrolleys[0];
+            HubTrolleys[0] = null;
+            return FirstTrolley;
+        }
+
+        public override void TakeVTrolleyIn(DanishTrolley t, Point DeliveryPoint = default)
+        {
+            if (HubTrolleys[0] != null)//Max trolleys reached, give error
+                throw new ArgumentException("The first trolley place wasn't empty");
+            HubTrolleys[0] = t;
+        }
+
+        public override void TakeHTrolleyIn(DanishTrolley t, Point DeliveryPoint = default)
+        {
+            if (HubTrolleys[0] != null)//Max trolleys reached, give error
+                throw new ArgumentException("The first trolley place wasn't empty");
+            HubTrolleys[0] = t;
+        }
+
 
         public override void TeleportHub(Point NewRPoint)
         {
@@ -78,7 +92,8 @@ namespace FloorSimulation
 
             //Trolleys
             foreach (DanishTrolley DT in HubTrolleys)
-                DT.DrawObject(g);
+                if(DT != null)
+                    DT.DrawObject(g);
         }
 
     }
