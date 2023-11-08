@@ -18,6 +18,7 @@ namespace FloorSimulation
         private Image VDistributerIMG;
         public Point RDPoint; // Real distributer point
         public Point DPoint; // Sim distributer point
+        public Point SavePoint; //A Point where the distributer can always return to.
         public Size RDistributerSize; //Is the real size in cm.
         private Size DistributerSize;
         public Size HRDistributerSize;
@@ -60,6 +61,8 @@ namespace FloorSimulation
             id = id_;
             floor = floor_;
             RDPoint = Rpoint_;
+            if (Rpoint_ != null)
+                SavePoint = Rpoint_;
             WW = WW_;
             IsVertical = IsVertical_;
             IsOnHarry = false;
