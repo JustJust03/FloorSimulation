@@ -74,8 +74,8 @@ namespace FloorSimulation
             ReadData rd = new ReadData();
             List<ShopHub> shops = rd.ReadHubData(floor);
 
-            //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys("2023-07-18", floor, length: "mini");
-            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys("2023-07-18", floor);
+            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys("2023-07-18", floor, length: "mini");
+            //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys("2023-07-18", floor);
             floor.PlaceShops(rd.UsedShopHubs);
             floor.FirstStartHub.AddUndistributedTrolleys(L);
         }

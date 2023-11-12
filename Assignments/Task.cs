@@ -24,6 +24,7 @@ namespace FloorSimulation
         private FinishedDistribution FinishedD;
         int WaitedTicks = 0;
         bool TargetWasSaveTile = false;
+        public AnalyzeInfo AInfo;
 
         public readonly List<string> VerspillingTasks = new List<string>
         {
@@ -34,8 +35,8 @@ namespace FloorSimulation
         };
 
         public bool InTask = false;
-        private bool Travelling = false;
-        private bool Waiting = false; // true when an agent is waiting for a possible route to it's destination.
+        public bool Travelling = false;
+        public bool Waiting = false; // true when an agent is waiting for a possible route to it's destination.
         public bool InSideActivity = false;
         public string Goal; // "TakeFullTrolley", "DistributePlants", "DeliveringEmptyTrolley", "PushTrolleyAway", "TakeFinishedTrolley", "DeliverFullTrolley", "TakeLangeHarry", "TakeEmptyTrolley", "DeliverEmptyTrolleyToShop", "TakeOldTrolley"
 
@@ -78,10 +79,12 @@ namespace FloorSimulation
             Harry = DButer.floor.FirstHarry;
             FinishedD = FinishedD_;
 
+            AInfo = new AnalyzeInfo(DButer, this, DButer.distributionms_per_tick);
         }
 
         public void PerformTask()
         {
+            AInfo.TickAnalyzeInfo(DButer.floor.SpeedMultiplier);
             if (!InTask && Goal == "TakeFullTrolley")
             {
                 TargetHub = StartHub;
@@ -98,7 +101,6 @@ namespace FloorSimulation
 
             if (Waiting)
             {
-                DButer.WachtTijd = DButer.WachtTijd.Add(TimeSpan.FromMilliseconds(DButer.distributionms_per_tick * DButer.floor.SpeedMultiplier));
                 FailRoute();
                 if(DButer.route != null)
                     WaitedTicks = 0;
