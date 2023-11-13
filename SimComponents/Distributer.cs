@@ -276,7 +276,11 @@ namespace FloorSimulation
             }
 
             if (SideActivityMsLeft > 0)
+            {
+                MainTask.AInfo.UpdateFreq(MainTask.Goal, true);
                 return true;
+            }
+
             return false;
         }
 

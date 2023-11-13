@@ -130,11 +130,13 @@ namespace FloorSimulation
         {
             if (TargetWasSaveTile)
             {
+                AInfo.UpdateWachtFreq();
                 TargetWasSaveTile = false;
                 FailRoute();
                 return;
             }
 
+            AInfo.UpdateFreq(Goal);
 
             //Trolley
             if (Goal == "TakeFullTrolley")
@@ -260,13 +262,15 @@ namespace FloorSimulation
                         Travelling = false;
                         return;
                     }
-
                 }
                 DButer.TravelToTrolley(Trolley);
             }
 
-            if (DButer.route == null || DButer.route.Count == 0)
+            if ((DButer.route == null || DButer.route.Count == 0) && !Waiting)
+            {
                 Waiting = true;
+                AInfo.UpdateWachtFreq();
+            }
             else
             {
                 DButer.TickWalk();
@@ -276,6 +280,7 @@ namespace FloorSimulation
 
         public void DistributionCompleted()
         {
+            AInfo.UpdateFreq(Goal, true);
             if (Goal == "DistributePlants")
             {
                 Trolley = TargetHub.PeekFirstTrolley();
@@ -303,6 +308,7 @@ namespace FloorSimulation
         /// </summary>
         private void TakeFullTrolley()
         {
+
             if(TargetHub.PeekFirstTrolley() != Trolley) // If the targeted trolley isn't in the hub anymore chose another trolley to target.
             {
                 InTask = false;

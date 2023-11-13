@@ -70,32 +70,104 @@ namespace FloorSimulation
             JObject TotalData = JObject.FromObject(this);
             TimeSpan TotalVerdeelTijd = new TimeSpan();
             TimeSpan TotalWachtTijd = new TimeSpan();
-            TimeSpan TotalVerspilTijd = new TimeSpan();
-            TimeSpan TotalTimeTimes = TimeSpan.FromTicks((long)(floor.ElapsedSimTime.Ticks * floor.DistrList.Count));
+            TimeSpan TotalHerindeelTijd = new TimeSpan();
+            TimeSpan TotalNieuwBordTijd = new TimeSpan();
+            TimeSpan TotalLaagBijTijd = new TimeSpan();
+            TimeSpan TotalTransportVerdeelTijd = new TimeSpan();
+            TimeSpan TotalNewShopTrolleyTijd = new TimeSpan();
+            TimeSpan TotalTakeFullTrolleyTijd = new TimeSpan();
+            TimeSpan TotalTrolleyTijd = new TimeSpan();
+
+            int TotalVerdeelFreq = 0;
+            int TotalWachtFreq = 0;
+            int TotalHerindeelFreq = 0;
+            int TotalNieuwBordFreq = 0;
+            int TotalLaagBijFreq = 0;
+            int TotalNewShopTrolleyFreq = 0;
+            int TotalNewTrolleyFreq = 0;
 
             JObject JOdistributer = new JObject();
             foreach (Distributer d in floor.DistrList)
             {
+                d.MainTask.AInfo.UpdateGeneralTimes();
+
                 TotalVerdeelTijd = TotalVerdeelTijd.Add(d.MainTask.AInfo.VerdeelTijd);
                 TotalWachtTijd = TotalWachtTijd.Add(d.MainTask.AInfo.WachtTijd);
-                TotalVerspilTijd = TotalVerspilTijd.Add(d.MainTask.AInfo.VerspilTijd);
+                TotalHerindeelTijd = TotalHerindeelTijd.Add(d.MainTask.AInfo.HerindeelTijd);
+                TotalNieuwBordTijd = TotalNieuwBordTijd.Add(d.MainTask.AInfo.NieuwBordTijd);
+                TotalLaagBijTijd = TotalLaagBijTijd.Add(d.MainTask.AInfo.LaagBijTijd);
+                TotalTransportVerdeelTijd = TotalTransportVerdeelTijd.Add(d.MainTask.AInfo.TransportVerdeelTijd);
+                TotalNewShopTrolleyTijd = TotalNewShopTrolleyTijd.Add(d.MainTask.AInfo.NewShopTrolleyTijd);
+                TotalTakeFullTrolleyTijd = TotalTakeFullTrolleyTijd.Add(d.MainTask.AInfo.TakeNewFullTrolleyTijd);
+                TotalTrolleyTijd = TotalTrolleyTijd.Add(d.MainTask.AInfo.TotalTrolleyTime);
+
+                TotalVerdeelFreq += d.MainTask.AInfo.VerdeelFreq;
+                TotalWachtFreq += d.MainTask.AInfo.WachtFreq;
+                TotalHerindeelFreq += d.MainTask.AInfo.HerindeelFreq;
+                TotalNieuwBordFreq += d.MainTask.AInfo.NieuwBordFreq;
+                TotalLaagBijFreq += d.MainTask.AInfo.LaagBijFreq;
+                TotalNewShopTrolleyFreq += d.MainTask.AInfo.NewShopTrolleyFreq;
+                TotalNewTrolleyFreq += d.MainTask.AInfo.NewFullTrolleyFreq;
 
                 JObject dbuter_info = new JObject
                 {
                     {"ID", d.id },
-                    {"VerdeelTijd", d.MainTask.AInfo.VerdeelTijd.ToString(@"hh\:mm\:ss")},
-                    {"WachtTijd", d.MainTask.AInfo.WachtTijd.ToString(@"hh\:mm\:ss")},
-                    {"VerspilTijd", d.MainTask.AInfo.VerspilTijd.ToString(@"hh\:mm\:ss")}
+                    {"Verdeel Tijd", d.MainTask.AInfo.VerdeelTijd.ToString(@"hh\:mm\:ss")},
+                    {"Verdeel Frequency", d.MainTask.AInfo.VerdeelFreq},
+
+                    {"Wacht Tijd", d.MainTask.AInfo.WachtTijd.ToString(@"hh\:mm\:ss")},
+                    {"Wacht Frequency", d.MainTask.AInfo.WachtFreq},
+
+                    {"Herindeel Tijd", d.MainTask.AInfo.HerindeelTijd.ToString(@"hh\:mm\:ss")},
+                    {"Herindeel Frequency", d.MainTask.AInfo.HerindeelFreq},
+
+                    {"Nieuw Bord Tijd", d.MainTask.AInfo.NieuwBordTijd.ToString(@"hh\:mm\:ss")},
+                    {"Nieuw Bord Frequency", d.MainTask.AInfo.NieuwBordFreq},
+
+                    {"Laag Bij Tijd", d.MainTask.AInfo.LaagBijTijd.ToString(@"hh\:mm\:ss")},
+                    {"Laag Bij Frequency", d.MainTask.AInfo.LaagBijFreq},
+
+                    {"Transport tussen verdelen Tijd", d.MainTask.AInfo.TransportVerdeelTijd.ToString(@"hh\:mm\:ss")},
+                    {"Transport tussen verdelen Frequency", Math.Max(d.MainTask.AInfo.VerdeelFreq - 1, 0)},
+
+                    {"Nieuwe Shop trolley Tijd", d.MainTask.AInfo.NewShopTrolleyTijd.ToString(@"hh\:mm\:ss")},
+                    {"Nieuwe Shop Trolley Frequency", d.MainTask.AInfo.NewShopTrolleyFreq},
+
+                    {"Nieuwe volle trolley pak Tijd", d.MainTask.AInfo.TakeNewFullTrolleyTijd.ToString(@"hh\:mm\:ss")},
+
+                    {"Totale tijd voor trolley", d.MainTask.AInfo.TotalTrolleyTime.ToString(@"hh\:mm\:ss")},
+                    {"Aantal trolley's verdeeld", d.MainTask.AInfo.NewFullTrolleyFreq},
                 };
                 JOdistributer.Add("Distributer " + (d.id + 1), dbuter_info);
             }
-            JObject DistrTotals = new JObject
+
+            JObject DistrAverage = new JObject
             {
-                {"VerdeelTijd", SafeDivisionPercentage(TotalVerdeelTijd.Ticks, TotalTimeTimes.Ticks)},
-                {"WachtTijd", SafeDivisionPercentage(TotalWachtTijd.Ticks, TotalTimeTimes.Ticks)},
-                {"VerspilTijd", SafeDivisionPercentage(TotalVerspilTijd.Ticks, TotalTimeTimes.Ticks) }
+                {"Verdeel Tijd", TSSafeDivision(TotalVerdeelTijd, TotalNewTrolleyFreq).ToString(@"hh\:mm\:ss")},
+                {"Verdeel Frequency", ISafeDivision(TotalVerdeelFreq, TotalNewTrolleyFreq)},
+
+                {"Wacht Tijd", TSSafeDivision(TotalWachtTijd, TotalNewTrolleyFreq).ToString(@"hh\:mm\:ss")},
+                {"Wacht Frequency", ISafeDivision(TotalWachtFreq, TotalNewTrolleyFreq)},
+
+                {"Herindeel Tijd", TSSafeDivision(TotalHerindeelTijd, TotalNewTrolleyFreq).ToString(@"hh\:mm\:ss")},
+                {"Herindeel Frequency", ISafeDivision(TotalHerindeelFreq, TotalNewTrolleyFreq)},
+
+                {"Nieuw Bord Tijd", TSSafeDivision(TotalNieuwBordTijd, TotalNewTrolleyFreq).ToString(@"hh\:mm\:ss")},
+                {"Nieuw Bord Frequency", ISafeDivision(TotalNieuwBordFreq, TotalNewTrolleyFreq)},
+
+                {"Laag Bij Tijd", TSSafeDivision(TotalLaagBijTijd, TotalNewTrolleyFreq).ToString(@"hh\:mm\:ss")},
+                {"Laag Bij Frequency", ISafeDivision(TotalLaagBijFreq, TotalNewTrolleyFreq)},
+
+                {"Transport tussen verdelen Tijd", TSSafeDivision(TotalTransportVerdeelTijd, TotalNewTrolleyFreq).ToString(@"hh\:mm\:ss")},
+
+                {"Nieuwe Shop trolley Tijd", TSSafeDivision(TotalNewShopTrolleyTijd, TotalNewTrolleyFreq).ToString(@"hh\:mm\:ss")},
+                {"Nieuwe Shop Trolley Frequency", ISafeDivision(TotalNewShopTrolleyFreq, TotalNewTrolleyFreq)},
+
+                {"Nieuwe volle trolley pak Tijd", TSSafeDivision(TotalTakeFullTrolleyTijd, TotalNewTrolleyFreq).ToString(@"hh\:mm\:ss")},
+
+                {"Totale Tijd Voor Trolley", TSSafeDivision(TotalTrolleyTijd, TotalNewTrolleyFreq).ToString(@"hh\:mm\:ss")},
             };
-            JOdistributer.Add("Totals", DistrTotals);
+            JOdistributer.Add("AveragePerTrolley", DistrAverage);
 
             JObject JOdistributers = new JObject();
             JOdistributers.Add("Distributers", JOdistributer);
@@ -112,11 +184,17 @@ namespace FloorSimulation
         /// a / b
         /// return 0 when b is 0 and rounds the answer.
         /// </summary>
-        private double SafeDivisionPercentage(double a, double b)
+        private TimeSpan TSSafeDivision(TimeSpan a, int b)
+        {
+            if (b == 0)
+                return TimeSpan.FromTicks(0);
+            else return TimeSpan.FromTicks(a.Ticks / b);
+        }
+        private double ISafeDivision(int a, int b)
         {
             if (b == 0)
                 return 0;
-            else return Math.Round((a / b) * 100, 2);
+            else return Math.Round(Convert.ToDouble(a) / Convert.ToDouble(b), 2);
         }
     }
 
@@ -137,8 +215,7 @@ namespace FloorSimulation
         public TimeSpan OtherTijd;
         public TimeSpan FillerTijd; //Wordt alleen aan toegevoegd wanneer je niet in een task bent.
 
-        public TimeSpan VerspilTijd;
-        public TimeSpan TrolleyTime;
+        public TimeSpan TotalTrolleyTime;
 
         public ref TimeSpan CurrentTask
         {
@@ -203,10 +280,8 @@ namespace FloorSimulation
         public int HerindeelFreq = 0;
         public int NieuwBordFreq = 0;
         public int LaagBijFreq = 0;
-        public int TransportVerdeelFreq = 0;
-        public int NewEmptyTrolleyFreq = 0;
+        public int NewShopTrolleyFreq = 0;
         public int NewFullTrolleyFreq = 0;
-        public int NTrolleysDistributed = 0;
 
         private string OldGoal;
 
@@ -220,6 +295,39 @@ namespace FloorSimulation
         public void TickAnalyzeInfo(int TickMultiplier)
         {
             CurrentTask = CurrentTask.Add(TimeSpan.FromMilliseconds(TickMs * TickMultiplier));
+        }
+
+        public void UpdateGeneralTimes()
+        {
+            TotalTrolleyTime = VerdeelTijd + WachtTijd + HerindeelTijd + NieuwBordTijd + LaagBijTijd + TransportVerdeelTijd + NewShopTrolleyTijd + TakeNewFullTrolleyTijd;
+        }
+
+        public void UpdateFreq(string goal, bool ForceUpdate = false)
+        {
+            if (OldGoal == goal && !ForceUpdate)
+                return;
+
+            OldGoal = goal;
+            if (goal == "DeliveringEmptyTrolley")
+                NewFullTrolleyFreq++;
+            else if (goal == "DistributePlants")
+            {
+                if (DButer.SideActivity == "Bord")
+                    NieuwBordFreq++;
+                else if (DButer.SideActivity == "Laag")
+                    LaagBijFreq++;
+                else if (DButer.SideActivity == "Her")
+                    HerindeelFreq++;
+                else
+                    VerdeelFreq++;
+            }
+            else if (goal == "DeliverEmptyTrolleyToShop")
+                NewShopTrolleyFreq++;
+        }
+        
+        public void UpdateWachtFreq()
+        {
+            WachtFreq++;
         }
     }
 }
