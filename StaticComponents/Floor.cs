@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using FloorSimulation.StaticComponents.Hubs;
+using System.Linq;
 
 namespace FloorSimulation
 {
@@ -33,15 +34,9 @@ namespace FloorSimulation
 
         public List<DanishTrolley> TrolleyList; // A list with all the trolleys that are on the floor.
         public List<Hub> HubList; // A list with all the hubs that are on the floor (starthub: 0, shophubs >= 1)
-        public StartHub FirstStartHub;
-        public StartHub SecondStartHub;
         public List<StartHub> STHubs;
-        public BufferHub BuffHub;
+        public List<BufferHub> BuffHubs;
         public List<FullTrolleyHub> FTHubs;
-        public FullTrolleyHub FTHub0;
-        public FullTrolleyHub FTHub1;
-        public FullTrolleyHub FTHub2;
-        public FullTrolleyHub FTHub3;
         public TruckHub TrHub;
         public List<Distributer> DistrList; // A list with all the distributers that are on the floor.
         public Distributer FirstDistr;
@@ -61,7 +56,7 @@ namespace FloorSimulation
         /// </summary>
         /// <param name="PanelLocation">Where should the panel be drawn from (topleft)</param>
         /// <param name="di">On which display is this being drawn</param>
-        public Floor(Point PanelLocation, MainDisplay di)
+        public Floor(Point PanelLocation, MainDisplay di, ReadData rd)
         {
             Display = di;
 
@@ -73,20 +68,18 @@ namespace FloorSimulation
             MilisecondsPerTick = (1.0 / Program.TICKS_PER_SECOND) * 1000;
             FinishedD = new FinishedDistribution(this);
             rand = new Random(0);
-            layout = new SLayoutDayId(this);
-            //layout = new SLayoutIdDay(this);
+            layout = new SLayoutDayId(this, rd);
+            //layout = new RechtHoekLayout(this, rd);
 
             TrolleyList = new List<DanishTrolley>();
             HubList = new List<Hub>();
             STHubs = new List<StartHub>();
+            FTHubs = new List<FullTrolleyHub>();
 
             FirstWW = new WalkWay(new Point(0, 0), new Size(RealFloorWidth, RealFloorHeight), this, DevTools_: false);
-            FirstStartHub = new StartHub("Start hub", 0, new Point(200, 4570), this, vertical_trolleys_: true);
-            HubList.Add(FirstStartHub);
-            SecondStartHub = new StartHub("Start hub", 0, new Point(1200, 4570), this, vertical_trolleys_: true);
-            HubList.Add(SecondStartHub);
-            STHubs.Add(FirstStartHub);
-            STHubs.Add(SecondStartHub);
+
+            layout.PlaceStartHubs();
+
             FirstHarry = new LangeHarry(0, this, FirstWW, new Point(4500, 1700));
 
             DistrList = new List<Distributer>();
@@ -107,24 +100,11 @@ namespace FloorSimulation
             DistrList.Add(SevenDistr);
             DistrList.Add(EightDistr);
 
-            FTHubs = new List<FullTrolleyHub>();
-            FTHub0 = new FullTrolleyHub("Full Trolley Hub", 2, new Point(400, 640), this, new Size(200, 3450));
-            FTHub1 = new FullTrolleyHub("Full Trolley Hub", 3, new Point(1350, 640), this, new Size(200, 3450));
-            FTHub2 = new FullTrolleyHub("Full Trolley Hub", 4, new Point(2300, 640), this, new Size(200, 3450));
-            FTHub3 = new FullTrolleyHub("Full Trolley Hub", 5, new Point(3250, 640), this, new Size(200, 3450));
-            FTHubs.Add(FTHub0);
-            FTHubs.Add(FTHub1);
-            FTHubs.Add(FTHub2);
-            FTHubs.Add(FTHub3);
-            foreach (FullTrolleyHub h in FTHubs)
-                HubList.Add(h);
-
-            BuffHub = new BufferHub("Buffer hub", 1, new Point(0, 40), this);
             TrHub = new TruckHub("Truck Hub", 6, new Point(4280, 500), this);
-            HubList.Add(BuffHub);
             HubList.Add(TrHub);
 
-
+            BuffHubs = new List<BufferHub>();
+            layout.PlaceBuffHubs();
 
             this.Paint += PaintFloor;
             this.Invalidate();
@@ -187,6 +167,16 @@ namespace FloorSimulation
             layout.PlaceShops(Shops, 640, 3870);
         }
 
+        public void PlaceFullTrolleyHubs()
+        {
+            layout.PlaceFullTrolleyHubs();
+        }
+
+        public void DistributeTrolleys(List<DanishTrolley> dtList)
+        {
+            layout.DistributeTrolleys(dtList);
+        }
+
         /// <summary>
         /// Returns the closes FullTrolley Hub to the distributer
         /// </summary>
@@ -198,6 +188,26 @@ namespace FloorSimulation
                     ClosestHub = FThub;
 
             return ClosestHub;
+        }
+
+        public StartHub GetStartHub(Distributer db)
+        {
+            return layout.GetStartHub(db);
+        }
+
+        public BufferHub GetBuffHub(Distributer db)
+        {
+            return layout.GetBuffHub(db);
+        }
+
+        public int TotalUndistributedTrolleys()
+        {
+            return STHubs.Select(sh => sh.TotalUndistributedTrolleys()).Sum();
+        }
+
+        public bool StartHubsEmpty()
+        {
+            return STHubs.All(sh => sh.StartHubEmpty);
         }
 
         public FullTrolleyHub HasFullTrolleyHubFull(int MinimumTrolleys)

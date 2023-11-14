@@ -23,8 +23,8 @@ namespace FloorSimulation
         /// Shop hub has a standard size: (200cm x 200cm)
         /// Usually horizontal trolleys
         /// </summary>
-        public ShopHub(string name_, int id_, Point FPoint_, Floor floor_, int initial_trolleys = 0, string ColliPlusDay_ = null) : 
-            base(name_, id_, FPoint_, floor_, new Size(160, 160), initial_trolleys: initial_trolleys)
+        public ShopHub(string name_, int id_, Point FPoint_, Floor floor_, Size s, int initial_trolleys = 0, string ColliPlusDay_ = null) : 
+            base(name_, id_, FPoint_, floor_, s, initial_trolleys: initial_trolleys)
         {
             ColliPlusDay = ColliPlusDay_;
             int nstrips = ColliPlusDay.Split('-').Length;

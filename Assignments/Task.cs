@@ -19,7 +19,6 @@ namespace FloorSimulation
         private WalkTile TilesDownTile; //Is only used as a target by the MoveEmptyTrolley
         public bool WasOnTopLeft;
         private bool MovingToClose; //Is only used when distributing plants and the shop hub was occupied
-        public Hub StartHub;
         private Distributer DButer;
         private FinishedDistribution FinishedD;
         int WaitedTicks = 0;
@@ -70,10 +69,9 @@ namespace FloorSimulation
         };
 
 
-        public Task(Hub TargetHub_,  Distributer DButer_, string Goal_, FinishedDistribution FinishedD_, DanishTrolley trolley_ = default)
+        public Task(Distributer DButer_, string Goal_, FinishedDistribution FinishedD_, DanishTrolley trolley_ = default)
         {
             Trolley = trolley_;
-            StartHub = TargetHub_;
             DButer = DButer_;
             Goal = Goal_;
             Harry = DButer.floor.FirstHarry;
@@ -84,10 +82,15 @@ namespace FloorSimulation
 
         public void PerformTask()
         {
+            if(Goal == "PushTrolleyAway" && DButer.trolley == null)
+            {
+                DButer.trolley = OldTrolley;
+                DButer.TravelTrolley();
+            }
             AInfo.TickAnalyzeInfo(DButer.floor.SpeedMultiplier);
             if (!InTask && Goal == "TakeFullTrolley")
             {
-                TargetHub = StartHub;
+                TargetHub = DButer.floor.GetStartHub(DButer);
                 Trolley = TargetHub.PeekFirstTrolley();
                 if (Trolley != null)
                 {
@@ -138,7 +141,6 @@ namespace FloorSimulation
         {
             if (TargetWasSaveTile)
             {
-                AInfo.UpdateWachtFreq();
                 TargetWasSaveTile = false;
                 FailRoute();
                 return;
@@ -265,12 +267,12 @@ namespace FloorSimulation
 
             if (DButer.route == null || DButer.route.Count == 0)
             {
-                if(!Waiting)
-                    AInfo.UpdateWachtFreq();
                 Waiting = true;
             }
             else
             {
+                if(Waiting)
+                    AInfo.UpdateWachtFreq();
                 DButer.TickWalk();
                 Waiting = false;
             }
@@ -284,12 +286,23 @@ namespace FloorSimulation
                 Trolley = TargetHub.PeekFirstTrolley();
                 if(Trolley == null) //If someone took the trolley, wait for a new one to return.
                     return;
+                if (DButer.trolley.PeekFirstPlant() == null) //Distributer trolley is empty. So move this trolley to the Empty trolley Hub.
+                {
+                    DistributerTrolleyBecameEmpty();
+                    return;
+                }
+
                 plant p = DButer.trolley.GiveFirstPlant();
                 if (Trolley.TakePlantIn(p)) //Transports plant from the distributer's trolley to the shop trolley. True when the shop trolley became full.
                 {
                     ShopTrolleyBecameFull();
                     return;
                 };
+                if(Trolley.NStickers == Trolley.MaxStickers) //Sticker bord became full. Add side activity
+                {
+                    StickerBordBecameFull();
+                    return;
+                }
                 p = DButer.trolley.PeekFirstPlant();
                 if (p == null) //Distributer trolley is empty. So move this trolley to the Empty trolley Hub.
                     DistributerTrolleyBecameEmpty();
@@ -343,8 +356,6 @@ namespace FloorSimulation
         {
             if(TargetHub.PeekFirstTrolley() == null)
             {
-                if(DButer.ReshufflePlants())
-                    FailRoute();
                 return;
             }
             Travelling = false;
@@ -363,7 +374,7 @@ namespace FloorSimulation
             DButer.WW.unoccupie_by_tiles(DButer.trolley.RPoint, DButer.trolley.GetRSize()); // drop the trolley of from the distributer
             DButer.GiveTrolley();
 
-            TargetHub = StartHub;
+            TargetHub = DButer.floor.GetStartHub(DButer);
 
             FullTrolleyHub h = DButer.floor.HasFullTrolleyHubFull(6);
             if(h != null)
@@ -438,7 +449,7 @@ namespace FloorSimulation
             DButer.WW.unoccupie_by_tiles(DButer.trolley.RPoint, DButer.trolley.GetRSize()); // drop the trolley of from the distributer
             DButer.GiveTrolley();
 
-            TargetHub = DButer.floor.BuffHub;
+            TargetHub = DButer.floor.GetBuffHub(DButer);
             DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
             Goal = "TakeEmptyTrolley"; //New goal
             if (DButer.route == null) //Route was not possible at this point. Try again later.
@@ -458,7 +469,7 @@ namespace FloorSimulation
         {
             if (Harry.IsInUse)
             {
-                TargetHub = StartHub;
+                TargetHub = DButer.floor.GetStartHub(DButer);
                 if (DButer.route == null) //Route was not possible at this point. Try again later.
                     FailRoute();
 
@@ -538,7 +549,7 @@ namespace FloorSimulation
                 }
 
                 DButer.DisMountHarry();
-                TargetHub = StartHub;
+                TargetHub = DButer.floor.GetStartHub(DButer);
 
                 Goal = "TakeFullTrolley"; //New goal
                 InTask = false;
@@ -626,7 +637,7 @@ namespace FloorSimulation
             DButer.floor.TrolleyList.Remove(Trolley);
             if (DButer.trolley.PeekFirstPlant() == null) //This dropped off trolley was actually empty, so deliver it to the buffer hub
             {
-                TargetHub = DButer.floor.BuffHub;
+                TargetHub = DButer.floor.GetBuffHub(DButer);
                 if (Trolley != OldTrolley)
                     throw new Exception("THIS TAKES THE WRONG TROLLEY!");
 
@@ -663,11 +674,24 @@ namespace FloorSimulation
         }
 
         /// <summary>
+        /// New Bord:
+        /// New side activity
+        /// </summary>
+        private void StickerBordBecameFull()
+        {
+            DButer.SideActivityMsLeft += Distributer.BordTime;
+            DButer.SideActivity = "Bord";
+            AInfo.UpdateFreq(Goal, true);
+            Trolley.NStickers = 0;
+            ;
+        }
+
+        /// <summary>
         /// After distributing, the trolley became empty. 
         /// </summary>
         private void DistributerTrolleyBecameEmpty()
         {
-            TargetHub = DButer.floor.BuffHub;
+            TargetHub = DButer.floor.GetBuffHub(DButer);
             Trolley = DButer.trolley;
             DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
 

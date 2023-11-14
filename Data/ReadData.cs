@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace FloorSimulation
         CsvConfiguration CsvConfig;
         public Dictionary<string, ShopHub> DestPlusDayToHub;
         public List<ShopHub> UsedShopHubs;
+        public List<string> days = new List<string> { "DI", "WO" };
 
         public ReadData()
         {
@@ -57,7 +59,7 @@ namespace FloorSimulation
             }
 
             UsedShopHubs = UsedShopHubs.Distinct().ToList();
-            UsedShopHubs = UsedShopHubs.Where(obj => obj.day == "DI" || obj.day == "WO").ToList();
+            UsedShopHubs = UsedShopHubs.Where(obj => days.Contains(obj.day)).ToList();
             UsedShopHubs = UsedShopHubs
                 .OrderBy(obj => obj.day)
                 .ThenBy(obj => obj.id).ToList();
@@ -85,7 +87,7 @@ namespace FloorSimulation
                 TransactieIdToTrolley[b.Transactieid] = new DanishTrolley(-1, floor, transactieId_: b.Transactieid);
 
             DanishTrolley t = TransactieIdToTrolley[b.Transactieid];
-            if(b.Destination.day == "DI" || b.Destination.day == "WO")
+            if(days.Contains(b.Destination.day))
             {
                 plant p = new plant(b.Destination, b.GetUnits(), name_: b.Product_omschrijving_1);
                 t.TakePlantIn(p);
@@ -127,7 +129,20 @@ namespace FloorSimulation
 
             foreach(HubData d in data)
             {
-                ShopHub s = new ShopHub(d.Search_Name, d.Zoeknaam2, default, floor, initial_trolleys: 2, d.ColliPlusDay);
+                int ntrolleys = floor.layout.NTrolleysInShop;
+                Size HubSize;
+                ShopHub s;
+                if (ntrolleys == 1) 
+                {
+                    HubSize = new Size(160, 80);
+                    s = new ShopHub(d.Search_Name, d.Zoeknaam2, default, floor, HubSize, initial_trolleys: ntrolleys, ColliPlusDay_: d.ColliPlusDay);
+                }
+                else
+                {
+                    HubSize = new Size(160, 160);
+                    s = new ShopHub(d.Search_Name, d.Zoeknaam2, default, floor, HubSize, initial_trolleys: ntrolleys, d.ColliPlusDay);
+                }
+
                 shops.Add(s);
                 DestPlusDayToHub[s.ColliPlusDay] = s;
             }

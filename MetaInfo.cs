@@ -48,7 +48,7 @@ namespace FloorSimulation
             TrolleysLeftBar.Location = new Point(5, 40);
             TrolleysLeftBar.Size = new Size(this.Size.Width / 3, this.Size.Height / 20);
             TrolleysLeftBar.Style = ProgressBarStyle.Continuous;
-            TrolleysLeftBar.Maximum = floor.FirstStartHub.TotalUndistributedTrolleys();
+            TrolleysLeftBar.Maximum = floor.TotalUndistributedTrolleys();
 
             progressBarScreenBounds = new Rectangle(TrolleysLeftBar.Location, TrolleysLeftBar.Size);
             progressBarScreenBounds.Inflate(1, 1);
@@ -59,7 +59,7 @@ namespace FloorSimulation
             Graphics g = pea.Graphics;
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             g.DrawRectangle(BlackPen, progressBarScreenBounds);
-            TrolleysLeftBar.Value = floor.FirstStartHub.TotalUndistributedTrolleys();
+            TrolleysLeftBar.Value = floor.TotalUndistributedTrolleys();
         }
 
         public void Inval()
