@@ -108,16 +108,6 @@ namespace FloorSimulation
             DistrList.Add(EightDistr);
 
             FTHubs = new List<FullTrolleyHub>();
-            FTHub0 = new FullTrolleyHub("Full Trolley Hub", 2, new Point(400, 640), this, new Size(200, 3450));
-            FTHub1 = new FullTrolleyHub("Full Trolley Hub", 3, new Point(1350, 640), this, new Size(200, 3450));
-            FTHub2 = new FullTrolleyHub("Full Trolley Hub", 4, new Point(2300, 640), this, new Size(200, 3450));
-            FTHub3 = new FullTrolleyHub("Full Trolley Hub", 5, new Point(3250, 640), this, new Size(200, 3450));
-            FTHubs.Add(FTHub0);
-            FTHubs.Add(FTHub1);
-            FTHubs.Add(FTHub2);
-            FTHubs.Add(FTHub3);
-            foreach (FullTrolleyHub h in FTHubs)
-                HubList.Add(h);
 
             BuffHub = new BufferHub("Buffer hub", 1, new Point(0, 40), this);
             TrHub = new TruckHub("Truck Hub", 6, new Point(4280, 500), this);
@@ -185,6 +175,11 @@ namespace FloorSimulation
         public void PlaceShops(List<ShopHub> Shops)
         {
             layout.PlaceShops(Shops, 640, 3870);
+        }
+
+        public void PlaceFullTrolleyHubs()
+        {
+            layout.PlaceFullTrolleyHubs();
         }
 
         public void DistributeTrolleys(List<DanishTrolley> dtList)

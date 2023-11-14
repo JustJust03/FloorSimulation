@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace FloorSimulation
 {
@@ -18,24 +19,31 @@ namespace FloorSimulation
             RData = rData;
         }
 
-        public abstract void PlaceShops(List<ShopHub> Shops, int UpperY, int LowerY, int StreetWidth = 600, int ShopHeight = 170);
+        public abstract void PlaceShops(List<ShopHub> Shops, int UpperY, int LowerY, int StreetWidth = 800, int ShopHeight = 170);
 
         public abstract void SortPlantLists(List<DanishTrolley> dtList);
 
         public abstract void DistributeTrolleys(List<DanishTrolley> dtList);
 
         public abstract StartHub GetStartHub(Distributer db);
+
+        public abstract void PlaceFullTrolleyHubs();
     }
 
     internal class SLayout : Layout
     {
+        private int UpperY;
+        private int LowestY;
+        private List<int> ShopCornersX = new List<int>(); //Keeps track of the upper corners of the shops in the street. Is used to place FullHubs
+
         public SLayout(Floor floor_, ReadData rData) : base(floor_, rData) 
         { 
 
         }
 
-        public override void PlaceShops(List<ShopHub> Shops, int UpperY, int LowerY, int StreetWidth = 600, int ShopHeight = 170)
+        public override void PlaceShops(List<ShopHub> Shops, int UpperY_, int LowerY, int StreetWidth = 800, int ShopHeight = 170)
         {
+            UpperY = UpperY_;
             int x = 0;
             int y = LowerY;
             int two_per_row = 1; //Keeps track of how many cols are placed without space between them
@@ -48,6 +56,14 @@ namespace FloorSimulation
                 Shop.TeleportHub(new Point(x, y));
                 if (two_per_row == 2)
                     Shop.HasLeftAccess = true;
+                
+                if(y == UpperY)
+                {
+                    if (Shop.HasLeftAccess)
+                        ShopCornersX.Add(Shop.RFloorPoint.X);
+                    else
+                        ShopCornersX.Add(Shop.RFloorPoint.X + Shop.RHubSize.Width);
+                }
 
                 placed_shops_in_a_row++;
                 if (placed_shops_in_a_row == 9 && FirstColFinished)
@@ -70,12 +86,13 @@ namespace FloorSimulation
                     two_per_row++;
                     if (two_per_row <= 2)
                     {
-                        x += StreetWidth + 200;
+                        x += StreetWidth;
                         y = UpperY;
                     }
                     else
                     {
                         y -= 2 * ShopHeight; // Because the middle section was placed at the bottom
+                        LowestY = y + ShopHeight;
                         x += 160;
                         two_per_row = 1;
                     }
@@ -105,6 +122,18 @@ namespace FloorSimulation
         {
             return floor.STHubs[0];
         }
+
+        public override void PlaceFullTrolleyHubs()
+        {
+            int FullTrolleyHubWidth = 200;
+            for (int i = 0; i < ShopCornersX.Count - 1; i += 2)
+            {
+                int x = ((ShopCornersX[i] + ShopCornersX[i + 1]) / 2) - (FullTrolleyHubWidth / 2);
+                floor.FTHubs.Add(new FullTrolleyHub("Full Trolley Hub", 2 + i / 2, new Point(x, UpperY), floor, new Size(FullTrolleyHubWidth, LowestY - UpperY)));
+            }
+
+            floor.HubList = floor.HubList.Concat(floor.FTHubs).ToList();
+        }
     }
 
     internal class SLayoutDayId : SLayout
@@ -120,7 +149,7 @@ namespace FloorSimulation
             return "S-Layout grouped by Day first and Id second";
         }
 
-        public override void PlaceShops(List<ShopHub> Shops, int UpperY, int LowerY, int StreetWidth = 600, int ShopHeight = 170)
+        public override void PlaceShops(List<ShopHub> Shops, int UpperY, int LowerY, int StreetWidth = 800, int ShopHeight = 170)
         {
             Shops = Shops
                 .OrderBy(obj => obj.day)
@@ -180,7 +209,7 @@ namespace FloorSimulation
         {
             return "S-Layout grouped by Id first and Day second";
         }
-        public override void PlaceShops(List<ShopHub> Shops, int UpperY, int LowerY, int StreetWidth = 600, int ShopHeight = 170)
+        public override void PlaceShops(List<ShopHub> Shops, int UpperY, int LowerY, int StreetWidth = 800, int ShopHeight = 170)
         {
             Shops = Shops
                 .OrderBy(obj => obj.id)
