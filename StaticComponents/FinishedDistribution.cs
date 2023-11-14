@@ -16,10 +16,12 @@ namespace FloorSimulation
         public string DistributionDate;
         public string Layout;
         public string TotalTime;
+        public string TotalTrolleysDistributed;
+        public string TotalTrolleysExported;
         private Floor floor;
         
-        public int TotalTrolleysDistributed;
-        public int TotalTrolleysExported;
+        private int TotalTrolleysDistr;
+        private int TotalTrolleysExp;
 
         public FinishedDistribution(Floor Floor)
         {
@@ -41,8 +43,12 @@ namespace FloorSimulation
                 m.isSimulating = false;
             }
 
-            TotalTrolleysDistributed = 0; //Wordt in the writefile geupdate.
-            TotalTrolleysExported = floor.TrHub.TrolleysExported + floor.TrHub.AmountOfTrolleys();
+            TotalTrolleysDistr = 0; //Wordt in the writefile geupdate.
+            foreach(Distributer d in floor.DistrList)
+                TotalTrolleysDistr += d.MainTask.AInfo.NewFullTrolleyFreq;
+            TotalTrolleysExp = floor.TrHub.TrolleysExported + floor.TrHub.AmountOfTrolleys();
+            TotalTrolleysDistributed = TotalTrolleysDistr.ToString();
+            TotalTrolleysExported = TotalTrolleysExp.ToString();
 
             DistributionDate = floor.Display.date;
             Layout = floor.layout.ToString();
@@ -115,7 +121,6 @@ namespace FloorSimulation
                 TotalNewShopTrolleyFreq += d.MainTask.AInfo.NewShopTrolleyFreq;
                 TotalNewTrolleyFreq += d.MainTask.AInfo.NewFullTrolleyFreq;
 
-                TotalTrolleysExported += d.MainTask.AInfo.NewFullTrolleyFreq;
 
                 JObject dbuter_info = new JObject
                 {

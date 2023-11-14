@@ -61,7 +61,7 @@ namespace FloorSimulation
         /// </summary>
         /// <param name="PanelLocation">Where should the panel be drawn from (topleft)</param>
         /// <param name="di">On which display is this being drawn</param>
-        public Floor(Point PanelLocation, MainDisplay di)
+        public Floor(Point PanelLocation, MainDisplay di, ReadData rd)
         {
             Display = di;
 
@@ -73,7 +73,7 @@ namespace FloorSimulation
             MilisecondsPerTick = (1.0 / Program.TICKS_PER_SECOND) * 1000;
             FinishedD = new FinishedDistribution(this);
             rand = new Random(0);
-            layout = new SLayoutDayId(this);
+            layout = new SLayoutDayId(this, rd);
             //layout = new SLayoutIdDay(this);
 
             TrolleyList = new List<DanishTrolley>();
@@ -187,6 +187,11 @@ namespace FloorSimulation
             layout.PlaceShops(Shops, 640, 3870);
         }
 
+        public void DistributeTrolleys(List<DanishTrolley> dtList)
+        {
+            layout.DistributeTrolleys(dtList);
+        }
+
         /// <summary>
         /// Returns the closes FullTrolley Hub to the distributer
         /// </summary>
@@ -198,6 +203,11 @@ namespace FloorSimulation
                     ClosestHub = FThub;
 
             return ClosestHub;
+        }
+
+        public StartHub GetStartHub(Distributer db)
+        {
+            return layout.GetStartHub(db);
         }
 
         public FullTrolleyHub HasFullTrolleyHubFull(int MinimumTrolleys)

@@ -80,7 +80,7 @@ namespace FloorSimulation
 
             travel_dist_per_tick = TravelSpeed / Program.TICKS_PER_SECOND;
             distributionms_per_tick = (int)(1000f / Program.TICKS_PER_SECOND);
-            MainTask = new Task(floor.FirstStartHub, this, "TakeFullTrolley", floor.FinishedD);
+            MainTask = new Task(this, "TakeFullTrolley", floor.FinishedD);
             trolley = null;
 
             AWW = new AstarWalkWays(WW, this);
@@ -253,15 +253,8 @@ namespace FloorSimulation
         /// </summary>
         private bool RollForSideActivity()
         {
-            //Nieuw bord
-            int r = floor.rand.Next(0, 1000);
-            if (r <= OddsOfBord * 1000)
-            {
-                SideActivityMsLeft += BordTime;
-                SideActivity = "Bord";
-            }
             //Nieuwe laag bijzetten
-            r = floor.rand.Next(0, 1000);
+            int r = floor.rand.Next(0, 1000);
             if (r <= OddsOfLaag * 1000)
             {
                 SideActivityMsLeft += LaagTime;

@@ -10,20 +10,26 @@ namespace FloorSimulation
     internal abstract class Layout
     {
         protected Floor floor;
+        protected ReadData RData;
 
-        public Layout(Floor floor_)
+        public Layout(Floor floor_, ReadData rData)
         {
             floor = floor_;
+            RData = rData;
         }
 
         public abstract void PlaceShops(List<ShopHub> Shops, int UpperY, int LowerY, int StreetWidth = 600, int ShopHeight = 170);
 
         public abstract void SortPlantLists(List<DanishTrolley> dtList);
+
+        public abstract void DistributeTrolleys(List<DanishTrolley> dtList);
+
+        public abstract StartHub GetStartHub(Distributer db);
     }
 
     internal class SLayout : Layout
     {
-        public SLayout(Floor floor_) : base(floor_) 
+        public SLayout(Floor floor_, ReadData rData) : base(floor_, rData) 
         { 
 
         }
@@ -90,11 +96,20 @@ namespace FloorSimulation
             }
         }
 
+        public override void DistributeTrolleys(List<DanishTrolley> dtList)
+        {
+            floor.STHubs[0].AddUndistributedTrolleys(dtList);
+        }
+
+        public override StartHub GetStartHub(Distributer db)
+        {
+            return floor.STHubs[0];
+        }
     }
 
     internal class SLayoutDayId : SLayout
     {
-        public SLayoutDayId(Floor floor_) : base(floor_) 
+        public SLayoutDayId(Floor floor_, ReadData rData) : base(floor_, rData) 
         {
 
         }
@@ -123,11 +138,40 @@ namespace FloorSimulation
                     .ToList();
             }
         }
+
+        /// <summary>
+        /// Puts all trolleys with the first day in the first hub,
+        /// All the trolleys with only plants for the second day are placed in the second hub
+        /// </summary>
+        public override void DistributeTrolleys(List<DanishTrolley> dtList)
+        {
+            List<List<DanishTrolley>> TrolleysPerDay = new List<List<DanishTrolley>> ();
+            for (int i = 0; i < RData.days.Count; i++)
+                TrolleysPerDay.Add(new List<DanishTrolley>());
+
+            foreach(DanishTrolley d in dtList)
+            {
+                int i = d.PlantList.Select(p => RData.days.IndexOf(p.DestinationHub.day)).Min();
+                TrolleysPerDay[i].Add(d);
+            }
+
+            for (int i = 0; i <  TrolleysPerDay.Count; i++)
+                floor.STHubs[i].AddUndistributedTrolleys(TrolleysPerDay[i]);
+            ;
+        }
+
+        public override StartHub GetStartHub(Distributer db)
+        {
+            foreach (StartHub sth in floor.STHubs)
+                if (sth.TotalUndistributedTrolleys() > 0)
+                    return sth;
+            return floor.STHubs[0];
+        }
     }
 
     internal class SLayoutIdDay: SLayout
     {
-        public SLayoutIdDay(Floor floor_) : base(floor_) 
+        public SLayoutIdDay(Floor floor_, ReadData rData) : base(floor_, rData) 
         {
 
         }

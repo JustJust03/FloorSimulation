@@ -31,6 +31,8 @@ namespace FloorSimulation
         public bool IsInTransport;
         public int Units; //Every unit of a plant, 1 plant can contain 12 units (it was on a tray)
         public readonly int MaxUnits = 100; //100 for now, find a better value
+        public int NStickers = 2;
+        public readonly int MaxStickers = 20;
 
         public const float TrolleyTravelSpeed = 100f; //cm/s
 
@@ -102,6 +104,7 @@ namespace FloorSimulation
 
         public bool TakePlantIn(plant p)
         {
+            NStickers++;
             Units += p.units;
             PlantList.Add(p);
             return IsFull();
