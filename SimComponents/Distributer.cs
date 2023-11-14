@@ -34,7 +34,7 @@ namespace FloorSimulation
         public const int HerTime = 16000; //ms
 
         public List<WalkTile> route;
-        private const float WALKSPEED = 142f; // cm/s
+        private const float WALKSPEED = 70f; // cm/s
         private float TravelSpeed = WALKSPEED;
         private float travel_dist_per_tick;
         public int distributionms_per_tick; // plant distribution per tick in ms

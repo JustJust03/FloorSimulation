@@ -19,7 +19,7 @@ namespace FloorSimulation
         public int ReorderTime; //ms
         public int units;
 
-        public plant(ShopHub desthub, int units_, string name_ = "Plant_Name_Here", int ReorderTime_ = 10900) 
+        public plant(ShopHub desthub, int units_, string name_ = "Plant_Name_Here", int ReorderTime_ = 17000) 
         { 
             DestinationHub = desthub;
             units = units_;

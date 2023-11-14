@@ -22,7 +22,7 @@ namespace FloorSimulation
         private int NTrolleysInRow;
 
         public BufferHub(string name_, int id_, Point FPoint_, Floor floor_, int initial_trolleys = 0, bool vertical_trolleys_ = true) :
-            base(name_, id_, FPoint_, floor_, new Size(floor_.FirstWW.RSizeWW.Width - 200, 400), initial_trolleys: 0, vertical_trolleys: vertical_trolleys_)
+            base(name_, id_, FPoint_, floor_, new Size(floor_.FirstWW.RSizeWW.Width - 200, 600), initial_trolleys: 0, vertical_trolleys: vertical_trolleys_)
         {
             DummyTrolley = new DanishTrolley(-1, floor, IsVertical_: true);
             if (vertical_trolleys_)
@@ -39,7 +39,7 @@ namespace FloorSimulation
             HubAccessPoints = new WalkTile[NRows, NTrolleysInRow];
             HubAccessPointsX = new int[NTrolleysInRow];
             HubAccessPointsY = new int[NRows];
-            for (int y = 0; y < 2; y++)
+            for (int y = 0; y < NRows; y++)
             {
                 int trolleyY = RFloorPoint.Y + y * 200;
                 for (int i = 0; i < NTrolleysInRow; i++)
