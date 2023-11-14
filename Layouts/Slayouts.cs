@@ -12,6 +12,7 @@ namespace FloorSimulation
     {
         protected Floor floor;
         protected ReadData RData;
+        public abstract int NTrolleysInShop { get; set; }
 
         public Layout(Floor floor_, ReadData rData)
         {
@@ -19,7 +20,7 @@ namespace FloorSimulation
             RData = rData;
         }
 
-        public abstract void PlaceShops(List<ShopHub> Shops, int UpperY, int LowerY, int StreetWidth = 800, int ShopHeight = 170);
+        public abstract void PlaceShops(List<ShopHub> Shops, int UpperY, int LowerY);
 
         public abstract void SortPlantLists(List<DanishTrolley> dtList);
 
@@ -27,7 +28,22 @@ namespace FloorSimulation
 
         public abstract StartHub GetStartHub(Distributer db);
 
-        public abstract void PlaceFullTrolleyHubs();
+        public abstract BufferHub GetBuffHub(Distributer db);
+
+        public virtual void PlaceFullTrolleyHubs()
+        {
+            floor.HubList = floor.HubList.Concat(floor.FTHubs).ToList();
+        }
+
+        public virtual void PlaceStartHubs()
+        {
+            floor.HubList = floor.HubList.Concat(floor.STHubs).ToList();
+        }
+
+        public virtual void PlaceBuffHubs()
+        {
+            floor.HubList = floor.HubList.Concat(floor.BuffHubs).ToList();
+        }
     }
 
     internal class SLayout : Layout
@@ -35,13 +51,23 @@ namespace FloorSimulation
         private int UpperY;
         private int LowestY;
         private List<int> ShopCornersX = new List<int>(); //Keeps track of the upper corners of the shops in the street. Is used to place FullHubs
+        protected int StreetWidth = 800;
+        protected int ShopHeight = 170;
+        private int NtrolleysPerShop = 2;
 
         public SLayout(Floor floor_, ReadData rData) : base(floor_, rData) 
         { 
 
         }
 
-        public override void PlaceShops(List<ShopHub> Shops, int UpperY_, int LowerY, int StreetWidth = 800, int ShopHeight = 170)
+        public override int NTrolleysInShop 
+        {
+            get { return NtrolleysPerShop; }
+            set { NtrolleysPerShop = value; }
+        }
+
+
+        public override void PlaceShops(List<ShopHub> Shops, int UpperY_, int LowerY)
         {
             UpperY = UpperY_;
             int x = 0;
@@ -123,6 +149,11 @@ namespace FloorSimulation
             return floor.STHubs[0];
         }
 
+        public override BufferHub GetBuffHub(Distributer db)
+        {
+            return floor.BuffHubs[0];
+        }
+
         public override void PlaceFullTrolleyHubs()
         {
             int FullTrolleyHubWidth = 200;
@@ -132,7 +163,22 @@ namespace FloorSimulation
                 floor.FTHubs.Add(new FullTrolleyHub("Full Trolley Hub", 2 + i / 2, new Point(x, UpperY), floor, new Size(FullTrolleyHubWidth, LowestY - UpperY)));
             }
 
-            floor.HubList = floor.HubList.Concat(floor.FTHubs).ToList();
+            base.PlaceFullTrolleyHubs();
+        }
+
+        public override void PlaceStartHubs()
+        {
+            floor.STHubs.Add(new StartHub("Start hub", 0, new Point(200, 4570), floor, vertical_trolleys_: true));
+            floor.STHubs.Add(new StartHub("Start hub", 1, new Point(1200, 4570), floor, vertical_trolleys_: true));
+
+            base.PlaceStartHubs();
+        }
+
+        public override void PlaceBuffHubs()
+        {
+            floor.BuffHubs.Add(new BufferHub("Buffer hub", 1, new Point(0, 40), floor));
+
+            base.PlaceBuffHubs();
         }
     }
 
@@ -149,12 +195,12 @@ namespace FloorSimulation
             return "S-Layout grouped by Day first and Id second";
         }
 
-        public override void PlaceShops(List<ShopHub> Shops, int UpperY, int LowerY, int StreetWidth = 800, int ShopHeight = 170)
+        public override void PlaceShops(List<ShopHub> Shops, int UpperY, int LowerY)
         {
             Shops = Shops
                 .OrderBy(obj => obj.day)
                 .ThenBy(obj => obj.id).ToList();
-            base.PlaceShops(Shops, UpperY, LowerY, StreetWidth, ShopHeight);
+            base.PlaceShops(Shops, UpperY, LowerY);
         }
 
         public override void SortPlantLists(List<DanishTrolley> dtList)
@@ -209,12 +255,102 @@ namespace FloorSimulation
         {
             return "S-Layout grouped by Id first and Day second";
         }
-        public override void PlaceShops(List<ShopHub> Shops, int UpperY, int LowerY, int StreetWidth = 800, int ShopHeight = 170)
+        public override void PlaceShops(List<ShopHub> Shops, int UpperY, int LowerY)
         {
             Shops = Shops
                 .OrderBy(obj => obj.id)
                 .ThenBy(obj => obj.day).ToList();
-            base.PlaceShops(Shops, UpperY, LowerY, StreetWidth, ShopHeight);
+            base.PlaceShops(Shops, UpperY, LowerY);
+        }
+    }
+
+    internal class RechtHoekLayout : Layout
+    {
+        int StreetWidth = 2000;
+        int ShopHeight = 80;
+        private int NtrolleysPerShop = 1;
+
+        public RechtHoekLayout(Floor floor_, ReadData rData) : base(floor_, rData)
+        { 
+
+        }
+
+        public override int NTrolleysInShop 
+        {
+            get { return NtrolleysPerShop; }
+            set { NtrolleysPerShop = value; }
+        }
+
+        public override string ToString()
+        {
+            return "RechtHoek: Eerste dag boven";
+        }
+
+        public override StartHub GetStartHub(Distributer db)
+        {
+            //throw new NotImplementedException();
+            return null;
+        }
+
+        public override BufferHub GetBuffHub(Distributer db)
+        {
+            //throw new NotImplementedException();
+            return null;
+        }
+
+        public override void DistributeTrolleys(List<DanishTrolley> dtList)
+        {
+            //throw new NotImplementedException();
+            return;
+        }
+
+        public override void PlaceFullTrolleyHubs()
+        {
+            //throw new NotImplementedException();
+            return;
+        }
+
+        public override void PlaceShops(List<ShopHub> Shops, int UpperY, int LowerY)
+        {
+            List<ShopHub> FirstDayShops = Shops.Where(s => RData.days.IndexOf(s.day) == 0).ToList();
+            List<ShopHub> SecondDayShops = Shops.Where(s => RData.days.IndexOf(s.day) == 1).ToList();
+
+
+            int ShopsToPlaceInMiddle = StreetWidth / ShopHeight;
+            int ShopsToPlaceOnRight = (FirstDayShops.Count - ShopsToPlaceInMiddle) / 2;
+            int ShopsToPlaceOnLeft = FirstDayShops.Count - ShopsToPlaceOnRight - ShopsToPlaceInMiddle;
+
+            int x = 800;
+            int y = floor.FirstWW.RSizeWW.Height / 2;
+            int overali = 0;
+            for (int i = 0; i < 1; i++)
+            {
+                ShopHub Shop = Shops[overali];
+                if (Shop.AmountOfTrolleys() == 0)
+                Shop.TeleportHub(new Point(x, y));
+                y -= ShopHeight;
+
+                floor.HubList.Add(Shop);
+                overali++;
+            }
+        }
+
+        public override void SortPlantLists(List<DanishTrolley> dtList)
+        {
+            //throw new NotImplementedException();
+            return;
+        }
+
+        public override void PlaceStartHubs()
+        {
+            //throw new NotImplementedException();
+            return;
+        }
+
+        public override void PlaceBuffHubs()
+        {
+            //throw new NotImplementedException();
+            return;
         }
     }
 }

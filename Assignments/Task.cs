@@ -444,7 +444,7 @@ namespace FloorSimulation
             DButer.WW.unoccupie_by_tiles(DButer.trolley.RPoint, DButer.trolley.GetRSize()); // drop the trolley of from the distributer
             DButer.GiveTrolley();
 
-            TargetHub = DButer.floor.BuffHub;
+            TargetHub = DButer.floor.GetBuffHub(DButer);
             DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
             Goal = "TakeEmptyTrolley"; //New goal
             if (DButer.route == null) //Route was not possible at this point. Try again later.
@@ -632,7 +632,7 @@ namespace FloorSimulation
             DButer.floor.TrolleyList.Remove(Trolley);
             if (DButer.trolley.PeekFirstPlant() == null) //This dropped off trolley was actually empty, so deliver it to the buffer hub
             {
-                TargetHub = DButer.floor.BuffHub;
+                TargetHub = DButer.floor.GetBuffHub(DButer);
                 if (Trolley != OldTrolley)
                     throw new Exception("THIS TAKES THE WRONG TROLLEY!");
 
@@ -686,7 +686,7 @@ namespace FloorSimulation
         /// </summary>
         private void DistributerTrolleyBecameEmpty()
         {
-            TargetHub = DButer.floor.BuffHub;
+            TargetHub = DButer.floor.GetBuffHub(DButer);
             Trolley = DButer.trolley;
             DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
 

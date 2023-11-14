@@ -63,7 +63,7 @@ namespace FloorSimulation
         /// <returns></returns>
         public bool CheckFinishedDistribution()
         {
-            if (!floor.FirstStartHub.StartHubEmpty)
+            if (!floor.StartHubsEmpty())
                 return false;
 
             foreach (Distributer d in floor.DistrList)

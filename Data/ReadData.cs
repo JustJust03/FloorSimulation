@@ -128,7 +128,13 @@ namespace FloorSimulation
 
             foreach(HubData d in data)
             {
-                ShopHub s = new ShopHub(d.Search_Name, d.Zoeknaam2, default, floor, initial_trolleys: 2, d.ColliPlusDay);
+                int ntrolleys = floor.layout.NTrolleysInShop;
+                if (ntrolleys == 1) 
+                { 
+                    
+                
+                }
+                ShopHub s = new ShopHub(d.Search_Name, d.Zoeknaam2, default, floor, initial_trolleys: ntrolleys, d.ColliPlusDay);
                 shops.Add(s);
                 DestPlusDayToHub[s.ColliPlusDay] = s;
             }
