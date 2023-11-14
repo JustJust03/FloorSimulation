@@ -18,6 +18,8 @@ namespace FloorSimulation.StaticComponents.Hubs
         private int NTrolleysInRow;
         private int YSlack = 10;
 
+        public int TrolleysExported = 0;
+
         public TruckHub(string name_, int id_, Point FPoint_, Floor floor_, int initial_trolleys_ = 0) :
             base(name_, id_, FPoint_, floor_, new Size(700, 2000), initial_trolleys: initial_trolleys_, vertical_trolleys:true)
         {
@@ -72,7 +74,7 @@ namespace FloorSimulation.StaticComponents.Hubs
             int ArrIndexX = Array.IndexOf(HubAccessPointsX, AgentRPoint.X);
             int ArrIndexY = Array.IndexOf(HubAccessPointsY, AgentRPoint.Y);
             Trolleyarr[ArrIndexY, ArrIndexX] = dt;
-            if (ArrIndexX == 0)
+            if (ArrIndexX == 0) //Export trolleys away
             {
                 Point p = dt.RPoint;
                 Size s = new Size(RHubSize.Width, dt.GetRSize().Height);
@@ -81,6 +83,7 @@ namespace FloorSimulation.StaticComponents.Hubs
                 {
                     Trolleyarr[ArrIndexY, i] = null;
                 }
+                TrolleysExported += NTrolleysInRow;
             }
         }
 
@@ -94,6 +97,16 @@ namespace FloorSimulation.StaticComponents.Hubs
             foreach (DanishTrolley DT in Trolleyarr)
                 if(DT != null)
                     DT.DrawObject(g);
+        }
+
+        public override int AmountOfTrolleys()
+        {
+            int count = 0;
+            for (int rowi = 0; rowi < NRows; rowi++) 
+                for(int coli = NTrolleysInRow - 1; coli >= 0; coli--)
+                    if (Trolleyarr[rowi, coli] != null)
+                        count++;
+            return count;
         }
     }
 }

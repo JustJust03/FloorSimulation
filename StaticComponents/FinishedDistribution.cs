@@ -17,6 +17,9 @@ namespace FloorSimulation
         public string Layout;
         public string TotalTime;
         private Floor floor;
+        
+        public int TotalTrolleysDistributed;
+        public int TotalTrolleysExported;
 
         public FinishedDistribution(Floor Floor)
         {
@@ -37,6 +40,9 @@ namespace FloorSimulation
                 m.ControlPanel.ss_button.Text = "Start";
                 m.isSimulating = false;
             }
+
+            TotalTrolleysDistributed = 0; //Wordt in the writefile geupdate.
+            TotalTrolleysExported = floor.TrHub.TrolleysExported + floor.TrHub.AmountOfTrolleys();
 
             DistributionDate = floor.Display.date;
             Layout = floor.layout.ToString();
@@ -108,6 +114,8 @@ namespace FloorSimulation
                 TotalLaagBijFreq += d.MainTask.AInfo.LaagBijFreq;
                 TotalNewShopTrolleyFreq += d.MainTask.AInfo.NewShopTrolleyFreq;
                 TotalNewTrolleyFreq += d.MainTask.AInfo.NewFullTrolleyFreq;
+
+                TotalTrolleysExported += d.MainTask.AInfo.NewFullTrolleyFreq;
 
                 JObject dbuter_info = new JObject
                 {

@@ -34,6 +34,8 @@ namespace FloorSimulation
         public List<DanishTrolley> TrolleyList; // A list with all the trolleys that are on the floor.
         public List<Hub> HubList; // A list with all the hubs that are on the floor (starthub: 0, shophubs >= 1)
         public StartHub FirstStartHub;
+        public StartHub SecondStartHub;
+        public List<StartHub> STHubs;
         public BufferHub BuffHub;
         public List<FullTrolleyHub> FTHubs;
         public FullTrolleyHub FTHub0;
@@ -76,10 +78,15 @@ namespace FloorSimulation
 
             TrolleyList = new List<DanishTrolley>();
             HubList = new List<Hub>();
+            STHubs = new List<StartHub>();
 
             FirstWW = new WalkWay(new Point(0, 0), new Size(RealFloorWidth, RealFloorHeight), this, DevTools_: false);
             FirstStartHub = new StartHub("Start hub", 0, new Point(200, 4570), this, vertical_trolleys_: true);
             HubList.Add(FirstStartHub);
+            SecondStartHub = new StartHub("Start hub", 0, new Point(1200, 4570), this, vertical_trolleys_: true);
+            HubList.Add(SecondStartHub);
+            STHubs.Add(FirstStartHub);
+            STHubs.Add(SecondStartHub);
             FirstHarry = new LangeHarry(0, this, FirstWW, new Point(4500, 1700));
 
             DistrList = new List<Distributer>();

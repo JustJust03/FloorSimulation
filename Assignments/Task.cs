@@ -97,6 +97,14 @@ namespace FloorSimulation
                     InTask = true;
                     Travelling = true;
                 }
+                else //When the distribution is finished, travel to your savepoint.
+                {
+                    DButer.TravelToTile(DButer.WW.GetTile(DButer.SavePoint));
+                    InTask = true;
+                    Travelling = true;
+                    TargetWasSaveTile = true;
+                }
+                    
             }
 
             if (Waiting)
@@ -210,17 +218,6 @@ namespace FloorSimulation
                 DButer.TravelToTrolley(TargetHub.PeekFirstTrolley());
                 if (DButer.route == null)
                 {
-                    if(TargetHub.PeekFirstTrolley() == null) //If the targethub is missing trolly, move on to the next plant.
-                    {
-                        if (DButer.ReshufflePlants())
-                        {
-                            TargetHub = DButer.trolley.PeekFirstPlant().DestinationHub;
-                            DButer.TravelToTrolley(TargetHub.PeekFirstTrolley());
-                        }
-                        if (DButer.route != null)
-                            return;
-                    }
-
                     Point targetp = TargetHub.RFloorPoint;
                     Point p;
                     if (TargetHub.HasLeftAccess)
@@ -266,10 +263,11 @@ namespace FloorSimulation
                 DButer.TravelToTrolley(Trolley);
             }
 
-            if ((DButer.route == null || DButer.route.Count == 0) && !Waiting)
+            if (DButer.route == null || DButer.route.Count == 0)
             {
+                if(!Waiting)
+                    AInfo.UpdateWachtFreq();
                 Waiting = true;
-                AInfo.UpdateWachtFreq();
             }
             else
             {
@@ -545,6 +543,7 @@ namespace FloorSimulation
                 Goal = "TakeFullTrolley"; //New goal
                 InTask = false;
                 Travelling = false;
+                FinishedD.CheckFinishedDistribution();
             }
             else
             {

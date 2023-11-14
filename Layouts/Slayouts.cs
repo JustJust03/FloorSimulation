@@ -19,7 +19,6 @@ namespace FloorSimulation
         public abstract void PlaceShops(List<ShopHub> Shops, int UpperY, int LowerY, int StreetWidth = 600, int ShopHeight = 170);
 
         public abstract void SortPlantLists(List<DanishTrolley> dtList);
-
     }
 
     internal class SLayout : Layout
@@ -90,6 +89,7 @@ namespace FloorSimulation
                     .ToList();
             }
         }
+
     }
 
     internal class SLayoutDayId : SLayout
