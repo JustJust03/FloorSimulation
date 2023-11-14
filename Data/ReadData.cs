@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -129,12 +130,19 @@ namespace FloorSimulation
             foreach(HubData d in data)
             {
                 int ntrolleys = floor.layout.NTrolleysInShop;
+                Size HubSize;
+                ShopHub s;
                 if (ntrolleys == 1) 
-                { 
-                    
-                
+                {
+                    HubSize = new Size(160, 80);
+                    s = new ShopHub(d.Search_Name, d.Zoeknaam2, default, floor, HubSize, initial_trolleys: ntrolleys, ColliPlusDay_: d.ColliPlusDay);
                 }
-                ShopHub s = new ShopHub(d.Search_Name, d.Zoeknaam2, default, floor, initial_trolleys: ntrolleys, d.ColliPlusDay);
+                else
+                {
+                    HubSize = new Size(160, 160);
+                    s = new ShopHub(d.Search_Name, d.Zoeknaam2, default, floor, HubSize, initial_trolleys: ntrolleys, d.ColliPlusDay);
+                }
+
                 shops.Add(s);
                 DestPlusDayToHub[s.ColliPlusDay] = s;
             }

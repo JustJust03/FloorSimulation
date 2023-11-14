@@ -68,8 +68,8 @@ namespace FloorSimulation
             MilisecondsPerTick = (1.0 / Program.TICKS_PER_SECOND) * 1000;
             FinishedD = new FinishedDistribution(this);
             rand = new Random(0);
-            //layout = new SLayoutDayId(this, rd);
-            layout = new RechtHoekLayout(this, rd);
+            layout = new SLayoutDayId(this, rd);
+            //layout = new RechtHoekLayout(this, rd);
 
             TrolleyList = new List<DanishTrolley>();
             HubList = new List<Hub>();

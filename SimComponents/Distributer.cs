@@ -205,7 +205,7 @@ namespace FloorSimulation
                 MainTask.RouteCompleted(); 
         }
 
-        private void TravelTrolley()
+        public void TravelTrolley()
         {
             WW.unfill_tiles(trolley.RPoint, trolley.GetRSize());
 

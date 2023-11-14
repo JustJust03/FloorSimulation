@@ -323,10 +323,9 @@ namespace FloorSimulation
             int x = 800;
             int y = floor.FirstWW.RSizeWW.Height / 2;
             int overali = 0;
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < ShopsToPlaceOnLeft; i++)
             {
                 ShopHub Shop = Shops[overali];
-                if (Shop.AmountOfTrolleys() == 0)
                 Shop.TeleportHub(new Point(x, y));
                 y -= ShopHeight;
 

@@ -82,6 +82,11 @@ namespace FloorSimulation
 
         public void PerformTask()
         {
+            if(Goal == "PushTrolleyAway" && DButer.trolley == null)
+            {
+                DButer.trolley = OldTrolley;
+                DButer.TravelTrolley();
+            }
             AInfo.TickAnalyzeInfo(DButer.floor.SpeedMultiplier);
             if (!InTask && Goal == "TakeFullTrolley")
             {
