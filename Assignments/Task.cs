@@ -24,6 +24,7 @@ namespace FloorSimulation
         private FinishedDistribution FinishedD;
         int WaitedTicks = 0;
         bool TargetWasSaveTile = false;
+        public AnalyzeInfo AInfo;
 
         public readonly List<string> VerspillingTasks = new List<string>
         {
@@ -34,8 +35,8 @@ namespace FloorSimulation
         };
 
         public bool InTask = false;
-        private bool Travelling = false;
-        private bool Waiting = false; // true when an agent is waiting for a possible route to it's destination.
+        public bool Travelling = false;
+        public bool Waiting = false; // true when an agent is waiting for a possible route to it's destination.
         public bool InSideActivity = false;
         public string Goal; // "TakeFullTrolley", "DistributePlants", "DeliveringEmptyTrolley", "PushTrolleyAway", "TakeFinishedTrolley", "DeliverFullTrolley", "TakeLangeHarry", "TakeEmptyTrolley", "DeliverEmptyTrolleyToShop", "TakeOldTrolley"
 
@@ -78,10 +79,12 @@ namespace FloorSimulation
             Harry = DButer.floor.FirstHarry;
             FinishedD = FinishedD_;
 
+            AInfo = new AnalyzeInfo(DButer, this, DButer.distributionms_per_tick);
         }
 
         public void PerformTask()
         {
+            AInfo.TickAnalyzeInfo(DButer.floor.SpeedMultiplier);
             if (!InTask && Goal == "TakeFullTrolley")
             {
                 TargetHub = StartHub;
@@ -98,7 +101,6 @@ namespace FloorSimulation
 
             if (Waiting)
             {
-                DButer.WachtTijd = DButer.WachtTijd.Add(TimeSpan.FromMilliseconds(DButer.distributionms_per_tick * DButer.floor.SpeedMultiplier));
                 FailRoute();
                 if(DButer.route != null)
                     WaitedTicks = 0;
@@ -128,11 +130,13 @@ namespace FloorSimulation
         {
             if (TargetWasSaveTile)
             {
+                AInfo.UpdateWachtFreq();
                 TargetWasSaveTile = false;
                 FailRoute();
                 return;
             }
 
+            AInfo.UpdateFreq(Goal);
 
             //Trolley
             if (Goal == "TakeFullTrolley")
@@ -258,13 +262,15 @@ namespace FloorSimulation
                         Travelling = false;
                         return;
                     }
-
                 }
                 DButer.TravelToTrolley(Trolley);
             }
 
-            if (DButer.route == null || DButer.route.Count == 0)
+            if ((DButer.route == null || DButer.route.Count == 0) && !Waiting)
+            {
                 Waiting = true;
+                AInfo.UpdateWachtFreq();
+            }
             else
             {
                 DButer.TickWalk();
@@ -274,6 +280,7 @@ namespace FloorSimulation
 
         public void DistributionCompleted()
         {
+            AInfo.UpdateFreq(Goal, true);
             if (Goal == "DistributePlants")
             {
                 Trolley = TargetHub.PeekFirstTrolley();
@@ -301,6 +308,7 @@ namespace FloorSimulation
         /// </summary>
         private void TakeFullTrolley()
         {
+
             if(TargetHub.PeekFirstTrolley() != Trolley) // If the targeted trolley isn't in the hub anymore chose another trolley to target.
             {
                 InTask = false;

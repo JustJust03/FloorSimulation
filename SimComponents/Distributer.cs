@@ -26,10 +26,6 @@ namespace FloorSimulation
         public int id;
         public Floor floor;
 
-        public TimeSpan VerdeelTijd;
-        public TimeSpan WachtTijd;
-        public TimeSpan VerspilTijd;
-
         public const float OddsOfBord = 0.065f;
         public const float OddsOfLaag = 0.094f;
         public const float OddsOfHer = 0.25f;
@@ -51,6 +47,7 @@ namespace FloorSimulation
         private bool IsVertical;
         public bool TrolleyOnTopLeft; //True when the trolley is to the left or on top of the distributer
         public bool IsOnHarry;
+        public string SideActivity;
 
         private AstarWalkWays AWW;
         public WalkWay WW;
@@ -166,8 +163,6 @@ namespace FloorSimulation
 
             if (route.Count > 0)
             {
-                if(MainTask.VerspillingTasks.Contains(MainTask.Goal))
-                    VerspilTijd = VerspilTijd.Add(TimeSpan.FromMilliseconds(distributionms_per_tick * floor.SpeedMultiplier));
                 ticktravel += travel_dist_per_tick * floor.SpeedMultiplier;
                 while(ticktravel > WalkWay.WALK_TILE_WIDTH)
                 {
@@ -232,7 +227,6 @@ namespace FloorSimulation
                 return;
             }
 
-            VerdeelTijd = VerdeelTijd.Add(TimeSpan.FromMilliseconds(distributionms_per_tick * floor.SpeedMultiplier));
             distributionms += distributionms_per_tick * floor.SpeedMultiplier;
             if (distributionms >= trolley.PlantList[0].ReorderTime)
             {
@@ -247,7 +241,10 @@ namespace FloorSimulation
         {
             SideActivityMsLeft -= distributionms_per_tick * floor.SpeedMultiplier;
             if (SideActivityMsLeft <= 0)
+            {
+                SideActivity = null;
                 MainTask.DistributionCompleted();
+            }
         }
 
         /// <summary>
@@ -259,18 +256,31 @@ namespace FloorSimulation
             //Nieuw bord
             int r = floor.rand.Next(0, 1000);
             if (r <= OddsOfBord * 1000)
+            {
                 SideActivityMsLeft += BordTime;
+                SideActivity = "Bord";
+            }
             //Nieuwe laag bijzetten
             r = floor.rand.Next(0, 1000);
             if (r <= OddsOfLaag * 1000)
+            {
                 SideActivityMsLeft += LaagTime;
+                SideActivity = "Laag";
+            }
             //De kar herindelen
             r = floor.rand.Next(0, 1000);
             if (r <= OddsOfHer * 1000)
+            {
                 SideActivityMsLeft += HerTime;
+                SideActivity = "Her";
+            }
 
             if (SideActivityMsLeft > 0)
+            {
+                MainTask.AInfo.UpdateFreq(MainTask.Goal, true);
                 return true;
+            }
+
             return false;
         }
 
