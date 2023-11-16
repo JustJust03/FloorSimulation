@@ -34,7 +34,7 @@ namespace FloorSimulation
         public int NStickers = 2;
         public readonly int MaxStickers = 20;
         public int TotalStickers = 2;
-        public readonly int MaxTotalStickers = 21;
+        public const int MaxTotalStickers = 22;
 
         public const float TrolleyTravelSpeed = 50f; //cm/s
 
@@ -133,6 +133,11 @@ namespace FloorSimulation
             if (TotalStickers >= MaxTotalStickers)
                 return true;
             return false;
+        }
+
+        public static string FullDetection()
+        {
+            return "Vol bij aantal Stickers";
         }
 
         public override string ToString()

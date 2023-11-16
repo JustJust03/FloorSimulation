@@ -56,11 +56,24 @@ namespace FloorSimulation
 
             BestemmingToNumberOfPlants = BestemmingToNumberOfPlants.OrderBy(o => o.Value).ToDictionary(o => o.Key, o => o.Value);
             List<int> l = BestemmingToNumberOfPlants.Values.ToList();
+            List<int> StickersPerTrolley = BestemmingToPlants.Values
+                .Select(t => t.Count)
+                .Where(count => count > 1)
+                .ToList();
             double MeanPlantsPerTrolley = l.Average();
+            double MeanStickersPerTrolley = StickersPerTrolley.Average();
+
             double VarPlantsPerTrolley = l.Select(x => Math.Pow(x - MeanPlantsPerTrolley, 2)).Average();
-            int minimum = l.Min();
-            int maximum = l.Max();
-            double sd = Math.Sqrt(VarPlantsPerTrolley);
+            double VarStickersPerTrolley = StickersPerTrolley.Select(x => Math.Pow(x - MeanStickersPerTrolley, 2)).Average();
+
+            int PlantsMinimum = l.Min();
+            int StickerMinimum = StickersPerTrolley.Min();
+            int PlantsMaximum = l.Max();
+            int StickerMaximum = StickersPerTrolley.Max();
+
+            double Plantssd = Math.Sqrt(VarPlantsPerTrolley);
+            double Stickersd = Math.Sqrt(VarStickersPerTrolley);
+
             ;
         }
 

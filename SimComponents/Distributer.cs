@@ -27,14 +27,14 @@ namespace FloorSimulation
         public Floor floor;
 
         public const float OddsOfBord = 0.065f;
-        public const float OddsOfLaag = 0.094f;
-        public const float OddsOfHer = 0.25f;
+        public const float OddsOfLaag = 0.15f;
+        public const float OddsOfHer = 0.28f;
         public const int BordTime = 34000; //ms
-        public const int LaagTime = 22000; //ms
-        public const int HerTime = 16000; //ms
+        public const int LaagTime = 30000; //ms
+        public const int HerTime = 20000; //ms
 
         public List<WalkTile> route;
-        private const float WALKSPEED = 70f; // cm/s
+        public const float WALKSPEED = 70f; // cm/s
         private float TravelSpeed = WALKSPEED;
         private float travel_dist_per_tick;
         public int distributionms_per_tick; // plant distribution per tick in ms
@@ -228,7 +228,7 @@ namespace FloorSimulation
             }
 
             distributionms += distributionms_per_tick * floor.SpeedMultiplier;
-            if (distributionms >= trolley.PlantList[0].ReorderTime)
+            if (distributionms >= plant.ReorderTime)
             {
                 distributionms = 0;
                 if (RollForSideActivity())

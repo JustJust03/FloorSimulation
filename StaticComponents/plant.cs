@@ -16,15 +16,14 @@ namespace FloorSimulation
         public int id = 0; //TODO: create a function to assign unique id's just like the trolleys
         public string name;//Assign plant names here 
         public ShopHub DestinationHub;
-        public int ReorderTime; //ms
+        public const int ReorderTime = 27000; //ms
         public int units;
 
-        public plant(ShopHub desthub, int units_, string name_ = "Plant_Name_Here", int ReorderTime_ = 17000) 
+        public plant(ShopHub desthub, int units_, string name_ = "Plant_Name_Here") 
         { 
             DestinationHub = desthub;
             units = units_;
             name = name_;
-            ReorderTime = ReorderTime_;
         }
 
         public override string ToString()

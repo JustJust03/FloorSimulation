@@ -57,7 +57,7 @@ namespace FloorSimulation
             Controls.Add(InfoPanel);
 
             Paint += PaintMainDisplay;
-            SaveFileBase = date + "_top_200";
+            SaveFileBase = date + "_" + "top_200_Slowest";
         }
 
         private void PaintMainDisplay(object sender, PaintEventArgs e)
