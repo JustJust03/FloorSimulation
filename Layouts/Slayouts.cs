@@ -42,9 +42,9 @@ namespace FloorSimulation
             for (int i = 0; i < Shops.Count;  i++) 
             { 
                 ShopHub Shop = Shops[i];
-                Shop.TeleportHub(new Point(x, y));
                 if (two_per_row == 2)
                     Shop.HasLeftAccess = true;
+                Shop.TeleportHub(new Point(x, y));
                 
                 if(y == UpperY)
                 {

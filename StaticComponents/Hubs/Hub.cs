@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 
 namespace FloorSimulation
 {
@@ -24,6 +25,8 @@ namespace FloorSimulation
         protected int max_trolleys;     //How many trolleys can be placed in this hub
         protected int Rslack = 20;
         public bool HasLeftAccess = false;
+        public bool VerticalTrolleys;
+        protected List<WalkTile> Accesspoint;
 
         public Hub(string name_, int id_, Point FPoint_, Floor floor_, Size RHubSize_, int initial_trolleys = 0, 
                    bool vertical_trolleys = false)
@@ -33,10 +36,14 @@ namespace FloorSimulation
             RFloorPoint = FPoint_;
             floor = floor_;
             WW = floor.FirstWW;
-            RHubSize = RHubSize_;   
-
+            RHubSize = RHubSize_;
+            VerticalTrolleys = vertical_trolleys;
 
             HubTrolleys = new List<DanishTrolley>();
+            Accesspoint = new List<WalkTile>
+            {
+                null
+            };
             DanishTrolley DummyTrolley = new DanishTrolley(433, floor, IsVertical_: true);
             if (vertical_trolleys)
             {
@@ -153,6 +160,12 @@ namespace FloorSimulation
                 return HubTrolleys[0];
         }
 
+        public virtual DanishTrolley GetRandomTrolley()
+        {
+            int r = floor.rand.Next(0, AmountOfTrolleys());
+            return HubTrolleys[r];
+        }
+
         /// <summary>
         /// Takes the first trolley from the hub trolley list and deletes it.
         /// AgentRPoint is only used by bufferhub to check which trolley it should give.
@@ -205,6 +218,33 @@ namespace FloorSimulation
         public virtual List<WalkTile> FilledSpots(Distributer DButer)
         {
             return null;
+        }
+
+        public int GetIndexOfTrolley(DanishTrolley dt)
+        {
+            return HubTrolleys.IndexOf(dt);
+        }
+
+        /// <summary>
+        /// Checks if the trolley that became full is the upper trolley.
+        /// If not, swap the two trolleys.
+        /// </summary>
+        public void SwapIfOtherTrolley(DanishTrolley dt)
+        {
+            int i = GetIndexOfTrolley(dt);
+            if(i != 0)
+            {
+                DanishTrolley dtToSwap = HubTrolleys[i];
+                HubTrolleys[i] = HubTrolleys[0];
+                HubTrolleys[0] = dtToSwap;
+
+                Point dtpToSwap = HubTrolleys[i].RPoint;
+                HubTrolleys[i].RPoint = HubTrolleys[0].RPoint;
+                HubTrolleys[0].RPoint = dtpToSwap;
+
+                HubTrolleys[i].SimPoint = floor.ConvertToSimPoint(HubTrolleys[i].RPoint);
+                HubTrolleys[0].SimPoint = floor.ConvertToSimPoint(HubTrolleys[0].RPoint);
+            }
         }
 
         public virtual int AmountOfTrolleys()
