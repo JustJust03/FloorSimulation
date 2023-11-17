@@ -78,8 +78,6 @@ namespace FloorSimulation
 
             FirstWW = new WalkWay(new Point(0, 0), new Size(RealFloorWidth, RealFloorHeight), this, DevTools_: false);
 
-            layout.PlaceStartHubs();
-
             FirstHarry = new LangeHarry(0, this, FirstWW, new Point(4500, 1700));
 
             DistrList = new List<Distributer>();
@@ -104,7 +102,6 @@ namespace FloorSimulation
             HubList.Add(TrHub);
 
             BuffHubs = new List<BufferHub>();
-            layout.PlaceBuffHubs();
 
             this.Paint += PaintFloor;
             this.Invalidate();
@@ -165,6 +162,16 @@ namespace FloorSimulation
         public void PlaceShops(List<ShopHub> Shops)
         {
             layout.PlaceShops(Shops, 840, 4070);
+        }
+
+        public void PlaceStartHubs()
+        {
+            layout.PlaceStartHubs();
+        }
+
+        public void PlaceBuffHubs()
+        {
+            layout.PlaceBuffHubs();
         }
 
         public void PlaceFullTrolleyHubs()

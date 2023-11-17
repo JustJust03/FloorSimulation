@@ -76,7 +76,10 @@ namespace FloorSimulation
 
             List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys("2023-07-18", floor, length: "top_200");
             //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys("2023-07-18", floor);
+
             floor.PlaceShops(rd.UsedShopHubs);
+            floor.PlaceStartHubs();
+            floor.PlaceBuffHubs();
             floor.PlaceFullTrolleyHubs();
             floor.DistributeTrolleys(L);
         }
