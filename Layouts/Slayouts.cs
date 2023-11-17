@@ -8,43 +8,6 @@ using System.Windows.Forms;
 
 namespace FloorSimulation
 {
-    internal abstract class Layout
-    {
-        protected Floor floor;
-        protected ReadData RData;
-        public abstract int NTrolleysInShop { get; set; }
-
-        public Layout(Floor floor_, ReadData rData)
-        {
-            floor = floor_;
-            RData = rData;
-        }
-
-        public abstract void PlaceShops(List<ShopHub> Shops, int UpperY, int LowerY);
-
-        public abstract void SortPlantLists(List<DanishTrolley> dtList);
-
-        public abstract void DistributeTrolleys(List<DanishTrolley> dtList);
-
-        public abstract StartHub GetStartHub(Distributer db);
-
-        public abstract BufferHub GetBuffHub(Distributer db);
-
-        public virtual void PlaceFullTrolleyHubs()
-        {
-            floor.HubList = floor.HubList.Concat(floor.FTHubs).ToList();
-        }
-
-        public virtual void PlaceStartHubs()
-        {
-            floor.HubList = floor.HubList.Concat(floor.STHubs).ToList();
-        }
-
-        public virtual void PlaceBuffHubs()
-        {
-            floor.HubList = floor.HubList.Concat(floor.BuffHubs).ToList();
-        }
-    }
 
     internal class SLayout : Layout
     {
@@ -176,7 +139,7 @@ namespace FloorSimulation
 
         public override void PlaceBuffHubs()
         {
-            floor.BuffHubs.Add(new BufferHub("Buffer hub", 1, new Point(0, 40), floor));
+            floor.BuffHubs.Add(new BufferHub("Buffer hub", 1, new Point(0, 40), new Size(floor.FirstWW.RSizeWW.Width - 200, 400), floor));
 
             base.PlaceBuffHubs();
         }
@@ -261,95 +224,6 @@ namespace FloorSimulation
                 .OrderBy(obj => obj.id)
                 .ThenBy(obj => obj.day).ToList();
             base.PlaceShops(Shops, UpperY, LowerY);
-        }
-    }
-
-    internal class RechtHoekLayout : Layout
-    {
-        int StreetWidth = 2000;
-        int ShopHeight = 80;
-        private int NtrolleysPerShop = 1;
-
-        public RechtHoekLayout(Floor floor_, ReadData rData) : base(floor_, rData)
-        { 
-
-        }
-
-        public override int NTrolleysInShop 
-        {
-            get { return NtrolleysPerShop; }
-            set { NtrolleysPerShop = value; }
-        }
-
-        public override string ToString()
-        {
-            return "RechtHoek: Eerste dag boven";
-        }
-
-        public override StartHub GetStartHub(Distributer db)
-        {
-            //throw new NotImplementedException();
-            return null;
-        }
-
-        public override BufferHub GetBuffHub(Distributer db)
-        {
-            //throw new NotImplementedException();
-            return null;
-        }
-
-        public override void DistributeTrolleys(List<DanishTrolley> dtList)
-        {
-            //throw new NotImplementedException();
-            return;
-        }
-
-        public override void PlaceFullTrolleyHubs()
-        {
-            //throw new NotImplementedException();
-            return;
-        }
-
-        public override void PlaceShops(List<ShopHub> Shops, int UpperY, int LowerY)
-        {
-            List<ShopHub> FirstDayShops = Shops.Where(s => RData.days.IndexOf(s.day) == 0).ToList();
-            List<ShopHub> SecondDayShops = Shops.Where(s => RData.days.IndexOf(s.day) == 1).ToList();
-
-
-            int ShopsToPlaceInMiddle = StreetWidth / ShopHeight;
-            int ShopsToPlaceOnRight = (FirstDayShops.Count - ShopsToPlaceInMiddle) / 2;
-            int ShopsToPlaceOnLeft = FirstDayShops.Count - ShopsToPlaceOnRight - ShopsToPlaceInMiddle;
-
-            int x = 800;
-            int y = floor.FirstWW.RSizeWW.Height / 2;
-            int overali = 0;
-            for (int i = 0; i < ShopsToPlaceOnLeft; i++)
-            {
-                ShopHub Shop = Shops[overali];
-                Shop.TeleportHub(new Point(x, y));
-                y -= ShopHeight;
-
-                floor.HubList.Add(Shop);
-                overali++;
-            }
-        }
-
-        public override void SortPlantLists(List<DanishTrolley> dtList)
-        {
-            //throw new NotImplementedException();
-            return;
-        }
-
-        public override void PlaceStartHubs()
-        {
-            //throw new NotImplementedException();
-            return;
-        }
-
-        public override void PlaceBuffHubs()
-        {
-            //throw new NotImplementedException();
-            return;
         }
     }
 }

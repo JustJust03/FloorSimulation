@@ -71,6 +71,16 @@ namespace FloorSimulation
             base.TeleportHub(NewRPoint);
         }
 
+        public void RotateAndTeleportHub(Point NewRPoint)
+        {
+            RHubSize = new Size(RHubSize.Height, RHubSize.Width);
+            HubSize = floor.ConvertToSimSize(RHubSize); //Scaled up the Real Hub Size to the SimSize
+            foreach(DanishTrolley dt in HubTrolleys)
+                dt.RotateTrolley();
+
+            TeleportHub(NewRPoint);
+        }
+
         /// <summary>
         /// Draw the components (trolleys) to the screen.
         /// optionally draw the outline of the hub for better visualization.

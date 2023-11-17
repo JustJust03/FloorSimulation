@@ -21,24 +21,48 @@ namespace FloorSimulation
         private int NRows;
         private int NTrolleysInRow;
 
-        public BufferHub(string name_, int id_, Point FPoint_, Floor floor_, int initial_trolleys = 0, bool vertical_trolleys_ = true) :
-            base(name_, id_, FPoint_, floor_, new Size(floor_.FirstWW.RSizeWW.Width - 200, 400), initial_trolleys: 0, vertical_trolleys: vertical_trolleys_)
+        public BufferHub(string name_, int id_, Point FPoint_, Size s, Floor floor_, int initial_trolleys = 0, bool vertical_trolleys_ = true) :
+            base(name_, id_, FPoint_, floor_, s, initial_trolleys: 0, vertical_trolleys: vertical_trolleys_)
         {
-            DummyTrolley = new DanishTrolley(-1, floor, IsVertical_: true);
             if (vertical_trolleys_)
             {
+                DummyTrolley = new DanishTrolley(-1, floor, IsVertical_: true);
                 NRows = RHubSize.Height / 200;
                 NTrolleysInRow = RHubSize.Width / (Rslack + DummyTrolley.GetRSize().Width);
                 Trolleyarr = new DanishTrolley[NRows, NTrolleysInRow];
             }
             else
-                throw new Exception("Horizontal bufferhub not implemented yet");
+            {
+                DummyTrolley = new DanishTrolley(-1, floor, IsVertical_: false);
+                NRows = RHubSize.Height / (Rslack + DummyTrolley.GetRSize().Height);
+                NTrolleysInRow = RHubSize.Width / 200;
+                Trolleyarr = new DanishTrolley[NRows, NTrolleysInRow];
+            }
 
-
-            //TODO: This ALWAYS puts the distributer at the top of the trolley
             HubAccessPoints = new WalkTile[NRows, NTrolleysInRow];
             HubAccessPointsX = new int[NTrolleysInRow];
             HubAccessPointsY = new int[NRows];
+
+            if(vertical_trolleys_)
+                GenerateVerticalAccessPoints();
+            else
+                GenerateHorizontalAccessPoints();
+
+
+
+
+            //Creates initial empty trolleys to the bufferhub
+            for (int i = Trolleyarr.Length - initial_trolleys; i < Trolleyarr.Length; i++)
+            {
+                Point p = HubAccessPoints[0, i].Rpoint;
+                DanishTrolley t = new DanishTrolley(100 + i, floor, p, true);
+                WW.fill_tiles(t.RPoint, t.GetRSize());
+                Trolleyarr[0, i] = t;
+            }
+        }
+
+        private void GenerateVerticalAccessPoints()
+        {
             for (int y = 0; y < 2; y++)
             {
                 int trolleyY = RFloorPoint.Y + y * 200;
@@ -51,14 +75,21 @@ namespace FloorSimulation
                 }
                 HubAccessPointsY[y] = HubAccessPoints[y, 0].Rpoint.Y;
             }
+        }
 
-            //Creates initial empty trolleys to the bufferhub
-            for (int i = Trolleyarr.Length - initial_trolleys; i < Trolleyarr.Length; i++)
+        private void GenerateHorizontalAccessPoints()
+        {
+            for(int x = 0; x < NTrolleysInRow; x++)
             {
-                Point p = HubAccessPoints[0, i].Rpoint;
-                DanishTrolley t = new DanishTrolley(100 + i, floor, p, true);
-                WW.fill_tiles(t.RPoint, t.GetRSize());
-                Trolleyarr[0, i] = t;
+                int trolleyX = RFloorPoint.X + x * 200;
+                for(int y = 0; y < NRows; y++)
+                {
+                    int trolleyY = RFloorPoint.Y + Rslack + y * (Rslack + DummyTrolley.GetRSize().Height);
+
+                    HubAccessPoints[y, x] = WW.GetTile(new Point(trolleyX, trolleyY));
+                    HubAccessPointsY[y] = HubAccessPoints[y, x].Rpoint.Y;
+                }
+                HubAccessPointsX[x] = HubAccessPoints[0, x].Rpoint.X;
             }
         }
 

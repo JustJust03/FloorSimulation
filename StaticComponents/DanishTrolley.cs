@@ -110,6 +110,11 @@ namespace FloorSimulation
             return IsFull();
         }
 
+        public void RotateTrolley()
+        {
+            IsVertical = !IsVertical;
+        }
+
         public plant PeekFirstPlant()
         {
             if (PlantList.Count > 0) 
