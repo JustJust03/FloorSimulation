@@ -74,12 +74,30 @@ namespace FloorSimulation
             return true;
         }
 
+
         /// <summary>
         /// Writes information about the run to a file.
         /// </summary>
         public void WriteFile()
         {
             JObject TotalData = JObject.FromObject(this);
+
+            JObject JOconstants = new JObject
+            {
+                {"Verdeeltijd (s)", plant.ReorderTime / 1000},
+                {"Loopsnelheid Distributer (km/h)", Math.Round(Distributer.WALKSPEED / 27.7f, 1)},
+                {"Loopsnelheid Distributer Kar (km/h)", Math.Round(DanishTrolley.TrolleyTravelSpeed/ 27.7f, 1)},
+                {"Loopsnelheid Lange Harry (km/h)", Math.Round(LangeHarry.HarryTravelSpeed / 27.7f, 1)},
+                {DanishTrolley.FullDetection(), DanishTrolley.MaxTotalStickers},
+                {"Kans op bord (% per sticker)", Distributer.OddsOfBord * 100},
+                {"Kans op laag (% per sticker)", Distributer.OddsOfLaag * 100},
+                {"Kans op herindelen (% per sticker)", Distributer.OddsOfHer * 100},
+                {"Bord tijd (s)", Distributer.BordTime / 1000},
+                {"Laag tijd (s)", Distributer.LaagTime / 1000},
+                {"Herindeel tijd (s)", Distributer.HerTime / 1000}
+            };
+            TotalData.Add("Constants", JOconstants);
+
             TimeSpan TotalVerdeelTijd = new TimeSpan();
             TimeSpan TotalWachtTijd = new TimeSpan();
             TimeSpan TotalHerindeelTijd = new TimeSpan();

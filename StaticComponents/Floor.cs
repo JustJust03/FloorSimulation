@@ -29,7 +29,7 @@ namespace FloorSimulation
         // Real size: 4000 cm x 4000 cm
         public const int RealFloorWidth = 5000; //cm
         public const int RealFloorHeight = 5000; //cm
-        public const float ScaleFactor = 0.25f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
+        public const float ScaleFactor = 0.15f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
         public Layout layout;
 
         public List<DanishTrolley> TrolleyList; // A list with all the trolleys that are on the floor.
@@ -98,7 +98,7 @@ namespace FloorSimulation
             DistrList.Add(SevenDistr);
             DistrList.Add(EightDistr);
 
-            TrHub = new TruckHub("Truck Hub", 6, new Point(4280, 500), this);
+            TrHub = new TruckHub("Truck Hub", 6, new Point(4280, 700), this);
             HubList.Add(TrHub);
 
             BuffHubs = new List<BufferHub>();
@@ -161,7 +161,7 @@ namespace FloorSimulation
 
         public void PlaceShops(List<ShopHub> Shops)
         {
-            layout.PlaceShops(Shops, 640, 3870);
+            layout.PlaceShops(Shops, 840, 4070);
         }
 
         public void PlaceStartHubs()

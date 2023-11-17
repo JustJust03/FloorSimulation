@@ -74,7 +74,7 @@ namespace FloorSimulation
                 Location = new Point(100, 50),
                 Width = this.Width - 120,
                 Minimum = 1,
-                Maximum = 32,
+                Maximum = 64,
                 Value = 1,
             };
             Text = "TrackBar Example";

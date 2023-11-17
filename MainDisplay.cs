@@ -57,7 +57,7 @@ namespace FloorSimulation
             Controls.Add(InfoPanel);
 
             Paint += PaintMainDisplay;
-            SaveFileBase = date + "TestAnalyze";
+            SaveFileBase = date + "_" + "top_200_Slowest";
         }
 
         private void PaintMainDisplay(object sender, PaintEventArgs e)
@@ -74,8 +74,9 @@ namespace FloorSimulation
         {
             List<ShopHub> shops = rd.ReadHubData(floor);
 
-            //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys("2023-07-18", floor, length: "half");
-            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys("2023-07-18", floor);
+            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys("2023-07-18", floor, length: "top_200");
+            //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys("2023-07-18", floor);
+
             floor.PlaceShops(rd.UsedShopHubs);
             floor.PlaceStartHubs();
             floor.PlaceBuffHubs();

@@ -33,8 +33,10 @@ namespace FloorSimulation
         public readonly int MaxUnits = 100; //100 for now, find a better value
         public int NStickers = 2;
         public readonly int MaxStickers = 20;
+        public int TotalStickers = 2;
+        public const int MaxTotalStickers = 22;
 
-        public const float TrolleyTravelSpeed = 100f; //cm/s
+        public const float TrolleyTravelSpeed = 50f; //cm/s
 
         //TODO: Keep track of maximum plants per trolley.
         public List<plant> PlantList;
@@ -105,6 +107,7 @@ namespace FloorSimulation
         public bool TakePlantIn(plant p)
         {
             NStickers++;
+            TotalStickers++;
             Units += p.units;
             PlantList.Add(p);
             return IsFull();
@@ -132,9 +135,14 @@ namespace FloorSimulation
 
         public bool IsFull()
         {
-            if (Units >= MaxUnits)
+            if (TotalStickers >= MaxTotalStickers)
                 return true;
             return false;
+        }
+
+        public static string FullDetection()
+        {
+            return "Vol bij aantal Stickers";
         }
 
         public override string ToString()

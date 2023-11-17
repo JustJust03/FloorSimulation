@@ -78,6 +78,8 @@ namespace FloorSimulation
                 dtList.Add(t);
             }
 
+            //CalculateImportStickers(dtList);
+
             return dtList;
         }
 
@@ -149,5 +151,23 @@ namespace FloorSimulation
 
             return shops;
         }
+
+        private void CalculateImportStickers(List<DanishTrolley> dtList)
+        {
+            List<int> StickersPerTrolley = dtList
+                .Select(dt => dt.PlantList.Count)
+                .Where(count => count > 1)
+                .ToList();
+
+            double MeanStickersPerTrolley = StickersPerTrolley.Average();
+
+            double VarStickersPerTrolley = StickersPerTrolley.Select(x => Math.Pow(x - MeanStickersPerTrolley, 2)).Average();
+
+            int StickerMinimum = StickersPerTrolley.Min();
+            int StickerMaximum = StickersPerTrolley.Max();
+
+            double Stickersd = Math.Sqrt(VarStickersPerTrolley);
+        }
+            
     }
 }

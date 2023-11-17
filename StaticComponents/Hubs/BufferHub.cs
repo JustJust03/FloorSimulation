@@ -48,9 +48,6 @@ namespace FloorSimulation
             else
                 GenerateHorizontalAccessPoints();
 
-
-
-
             //Creates initial empty trolleys to the bufferhub
             for (int i = Trolleyarr.Length - initial_trolleys; i < Trolleyarr.Length; i++)
             {

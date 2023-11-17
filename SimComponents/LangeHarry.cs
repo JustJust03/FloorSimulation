@@ -27,7 +27,7 @@ namespace FloorSimulation
         public bool IsInUse;
         public bool IsTargeted;
         public Distributer DButer;
-        public const float HarryTravelSpeed = 300f; //cm/s
+        public const float HarryTravelSpeed = 150f; //cm/s
 
         public List<DanishTrolley> TrolleyList;
 
