@@ -139,7 +139,7 @@ namespace FloorSimulation
 
         public override void PlaceBuffHubs()
         {
-            floor.BuffHubs.Add(new BufferHub("Buffer hub", 1, new Point(0, 40), new Size(floor.FirstWW.RSizeWW.Width - 200, 400), floor));
+            floor.BuffHubs.Add(new BufferHub("Buffer hub", 1, new Point(0, 40), new Size(floor.FirstWW.RSizeWW.Width - 200, 600), floor));
 
             base.PlaceBuffHubs();
         }

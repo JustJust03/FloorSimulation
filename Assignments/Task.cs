@@ -224,13 +224,13 @@ namespace FloorSimulation
                     Point p;
                     if (TargetHub.HasLeftAccess)
                     {
-                        p = new Point(Math.Max(targetp.X - 220, 0), targetp.Y);
+                        p = new Point(Math.Max(targetp.X - 160, 0), targetp.Y);
                         DButer.TravelToTile(DButer.WW.GetTile(p));
                     }
                     else
                     {
                         int maxwidth = DButer.floor.FirstWW.RSizeWW.Width;
-                        p = new Point(Math.Min(targetp.X + 350, maxwidth), targetp.Y);
+                        p = new Point(Math.Min(targetp.X + 160, maxwidth), targetp.Y);
                         DButer.TravelToTile(DButer.WW.GetTile(p));
                     }
                     if (DButer.route != null)
