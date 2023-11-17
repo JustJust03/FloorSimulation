@@ -26,10 +26,10 @@ namespace FloorSimulation
         public FinishedDistribution FinishedD;
         public Random rand;
 
-        // Real size: 4000 cm x 4000 cm
+        // Real size: 5000 cm x 5000 cm
         public const int RealFloorWidth = 5000; //cm
         public const int RealFloorHeight = 5000; //cm
-        public const float ScaleFactor = 0.15f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
+        public const float ScaleFactor = 0.25f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
         public Layout layout;
 
         public List<DanishTrolley> TrolleyList; // A list with all the trolleys that are on the floor.

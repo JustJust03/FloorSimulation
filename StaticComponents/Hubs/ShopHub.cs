@@ -41,6 +41,11 @@ namespace FloorSimulation
             return HubTrolleys[0];
         }
 
+        public override List<WalkTile> OpenSpots(Distributer DButer)
+        {
+            return new List<WalkTile> { Accesspoint[0] };
+        }
+
         public override DanishTrolley GiveTrolley(Point AgenRPoint = default)
         {
             DanishTrolley FirstTrolley = HubTrolleys[0];
@@ -65,9 +70,16 @@ namespace FloorSimulation
 
         public override void TeleportHub(Point NewRPoint)
         {
-            WalkTile t = WW.GetTile(new Point(NewRPoint.X + RHubSize.Width - 10, NewRPoint.Y + RHubSize.Height));
-            t.IsStatic = true;
-            t.occupied = true;
+            //Update Accesspoints
+            if (VerticalTrolleys)
+                throw new NotImplementedException("Implement access points for shop hubs first!");
+            else
+            {
+                if (HasLeftAccess)
+                    Accesspoint[0] = WW.GetTile(new Point(NewRPoint.X - 40, NewRPoint.Y + 20));
+                else
+                    Accesspoint[0] = WW.GetTile(new Point(NewRPoint.X + RHubSize.Width, NewRPoint.Y + 20));
+            }
             base.TeleportHub(NewRPoint);
         }
 
@@ -75,6 +87,7 @@ namespace FloorSimulation
         {
             RHubSize = new Size(RHubSize.Height, RHubSize.Width);
             HubSize = floor.ConvertToSimSize(RHubSize); //Scaled up the Real Hub Size to the SimSize
+            VerticalTrolleys = !VerticalTrolleys;
             foreach(DanishTrolley dt in HubTrolleys)
                 dt.RotateTrolley();
 
