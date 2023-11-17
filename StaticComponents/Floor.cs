@@ -68,8 +68,8 @@ namespace FloorSimulation
             MilisecondsPerTick = (1.0 / Program.TICKS_PER_SECOND) * 1000;
             FinishedD = new FinishedDistribution(this);
             rand = new Random(0);
-            layout = new SLayoutDayId(this, rd);
-            //layout = new RechtHoekLayout(this, rd);
+            //layout = new SLayoutDayId(this, rd);
+            layout = new SLayoutDayIdBuffhub(this, rd);
 
             TrolleyList = new List<DanishTrolley>();
             HubList = new List<Hub>();
@@ -202,9 +202,14 @@ namespace FloorSimulation
             return layout.GetStartHub(db);
         }
 
-        public BufferHub GetBuffHub(Distributer db)
+        public BufferHub GetBuffHubFull(Distributer db)
         {
-            return layout.GetBuffHub(db);
+            return layout.GetBuffHubFull(db);
+        }
+
+        public BufferHub GetBuffHubOpen(Distributer db)
+        {
+            return layout.GetBuffHubOpen(db);
         }
 
         public int TotalUndistributedTrolleys()

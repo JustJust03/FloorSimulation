@@ -60,7 +60,7 @@ namespace FloorSimulation
 
         private void GenerateVerticalAccessPoints()
         {
-            for (int y = 0; y < 2; y++)
+            for (int y = 0; y < NRows; y++)
             {
                 int trolleyY = RFloorPoint.Y + y * 200;
                 for (int i = 0; i < NTrolleysInRow; i++)
@@ -78,7 +78,7 @@ namespace FloorSimulation
         {
             for(int x = 0; x < NTrolleysInRow; x++)
             {
-                int trolleyX = RFloorPoint.X + x * 200;
+                int trolleyX = RFloorPoint.X;
                 for(int y = 0; y < NRows; y++)
                 {
                     int trolleyY = RFloorPoint.Y + Rslack + y * (Rslack + DummyTrolley.GetRSize().Height);
@@ -97,13 +97,26 @@ namespace FloorSimulation
         {
             List<WalkTile> OpenSpots = new List<WalkTile>();
 
-            for (int coli = NTrolleysInRow - 1; coli >= 0; coli--)
+            if (VerticalTrolleys)
+            {
+                for (int coli = NTrolleysInRow - 1; coli >= 0; coli--)
+                    for (int rowi = 0; rowi < NRows; rowi++)
+                        if (Trolleyarr[rowi, coli] == null)
+                        {
+                            OpenSpots.Add(HubAccessPoints[rowi, coli]);
+                            break;
+                        }
+            }
+
+            else
+            {
                 for (int rowi = 0; rowi < NRows; rowi++)
-                    if (Trolleyarr[rowi, coli] == null)
-                    {
-                        OpenSpots.Add(HubAccessPoints[rowi, coli]);
-                        break;
-                    }
+                    for (int coli = NTrolleysInRow - 1; coli >= 0; coli--)
+                        if (Trolleyarr[rowi, coli] == null)
+                        {
+                            OpenSpots.Add(HubAccessPoints[rowi, coli]);
+                        }
+            }
 
             return OpenSpots;
         }
@@ -120,16 +133,18 @@ namespace FloorSimulation
                     if (Trolleyarr[rowi, coli] != null)
                     {
                         Point p = HubAccessPoints[rowi, coli].Rpoint;
-                        p.Y += 180;
+                        if (VerticalTrolleys)
+                            p.Y += 180;
+                        else
+                            p.X -= 20;
                         CSpots.Add(WW.GetTile(p));
                     }
 
-            if(CSpots.Count == 0) 
+            if(CSpots.Count == 0 && name == "Buffer hub") 
             {
                 SpawnEmptyTrolleys(5);
                 return FilledSpots(DButer);
-            }
-
+            } 
             return CSpots;
         }
 
@@ -151,8 +166,19 @@ namespace FloorSimulation
 
         public override DanishTrolley GiveTrolley(Point AgentRPoint)
         {
-            int ArrIndexx = Array.IndexOf(HubAccessPointsX, AgentRPoint.X);
-            int ArrIndexy = Array.IndexOf(HubAccessPointsY, AgentRPoint.Y - 180); //This 20 is because of the extra height when the dbuter is rotated.
+            int ArrIndexx;
+            int ArrIndexy;
+            if (!VerticalTrolleys)
+            {
+                ArrIndexx = Array.IndexOf(HubAccessPointsX, AgentRPoint.X + 20);
+                ArrIndexy = Array.IndexOf(HubAccessPointsY, AgentRPoint.Y); //This 20 is because of the extra height when the dbuter is rotated.
+            }
+            else
+            {
+                ArrIndexx = Array.IndexOf(HubAccessPointsX, AgentRPoint.X);
+                ArrIndexy = Array.IndexOf(HubAccessPointsY, AgentRPoint.Y - 180); //This 20 is because of the extra height when the dbuter is rotated.
+            }
+
             if (ArrIndexx == -1 || ArrIndexy == -1) return null;
             DanishTrolley t = Trolleyarr[ArrIndexy, ArrIndexx];
             Trolleyarr[ArrIndexy, ArrIndexx] = null;
@@ -169,10 +195,29 @@ namespace FloorSimulation
         public override void TakeVTrolleyIn(DanishTrolley dt, Point AgentRPoint)
         {
             int ArrIndexx = Array.IndexOf(HubAccessPointsX, AgentRPoint.X);
+            int ArrIndexy = Array.IndexOf(HubAccessPointsY, AgentRPoint.Y + 10); //The lenght of the trolley
+            Trolleyarr[ArrIndexy, ArrIndexx] = dt;
+            dt.Units = 0;
+            dt.NStickers = 2;
+            dt.IsVertical = true;
+            if (MainBufferFull()) //Remove the first row
+            {
+                Point p = new Point(RFloorPoint.X, RFloorPoint.Y + (NRows - 1) * 200);
+                Size s = new Size(RHubSize.Width, 200);
+                floor.FirstWW.unfill_tiles(p, s);
+                for (int coli = NTrolleysInRow - 1; coli >= 0; coli--)
+                    Trolleyarr[NRows - 1, coli] = null;
+            }
+        }
+
+        public override void TakeHTrolleyIn(DanishTrolley dt, Point AgentRPoint)
+        {
+            int ArrIndexx = Array.IndexOf(HubAccessPointsX, AgentRPoint.X + 10);
             int ArrIndexy = Array.IndexOf(HubAccessPointsY, AgentRPoint.Y); //The lenght of the trolley
             Trolleyarr[ArrIndexy, ArrIndexx] = dt;
             dt.Units = 0;
-            dt.IsVertical = true;
+            dt.NStickers = 2;
+            dt.IsVertical = false;
         }
 
         public override void DrawHub(Graphics g, bool DrawOutline = false)
@@ -185,6 +230,16 @@ namespace FloorSimulation
             foreach (DanishTrolley DT in Trolleyarr)
                 if(DT != null)
                     DT.DrawObject(g);
+        }
+
+        private bool MainBufferFull()
+        {
+            if (name != "Buffer hub")
+                return false;
+            for (int coli = NTrolleysInRow - 1; coli >= 0; coli--)
+                if (Trolleyarr[NRows - 1, coli] == null)
+                    return false;
+            return true;
         }
     }
 }

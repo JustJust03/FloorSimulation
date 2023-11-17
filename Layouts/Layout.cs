@@ -26,7 +26,8 @@ namespace FloorSimulation
 
         public abstract StartHub GetStartHub(Distributer db);
 
-        public abstract BufferHub GetBuffHub(Distributer db);
+        public abstract BufferHub GetBuffHubOpen(Distributer db);
+        public abstract BufferHub GetBuffHubFull(Distributer db);
 
         public virtual void PlaceFullTrolleyHubs()
         {

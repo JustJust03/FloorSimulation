@@ -369,9 +369,12 @@ namespace FloorSimulation
         /// </summary>
         private void DeliveringEmptyTrolley()
         {
-            TargetHub.TakeVTrolleyIn(Trolley, DButer.RDPoint);
             DButer.WW.unoccupie_by_tiles(DButer.trolley.RPoint, DButer.trolley.GetRSize()); // drop the trolley of from the distributer
             DButer.GiveTrolley();
+            if(Trolley.IsVertical)
+                TargetHub.TakeVTrolleyIn(Trolley, DButer.RDPoint);
+            else
+                TargetHub.TakeHTrolleyIn(Trolley, DButer.RDPoint);
 
             TargetHub = DButer.floor.GetStartHub(DButer);
 
@@ -448,7 +451,7 @@ namespace FloorSimulation
             DButer.WW.unoccupie_by_tiles(DButer.trolley.RPoint, DButer.trolley.GetRSize()); // drop the trolley of from the distributer
             DButer.GiveTrolley();
 
-            TargetHub = DButer.floor.GetBuffHub(DButer);
+            TargetHub = DButer.floor.GetBuffHubFull(DButer);
             DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
             Goal = "TakeEmptyTrolley"; //New goal
             if (DButer.route == null) //Route was not possible at this point. Try again later.
@@ -577,6 +580,7 @@ namespace FloorSimulation
             //The trolley in buffhub was already taken
             if (t == null)
             {
+                TargetHub = DButer.floor.GetBuffHubFull(DButer);
                 DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
                 if (DButer.route == null) //Route was not possible at this point. Try again later.
                     FailRoute();
@@ -585,10 +589,24 @@ namespace FloorSimulation
             Trolley = t;
             DButer.TakeTrolleyIn(t);
 
-            TilesDownTile = DButer.WW.GetTile(new Point(DButer.RDPoint.X, TargetHub.RFloorPoint.Y + TargetHub.RHubSize.Height));
-            DButer.TravelToTile(TilesDownTile);
 
-            Goal = "MoveEmptyTrolleyDown"; //New goal
+            if (Trolley.IsVertical)
+            {
+                TilesDownTile = DButer.WW.GetTile(new Point(DButer.RDPoint.X, TargetHub.RFloorPoint.Y + TargetHub.RHubSize.Height));
+                DButer.TravelToTile(TilesDownTile);
+                Goal = "MoveEmptyTrolleyDown"; //New goal
+            }
+            else
+            {
+                if(TargetHub.VerticalTrolleys != Trolley.IsVertical)
+                    DButer.RotateDistributerAndTrolley(); //Rotate the distributer and the trolley to fit into the shop.
+                if (WasOnTopLeft)
+                    OldWalkTile = DButer.WW.GetTile(new Point(OldWalkTile.Rpoint.X - DButer.RDistributerSize.Width + 10, OldWalkTile.Rpoint.Y)); //Because dbuter is on the left of the trolley.
+                DButer.TravelToTile(OldWalkTile);
+                TargetHub = OldTargetHub;
+
+                Goal = "DeliverEmptyTrolleyToShop"; //New goal
+            }
             InTask = true;
             Travelling = true;
         }
@@ -636,11 +654,14 @@ namespace FloorSimulation
             DButer.floor.TrolleyList.Remove(Trolley);
             if (DButer.trolley.PeekFirstPlant() == null) //This dropped off trolley was actually empty, so deliver it to the buffer hub
             {
-                TargetHub = DButer.floor.GetBuffHub(DButer);
+                TargetHub = DButer.floor.GetBuffHubOpen(DButer);
                 if (Trolley != OldTrolley)
                     throw new Exception("THIS TAKES THE WRONG TROLLEY!");
 
                 Trolley = DButer.trolley;
+                if(TargetHub.VerticalTrolleys != Trolley.IsVertical)
+                    DButer.RotateDistributerAndTrolley();
+
                 DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
 
                 Goal = "DeliveringEmptyTrolley"; //New goal
@@ -690,8 +711,14 @@ namespace FloorSimulation
         /// </summary>
         private void DistributerTrolleyBecameEmpty()
         {
-            TargetHub = DButer.floor.GetBuffHub(DButer);
+            TargetHub = DButer.floor.GetBuffHubOpen(DButer);
             Trolley = DButer.trolley;
+            if(TargetHub.VerticalTrolleys != Trolley.IsVertical)
+            {
+                ;
+                DButer.RotateDistributerAndTrolley();
+            }
+
             DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
 
             Goal = "DeliveringEmptyTrolley"; //New goal

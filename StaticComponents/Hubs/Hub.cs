@@ -14,7 +14,7 @@ namespace FloorSimulation
     internal class Hub
     {
         protected List<DanishTrolley> HubTrolleys;
-        protected string name;
+        public string name;
         public int id;
         public Point RFloorPoint;    //Real point on the floor. In cm.
         protected Point FloorPoint;
