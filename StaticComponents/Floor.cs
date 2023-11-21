@@ -39,14 +39,6 @@ namespace FloorSimulation
         public List<FullTrolleyHub> FTHubs;
         public TruckHub TrHub;
         public List<Distributer> DistrList; // A list with all the distributers that are on the floor.
-        public Distributer FirstDistr;
-        public Distributer SecondDistr;
-        public Distributer ThirdDistr;
-        public Distributer FourthDistr;
-        public Distributer FiveDistr;
-        public Distributer SixDistr;
-        public Distributer SevenDistr;
-        public Distributer EightDistr;
         public LangeHarry FirstHarry;
         public WalkWay FirstWW;
 
@@ -81,22 +73,7 @@ namespace FloorSimulation
             FirstHarry = new LangeHarry(0, this, FirstWW, new Point(4500, 1700));
 
             DistrList = new List<Distributer>();
-            FirstDistr = new Distributer(0, this, FirstWW, Rpoint_: new Point(4000, 3000));
-            SecondDistr = new Distributer(1, this, FirstWW, Rpoint_: new Point(4100, 3000));
-            ThirdDistr = new Distributer(2, this, FirstWW, Rpoint_: new Point(4200, 3000));
-            FourthDistr = new Distributer(3, this, FirstWW, Rpoint_: new Point(4300, 3000));
-            FiveDistr = new Distributer(4, this, FirstWW, Rpoint_: new Point(4400, 3000));
-            SixDistr = new Distributer(5, this, FirstWW, Rpoint_: new Point(4500, 3000));
-            SevenDistr = new Distributer(6, this, FirstWW, Rpoint_: new Point(4600, 3000));
-            EightDistr = new Distributer(7, this, FirstWW, Rpoint_: new Point(4700, 3000));
-            DistrList.Add(FirstDistr);
-            DistrList.Add(SecondDistr);
-            DistrList.Add(ThirdDistr);
-            DistrList.Add(FourthDistr);
-            DistrList.Add(FiveDistr);
-            DistrList.Add(SixDistr);
-            DistrList.Add(SevenDistr);
-            DistrList.Add(EightDistr);
+            layout.PlaceDistributers(8, new Point(4000, 3000));
 
             TrHub = new TruckHub("Truck Hub", 6, new Point(4230, 700), this);
             HubList.Add(TrHub);

@@ -283,8 +283,8 @@ namespace FloorSimulation
 
         public override void PlaceFullTrolleyHubs()
         {
-            UpperY += 600;
-            LowestY -= 600;
+            UpperY += 880;
+            LowestY -= 880;
 
             base.PlaceFullTrolleyHubs();
         }

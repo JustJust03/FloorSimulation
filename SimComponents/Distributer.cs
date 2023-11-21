@@ -168,10 +168,6 @@ namespace FloorSimulation
                 {
                     WalkTile destination = route[0];
 
-                    if (this == floor.SecondDistr)
-                    {
-                        ;
-                    }
                     WW.WWC.UpdateLocalClearances(this, GetDButerTileSize(), destination);
 
                     if (!AWW.IsTileAccessible(destination)) //Route failed, there was something occupying the calculated route

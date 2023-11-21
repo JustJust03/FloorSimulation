@@ -18,6 +18,7 @@ namespace FloorSimulation
         public string TotalTime;
         public string TotalTrolleysDistributed;
         public string TotalTrolleysExported;
+        public string DistributersWorking;
         private Floor floor;
         
         private int TotalTrolleysDistr;
@@ -49,6 +50,7 @@ namespace FloorSimulation
             TotalTrolleysExp = floor.TrHub.TrolleysExported + floor.FullTrolleysOnFloor();
             TotalTrolleysDistributed = TotalTrolleysDistr.ToString();
             TotalTrolleysExported = TotalTrolleysExp.ToString();
+            DistributersWorking = floor.DistrList.Count.ToString();
 
             DistributionDate = floor.Display.date;
             Layout = floor.layout.ToString();

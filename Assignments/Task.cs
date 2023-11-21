@@ -274,9 +274,13 @@ namespace FloorSimulation
                 DButer.TravelToTrolley(Trolley);
             }
 
-            if (DButer.route == null || DButer.route.Count == 0)
+            if (DButer.route == null)
             {
                 Waiting = true;
+            }
+            else if(DButer.route.Count == 0)
+            {
+                RouteCompleted();
             }
             else
             {
@@ -626,7 +630,6 @@ namespace FloorSimulation
 
             InTask = true;
             Travelling = true;
-
         }
 
         /// <summary>
