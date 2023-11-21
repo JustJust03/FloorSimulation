@@ -33,10 +33,11 @@ namespace FloorSimulation
         public override void PlaceShops(List<ShopHub> Shops, int UpperY_, int LowerY)
         {
             UpperY = UpperY_;
-            int x = 0;
             int y = LowerY;
+            int x = 0;
             int two_per_row = 1; //Keeps track of how many cols are placed without space between them
             int placed_shops_in_a_row = 0;
+            int HalfShopsInRow = 0;
 
             bool FirstColFinished = false;
             for (int i = 0; i < Shops.Count;  i++) 
@@ -58,7 +59,7 @@ namespace FloorSimulation
                 }
 
                 placed_shops_in_a_row++;
-                if (placed_shops_in_a_row == 9 && FirstColFinished)
+                if (FirstColFinished && placed_shops_in_a_row == HalfShopsInRow)
                 {
                     placed_shops_in_a_row = 0;
                     if (two_per_row == 1)
@@ -73,6 +74,8 @@ namespace FloorSimulation
                     y += ShopHeight;
                 else
                 {
+                    if (!FirstColFinished)
+                        HalfShopsInRow = (placed_shops_in_a_row - 1) / 2;
                     FirstColFinished = true;
                     placed_shops_in_a_row = 0;
                     two_per_row++;
@@ -140,8 +143,8 @@ namespace FloorSimulation
 
         public override void PlaceStartHubs()
         {
-            floor.STHubs.Add(new StartHub("Start hub", 0, new Point(200, 4770), floor, vertical_trolleys_: true));
-            floor.STHubs.Add(new StartHub("Start hub", 1, new Point(1200, 4770), floor, vertical_trolleys_: true));
+            floor.STHubs.Add(new StartHub("Start hub", 0, new Point(200, floor.FirstWW.RSizeWW.Height - 250), floor, vertical_trolleys_: true));
+            floor.STHubs.Add(new StartHub("Start hub", 1, new Point(1200, floor.FirstWW.RSizeWW.Height - 250), floor, vertical_trolleys_: true));
 
             base.PlaceStartHubs();
         }

@@ -29,8 +29,8 @@ namespace FloorSimulation
 
             for(int i  = 0; i < amount; i++)
             {
-                db = new Distributer(0, floor, floor.FirstWW, Rpoint_: new Point(x, y));
-                floor.DistrList.Add(db);
+                db = new Distributer(i, floor, floor.FirstWW, Rpoint_: new Point(x, y));
+                floor.TotalDistrList.Add(db);
                 x += 100;
                 if (x > floor.FirstWW.RSizeWW.Width - 200)
                 {
