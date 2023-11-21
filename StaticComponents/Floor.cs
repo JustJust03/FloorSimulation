@@ -98,7 +98,7 @@ namespace FloorSimulation
             DistrList.Add(SevenDistr);
             DistrList.Add(EightDistr);
 
-            TrHub = new TruckHub("Truck Hub", 6, new Point(4280, 700), this);
+            TrHub = new TruckHub("Truck Hub", 6, new Point(4230, 700), this);
             HubList.Add(TrHub);
 
             BuffHubs = new List<BufferHub>();

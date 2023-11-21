@@ -224,13 +224,13 @@ namespace FloorSimulation
                     Point p;
                     if (TargetHub.HasLeftAccess)
                     {
-                        p = new Point(Math.Max(targetp.X - 160, 0), targetp.Y);
+                        p = new Point(Math.Max(targetp.X - 180, 0), targetp.Y);
                         DButer.TravelToTile(DButer.WW.GetTile(p));
                     }
                     else
                     {
                         int maxwidth = DButer.floor.FirstWW.RSizeWW.Width;
-                        p = new Point(Math.Min(targetp.X + 160, maxwidth), targetp.Y);
+                        p = new Point(Math.Min(targetp.X + 180, maxwidth), targetp.Y);
                         DButer.TravelToTile(DButer.WW.GetTile(p));
                     }
                     if (DButer.route != null)
@@ -378,7 +378,7 @@ namespace FloorSimulation
 
             TargetHub = DButer.floor.GetStartHub(DButer);
 
-            FullTrolleyHub h = DButer.floor.HasFullTrolleyHubFull(6);
+            FullTrolleyHub h = DButer.floor.HasFullTrolleyHubFull(8);
             if(h != null)
             {
                 TargetHub = h;
@@ -510,7 +510,7 @@ namespace FloorSimulation
         {
             Harry.TakeTrolleyIn(TargetHub.GiveTrolley(DButer.RDPoint));
 
-            if (TargetHub.AmountOfTrolleys() > 0 && Harry.TrolleyList.Count < 3)
+            if (TargetHub.AmountOfTrolleys() > 0 && Harry.TrolleyList.Count < LangeHarry.MaxTrolleysPerHarry)
             {
                 DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
                 if (DButer.route == null) //Route was not possible at this point
@@ -540,7 +540,7 @@ namespace FloorSimulation
 
             if(Harry.TrolleyList.Count < 1)
             {
-                FullTrolleyHub h = DButer.floor.HasFullTrolleyHubFull(3);
+                FullTrolleyHub h = DButer.floor.HasFullTrolleyHubFull(4);
                 if(h != null)
                 {
                     TargetHub = h;
