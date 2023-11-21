@@ -19,6 +19,7 @@ namespace FloorSimulation
         public readonly Pen BPen = new Pen(Color.Black);
         public readonly Pen BluePen = new Pen(Color.Blue);
         public readonly Pen YellowPen = new Pen(Color.Yellow);
+        public readonly Pen GreenPen = new Pen(Color.Green);
         public int Ticks = 0;
         public double MilisecondsPerTick;
         public TimeSpan ElapsedSimTime = TimeSpan.Zero;
@@ -138,7 +139,7 @@ namespace FloorSimulation
 
         public void PlaceShops(List<ShopHub> Shops)
         {
-            layout.PlaceShops(Shops, 840, 4070);
+            layout.PlaceShops(Shops, 1040, 4270);
         }
 
         public void PlaceStartHubs()

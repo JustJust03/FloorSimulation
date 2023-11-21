@@ -17,6 +17,7 @@ namespace FloorSimulation
         public Dictionary<string, ShopHub> DestPlusDayToHub;
         public List<ShopHub> UsedShopHubs;
         public List<string> days = new List<string> { "DI", "WO" };
+        //public List<string> days = new List<string> { "DI" };
 
         public ReadData()
         {
@@ -73,7 +74,7 @@ namespace FloorSimulation
             List<DanishTrolley> dtList = new List<DanishTrolley>();
             foreach(DanishTrolley t in TransactieIdToTrolley.Values.ToList())
             {
-                if (t.PlantList.Count == 0)
+                if (t.PlantList.Count == 0 || t.PlantList.Distinct().ToList().Count == 1)
                     continue;
                 dtList.Add(t);
             }
@@ -120,12 +121,18 @@ namespace FloorSimulation
                     recordsdo.ColliPlusDay = recordsdo.Code_collistikkers + "-" + "DO";
                     HubData recordsvr = recordsma.Clone();
                     recordsvr.ColliPlusDay = recordsvr.Code_collistikkers + "-" + "VR";
+                    HubData recordsza = recordsma.Clone();
+                    recordsza.ColliPlusDay = recordsza.Code_collistikkers + "-" + "ZA";
+                    HubData recordszo = recordsma.Clone();
+                    recordszo.ColliPlusDay = recordszo.Code_collistikkers + "-" + "ZO";
 
                     data.Add(recordsma);
                     data.Add(recordsdi);
                     data.Add(recordswo);
                     data.Add(recordsdo);
                     data.Add(recordsvr);
+                    data.Add(recordsza);
+                    data.Add(recordszo);
                 }
             }
 

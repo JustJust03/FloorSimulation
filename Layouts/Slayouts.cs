@@ -46,12 +46,15 @@ namespace FloorSimulation
                     Shop.HasLeftAccess = true;
                 Shop.TeleportHub(new Point(x, y));
                 
-                if(y == UpperY)
+                //Add corners when you get to a new col, or if this was the last col on the right
+                if(y == UpperY || (i == Shops.Count - 1 && two_per_row == 1))
                 {
                     if (Shop.HasLeftAccess)
                         ShopCornersX.Add(Shop.RFloorPoint.X);
                     else
                         ShopCornersX.Add(Shop.RFloorPoint.X + Shop.RHubSize.Width);
+                    if(i == Shops.Count - 1)
+                        ShopCornersX.Add(Shop.RFloorPoint.X + Shop.RHubSize.Width + StreetWidth);
                 }
 
                 placed_shops_in_a_row++;
@@ -137,8 +140,8 @@ namespace FloorSimulation
 
         public override void PlaceStartHubs()
         {
-            floor.STHubs.Add(new StartHub("Start hub", 0, new Point(200, 4570), floor, vertical_trolleys_: true));
-            floor.STHubs.Add(new StartHub("Start hub", 1, new Point(1200, 4570), floor, vertical_trolleys_: true));
+            floor.STHubs.Add(new StartHub("Start hub", 0, new Point(200, 4770), floor, vertical_trolleys_: true));
+            floor.STHubs.Add(new StartHub("Start hub", 1, new Point(1200, 4770), floor, vertical_trolleys_: true));
 
             base.PlaceStartHubs();
         }

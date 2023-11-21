@@ -24,7 +24,7 @@ namespace FloorSimulation.StaticComponents.Hubs
             base(name_, id_, FPoint_, floor_, new Size(700, 2000), initial_trolleys: initial_trolleys_, vertical_trolleys:true)
         {
             DummyTrolley = new DanishTrolley(-1, floor, IsVertical_: true);
-            NRows = RHubSize.Height / DummyTrolley.GetRSize().Height;
+            NRows = RHubSize.Height / DummyTrolley.GetRSize().Height + YSlack;
             NTrolleysInRow = RHubSize.Width / DummyTrolley.GetRSize().Width;
             Trolleyarr = new DanishTrolley[NRows, NTrolleysInRow];
 
@@ -34,7 +34,7 @@ namespace FloorSimulation.StaticComponents.Hubs
             HubAccessPointsY = new int[NRows];
             for (int Row = 0; Row < NRows; Row++)
             {
-                int trolleyY = RFloorPoint.Y + Row * DummyTrolley.GetRSize().Height + YSlack;
+                int trolleyY = RFloorPoint.Y + Row * (DummyTrolley.GetRSize().Height + YSlack);
                 for(int coli = 0; coli < NTrolleysInRow; coli++)
                 {
                     int trolleyX = RFloorPoint.X + (coli - LangeHarry.MaxTrolleysPerHarry + 2) * DummyTrolley.GetRSize().Width - floor.FirstHarry.GetRSize().Width; //this point + how far in the line it is
@@ -52,12 +52,14 @@ namespace FloorSimulation.StaticComponents.Hubs
         public override List<WalkTile> OpenSpots(Distributer DButer)
         {
             List<WalkTile> OpenSpots = new List<WalkTile>();
+            int farthest = -1;
             
             for (int rowi = 0; rowi < NRows; rowi++) 
-                for(int coli = NTrolleysInRow - 1; coli >= 0; coli--)
+                for(int coli = NTrolleysInRow - 1; coli >= 0 && coli > farthest; coli--)
                     if (Trolleyarr[rowi, coli] == null)
                     {
                         OpenSpots.Add(HubAccessPoints[rowi, coli]);
+                        farthest = coli;
                         break;
                     }
 

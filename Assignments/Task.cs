@@ -390,8 +390,6 @@ namespace FloorSimulation
             else
                 TargetHub.TakeHTrolleyIn(Trolley, DButer.RDPoint);
 
-            TargetHub = DButer.floor.GetStartHub(DButer);
-
             //Check if you need to empty a full trolley hub.
             FullTrolleyHub fh = DButer.floor.HasFullTrolleyHubFull(8);
             if(fh != null)
@@ -413,6 +411,9 @@ namespace FloorSimulation
                 Goal = "TakeLangeHarry";
                 return;
             }
+
+            TargetHub = DButer.floor.GetStartHub(DButer);
+            Trolley = TargetHub.PeekFirstTrolley();
 
             Goal = "TakeFullTrolley"; //New goal
             InTask = false;
@@ -498,8 +499,7 @@ namespace FloorSimulation
             if (Harry.IsInUse)
             {
                 TargetHub = DButer.floor.GetStartHub(DButer);
-                if (DButer.route == null) //Route was not possible at this point. Try again later.
-                    FailRoute();
+                Trolley = TargetHub.PeekFirstTrolley();
 
                 Goal = "TakeFullTrolley"; //New goal
                 InTask = false;
@@ -508,6 +508,13 @@ namespace FloorSimulation
             }
 
             DButer.MountHarry(Harry);
+
+            if (TargetHub is FullTrolleyHub)
+                Goal = "LHTakeFinishedTrolley";
+            else if (TargetHub is BufferHub)
+                Goal = "LHTakeEmptyTrolley";
+            else
+                throw new NotImplementedException("Lange Harry can't target this hub.");
 
             //Target hub stays the same as it was
             if(Harry.IsVertical)
@@ -524,12 +531,6 @@ namespace FloorSimulation
                     FailRoute();
             }
 
-            if (TargetHub is FullTrolleyHub)
-                Goal = "LHTakeFinishedTrolley";
-            else if (TargetHub is BufferHub)
-                Goal = "LHTakeEmptyTrolley";
-            else
-                throw new NotImplementedException("Lange Harry can't target this hub.");
             InTask = true;
             Travelling = true;
         }
@@ -573,7 +574,6 @@ namespace FloorSimulation
             else
             {
                 TargetHub = DButer.floor.TrHub;
-                DButer.RotateDistributerAndHarry();
                 DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
                 Goal = "LHDeliverFinishedTrolleys";
                 if (DButer.route == null) //Route was not possible
@@ -615,6 +615,7 @@ namespace FloorSimulation
 
                 DButer.DisMountHarry();
                 TargetHub = DButer.floor.GetStartHub(DButer);
+                Trolley = TargetHub.PeekFirstTrolley();
 
                 Goal = "TakeFullTrolley"; //New goal
                 InTask = false;
@@ -637,6 +638,8 @@ namespace FloorSimulation
         /// </summary>
         private void LHDeliverFinishedTrolleys()
         {
+            if(Harry.IsVertical == TargetHub.VerticalTrolleys)
+                DButer.RotateDistributerAndHarry();
             DanishTrolley t = Harry.DropTrolley();
             TargetHub.TakeVTrolleyIn(t, DButer.RDPoint);
 
@@ -664,6 +667,7 @@ namespace FloorSimulation
 
                 DButer.DisMountHarry();
                 TargetHub = DButer.floor.GetStartHub(DButer);
+                Trolley = TargetHub.PeekFirstTrolley();
 
                 Goal = "TakeFullTrolley"; //New goal
                 InTask = false;
