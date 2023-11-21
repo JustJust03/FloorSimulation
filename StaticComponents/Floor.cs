@@ -230,6 +230,30 @@ namespace FloorSimulation
             return null;
         }
 
+        public BufferHub HasFullSmallBufferHub(int MinimumTrolleys) 
+        {
+            foreach (BufferHub Hub in BuffHubs)
+                if(Hub.name == "Buffer hub")
+                    continue;
+                else if(Hub.AmountOfTrolleys() >= MinimumTrolleys)
+                    return Hub;
+            return null;
+        }
+
+        /// <summary>
+        /// Counts the amount of full trolleys in the FullTrolley hubs and the truck hub.
+        /// </summary>
+        /// <returns></returns>
+        public int FullTrolleysOnFloor()
+        {
+            int trolleys = 0;
+            foreach(FullTrolleyHub t in FTHubs)
+                trolleys += t.AmountOfTrolleys();
+            trolleys += TrHub.AmountOfTrolleys();
+
+            return trolleys;
+        }
+
         public Point ConvertToSimPoint(Point RPoint)
         {
             RPoint.X = (int)(RPoint.X * ScaleFactor);

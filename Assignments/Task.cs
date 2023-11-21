@@ -52,11 +52,13 @@ namespace FloorSimulation
         {
             "DeliveringEmptyTrolley",
             "DeliverFullTrolley",
-            "LHDeliverFinishedTrolleys"
+            "LHDeliverFinishedTrolleys",
+            "LHDeliverEmptyTrolleys"
         };
         public readonly List<string> TargetIsFilledSpots = new List<string>
         {
             "LHTakeFinishedTrolley",
+            "LHTakeEmptyTrolley",
             "TakeEmptyTrolley"
         };
         public readonly List<string> TargetIsHarry = new List<string>
@@ -185,12 +187,20 @@ namespace FloorSimulation
                 TakeLangeHarry();
 
             //Targethub.FilledSpots(DButer)
+            else if (Goal == "LHTakeEmptyTrolley")
+                LHTakeEmptyTrolley();
+
+            //Targethub.FilledSpots(DButer)
             else if (Goal == "LHTakeFinishedTrolley")
                 LHTakeFinishedTrolley();
 
             //Targethub.OpenSpots(DButer)
             else if (Goal == "LHDeliverFinishedTrolleys")
                 LHDeliverFinishedTrolleys();
+
+            //Targethub.OpenSpots(DButer)
+            else if (Goal == "LHDeliverEmptyTrolleys")
+                LHDeliverEmptyTrolleys();
 
             //Trolley
             else if (Goal == "TakeEmptyTrolley")
@@ -378,10 +388,22 @@ namespace FloorSimulation
 
             TargetHub = DButer.floor.GetStartHub(DButer);
 
-            FullTrolleyHub h = DButer.floor.HasFullTrolleyHubFull(8);
-            if(h != null)
+            //Check if you need to empty a full trolley hub.
+            FullTrolleyHub fh = DButer.floor.HasFullTrolleyHubFull(8);
+            if(fh != null)
             {
-                TargetHub = h;
+                TargetHub = fh;
+                DButer.TravelToHarry(Harry);
+                Harry.IsTargeted = true;
+                Goal = "TakeLangeHarry";
+                return;
+            }
+
+            //Check if you need to transport some empty trolleys to the big buffer hub.
+            BufferHub bh = DButer.floor.HasFullSmallBufferHub(7);
+            if(bh != null)
+            {
+                TargetHub = bh;
                 DButer.TravelToHarry(Harry);
                 Harry.IsTargeted = true;
                 Goal = "TakeLangeHarry";
@@ -498,7 +520,35 @@ namespace FloorSimulation
                     FailRoute();
             }
 
-            Goal = "LHTakeFinishedTrolley";
+            if (TargetHub is FullTrolleyHub)
+                Goal = "LHTakeFinishedTrolley";
+            else if (TargetHub is BufferHub)
+                Goal = "LHTakeEmptyTrolley";
+            else
+                throw new NotImplementedException("Lange Harry can't target this hub.");
+            InTask = true;
+            Travelling = true;
+        }
+
+        private void LHTakeEmptyTrolley()
+        {
+            Harry.TakeTrolleyIn(TargetHub.GiveTrolleyToHarry(DButer.RDPoint));
+
+            if (TargetHub.AmountOfTrolleys() > 0 && Harry.TrolleyList.Count < LangeHarry.MaxTrolleysPerHarry)
+            {
+                DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
+                if (DButer.route == null) //Route was not possible at this point
+                    FailRoute();
+            }
+            else
+            {
+                TargetHub = DButer.floor.BuffHubs[DButer.floor.BuffHubs.Count - 1];
+                DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer)); //Automaticaly checks if dbuter is on harry, which it is.
+                Goal = "LHDeliverEmptyTrolleys";
+                if (DButer.route == null) //Route was not possible
+                    FailRoute();
+            }
+
             InTask = true;
             Travelling = true;
         }
@@ -530,6 +580,55 @@ namespace FloorSimulation
             Travelling = true;
         }
 
+        private void LHDeliverEmptyTrolleys()
+        {
+            if(Harry.IsVertical == TargetHub.VerticalTrolleys)
+                DButer.RotateDistributerAndHarry();
+            DanishTrolley t = Harry.DropTrolley();
+            TargetHub.LHTakeVTrolleyIn(t, DButer.RDPoint);
+
+            if(Harry.TrolleyList.Count < 1)
+            {
+                BufferHub bh = DButer.floor.HasFullSmallBufferHub(6);
+                if(bh != null)
+                {
+                    TargetHub = bh;
+                    Goal = "LHTakeEmptyTrolley";
+                    DButer.RotateDistributerAndHarry();
+                    DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
+                    return;
+                }
+
+                FullTrolleyHub fh = DButer.floor.HasFullTrolleyHubFull(4);
+                if(fh != null)
+                {
+                    TargetHub = fh;
+                    Goal = "LHTakeFinishedTrolley";
+                    DButer.RotateDistributerAndHarry();
+                    DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
+                    return;
+                }
+
+                DButer.DisMountHarry();
+                TargetHub = DButer.floor.GetStartHub(DButer);
+
+                Goal = "TakeFullTrolley"; //New goal
+                InTask = false;
+                Travelling = false;
+                FinishedD.CheckFinishedDistribution();
+            }
+            else
+            {
+                DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
+                if (DButer.route == null) //Route was not possible
+                    FailRoute();
+            }
+
+            InTask = true;
+            Travelling = true;
+
+        }
+
         /// <summary>
         /// Uses target hub and OpenSpots as travel tile
         /// </summary>
@@ -540,11 +639,21 @@ namespace FloorSimulation
 
             if(Harry.TrolleyList.Count < 1)
             {
-                FullTrolleyHub h = DButer.floor.HasFullTrolleyHubFull(4);
-                if(h != null)
+                FullTrolleyHub fh = DButer.floor.HasFullTrolleyHubFull(4);
+                if(fh != null)
                 {
-                    TargetHub = h;
+                    TargetHub = fh;
                     Goal = "LHTakeFinishedTrolley";
+                    DButer.RotateDistributerAndHarry();
+                    DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
+                    return;
+                }
+
+                BufferHub bh = DButer.floor.HasFullSmallBufferHub(6);
+                if(bh != null)
+                {
+                    TargetHub = bh;
+                    Goal = "LHTakeEmptyTrolley";
                     DButer.RotateDistributerAndHarry();
                     DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
                     return;

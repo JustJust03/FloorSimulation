@@ -269,11 +269,12 @@ namespace FloorSimulation
                 int deltaY = obj.RFloorPoint.Y - db.RDPoint.Y;
                 return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
             })
+            .Where(obj => obj.name != "Buffer hub")
             .ToList();
 
             foreach(BufferHub buffhub in sortedList) 
             {
-                if (buffhub.OpenSpots(db).Count > 1)
+                if (buffhub.OpenSpots(db).Count > 0)
                     return buffhub;
             }
 
@@ -298,7 +299,8 @@ namespace FloorSimulation
                     floor.BuffHubs.Add(new BufferHub("Small buffer hub", 1 + i, new Point(x, y),new Size(BuffHubWidth, 600), floor, vertical_trolleys_: false));
             }
 
-            base.PlaceBuffHubs();
+            floor.BuffHubs.Add(new BufferHub("Buffer hub", 1, new Point(300, 40), new Size(floor.FirstWW.RSizeWW.Width - 500, 600), floor));
+            floor.HubList = floor.HubList.Concat(floor.BuffHubs).ToList();
         }
 
     }

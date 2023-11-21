@@ -166,12 +166,6 @@ namespace FloorSimulation
                 ticktravel += travel_dist_per_tick * floor.SpeedMultiplier;
                 while(ticktravel > WalkWay.WALK_TILE_WIDTH)
                 {
-                    if(route.Count == 0)
-                    {
-                        ticktravel = 0;
-                        break;
-                    }
-
                     WalkTile destination = route[0];
 
                     if (this == floor.SecondDistr)
@@ -199,10 +193,15 @@ namespace FloorSimulation
 
                     ticktravel -= WalkWay.WALK_TILE_WIDTH;
                     route.RemoveAt(0);
+
+                    if(route.Count == 0)
+                    {
+                        ticktravel = 0;
+                        MainTask.RouteCompleted();
+                        break;
+                    }
                 }
             }
-            else // Route is empty, thus target has been reached.
-                MainTask.RouteCompleted(); 
         }
 
         public void TravelTrolley()
