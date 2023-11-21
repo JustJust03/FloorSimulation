@@ -164,7 +164,7 @@ namespace FloorSimulation
             if (route.Count > 0)
             {
                 ticktravel += travel_dist_per_tick * floor.SpeedMultiplier;
-                while(ticktravel > WalkWay.WALK_TILE_WIDTH)
+                while (ticktravel > WalkWay.WALK_TILE_WIDTH)
                 {
                     WalkTile destination = route[0];
 
@@ -194,7 +194,7 @@ namespace FloorSimulation
                     ticktravel -= WalkWay.WALK_TILE_WIDTH;
                     route.RemoveAt(0);
 
-                    if(route.Count == 0)
+                    if (route.Count == 0)
                     {
                         ticktravel = 0;
                         MainTask.RouteCompleted();
@@ -202,6 +202,8 @@ namespace FloorSimulation
                     }
                 }
             }
+            else
+                MainTask.FailRoute();
         }
 
         public void TravelTrolley()
