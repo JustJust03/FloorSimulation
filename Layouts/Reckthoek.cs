@@ -40,7 +40,13 @@ namespace FloorSimulation
             return null;
         }
 
-        public override BufferHub GetBuffHub(Distributer db)
+        public override BufferHub GetBuffHubOpen(Distributer db)
+        {
+            //throw new NotImplementedException();
+            return null;
+        }
+
+        public override BufferHub GetBuffHubFull(Distributer db)
         {
             //throw new NotImplementedException();
             return null;

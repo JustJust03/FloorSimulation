@@ -14,7 +14,7 @@ namespace FloorSimulation
     internal class Hub
     {
         protected List<DanishTrolley> HubTrolleys;
-        protected string name;
+        public string name;
         public int id;
         public Point RFloorPoint;    //Real point on the floor. In cm.
         protected Point FloorPoint;
@@ -179,6 +179,11 @@ namespace FloorSimulation
             return FirstTrolley;
         }
 
+        public virtual DanishTrolley GiveTrolleyToHarry(Point AgentRPoint)
+        {
+            return null;
+        }
+
         /// <summary>
         /// Takes in the trolley in it's trolley list.
         /// </summary>
@@ -188,6 +193,12 @@ namespace FloorSimulation
                 throw new ArgumentException("Can't add more trolleys to this shop hub.");
             HubTrolleys.Add(t);
         }
+
+        public virtual void LHTakeVTrolleyIn(DanishTrolley t, Point DeliveryPoint = default)
+        {
+            return;
+        }
+
 
         /// <summary>
         /// Takes in the trolley in it's trolley list.

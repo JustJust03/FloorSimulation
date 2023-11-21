@@ -39,14 +39,6 @@ namespace FloorSimulation
         public List<FullTrolleyHub> FTHubs;
         public TruckHub TrHub;
         public List<Distributer> DistrList; // A list with all the distributers that are on the floor.
-        public Distributer FirstDistr;
-        public Distributer SecondDistr;
-        public Distributer ThirdDistr;
-        public Distributer FourthDistr;
-        public Distributer FiveDistr;
-        public Distributer SixDistr;
-        public Distributer SevenDistr;
-        public Distributer EightDistr;
         public LangeHarry FirstHarry;
         public WalkWay FirstWW;
 
@@ -68,8 +60,8 @@ namespace FloorSimulation
             MilisecondsPerTick = (1.0 / Program.TICKS_PER_SECOND) * 1000;
             FinishedD = new FinishedDistribution(this);
             rand = new Random(0);
-            layout = new SLayoutDayId(this, rd);
-            //layout = new RechtHoekLayout(this, rd);
+            //layout = new SLayoutDayId(this, rd);
+            layout = new SLayoutDayIdBuffhub(this, rd);
 
             TrolleyList = new List<DanishTrolley>();
             HubList = new List<Hub>();
@@ -81,24 +73,9 @@ namespace FloorSimulation
             FirstHarry = new LangeHarry(0, this, FirstWW, new Point(4500, 1700));
 
             DistrList = new List<Distributer>();
-            FirstDistr = new Distributer(0, this, FirstWW, Rpoint_: new Point(4000, 3000));
-            SecondDistr = new Distributer(1, this, FirstWW, Rpoint_: new Point(4100, 3000));
-            ThirdDistr = new Distributer(2, this, FirstWW, Rpoint_: new Point(4200, 3000));
-            FourthDistr = new Distributer(3, this, FirstWW, Rpoint_: new Point(4300, 3000));
-            FiveDistr = new Distributer(4, this, FirstWW, Rpoint_: new Point(4400, 3000));
-            SixDistr = new Distributer(5, this, FirstWW, Rpoint_: new Point(4500, 3000));
-            SevenDistr = new Distributer(6, this, FirstWW, Rpoint_: new Point(4600, 3000));
-            EightDistr = new Distributer(7, this, FirstWW, Rpoint_: new Point(4700, 3000));
-            DistrList.Add(FirstDistr);
-            DistrList.Add(SecondDistr);
-            DistrList.Add(ThirdDistr);
-            DistrList.Add(FourthDistr);
-            DistrList.Add(FiveDistr);
-            DistrList.Add(SixDistr);
-            DistrList.Add(SevenDistr);
-            DistrList.Add(EightDistr);
+            layout.PlaceDistributers(8, new Point(4000, 3000));
 
-            TrHub = new TruckHub("Truck Hub", 6, new Point(4280, 700), this);
+            TrHub = new TruckHub("Truck Hub", 6, new Point(4230, 700), this);
             HubList.Add(TrHub);
 
             BuffHubs = new List<BufferHub>();
@@ -202,9 +179,14 @@ namespace FloorSimulation
             return layout.GetStartHub(db);
         }
 
-        public BufferHub GetBuffHub(Distributer db)
+        public BufferHub GetBuffHubFull(Distributer db)
         {
-            return layout.GetBuffHub(db);
+            return layout.GetBuffHubFull(db);
+        }
+
+        public BufferHub GetBuffHubOpen(Distributer db)
+        {
+            return layout.GetBuffHubOpen(db);
         }
 
         public int TotalUndistributedTrolleys()
@@ -223,6 +205,30 @@ namespace FloorSimulation
                 if(Hub.AmountOfTrolleys() >= MinimumTrolleys)
                     return Hub;
             return null;
+        }
+
+        public BufferHub HasFullSmallBufferHub(int MinimumTrolleys) 
+        {
+            foreach (BufferHub Hub in BuffHubs)
+                if(Hub.name == "Buffer hub")
+                    continue;
+                else if(Hub.AmountOfTrolleys() >= MinimumTrolleys)
+                    return Hub;
+            return null;
+        }
+
+        /// <summary>
+        /// Counts the amount of full trolleys in the FullTrolley hubs and the truck hub.
+        /// </summary>
+        /// <returns></returns>
+        public int FullTrolleysOnFloor()
+        {
+            int trolleys = 0;
+            foreach(FullTrolleyHub t in FTHubs)
+                trolleys += t.AmountOfTrolleys();
+            trolleys += TrHub.AmountOfTrolleys();
+
+            return trolleys;
         }
 
         public Point ConvertToSimPoint(Point RPoint)

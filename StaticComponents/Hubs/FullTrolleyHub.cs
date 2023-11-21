@@ -19,7 +19,7 @@ namespace FloorSimulation
         private WalkTile[] HubAccessPoints; //The Points in the hub where you can drop of trolleys
         private int[] HubAccessPointsY; //The Points in the hub where you can drop of trolleys
         private WalkTile[] HarryHubAccessPoints; //The Points in the hub where Lange Harry can pick up trolleys
-        private int[] HarryHubAccessPointsY; //The Points in the hub where you can drop of trolleys
+        private int[] HarryHubAccessPointsY; //The Points in the hub where Lange
 
         /// <summary>
         /// The full trolley hub is usually placed inbetween the street

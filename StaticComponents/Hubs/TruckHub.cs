@@ -37,7 +37,7 @@ namespace FloorSimulation.StaticComponents.Hubs
                 int trolleyY = RFloorPoint.Y + Row * DummyTrolley.GetRSize().Height + YSlack;
                 for(int coli = 0; coli < NTrolleysInRow; coli++)
                 {
-                    int trolleyX = RFloorPoint.X + (coli - 1) * DummyTrolley.GetRSize().Width - floor.FirstHarry.GetRSize().Width; //this point + how far in the line it is
+                    int trolleyX = RFloorPoint.X + (coli - LangeHarry.MaxTrolleysPerHarry + 2) * DummyTrolley.GetRSize().Width - floor.FirstHarry.GetRSize().Width; //this point + how far in the line it is
 
                     HubAccessPoints[Row, coli] = WW.GetTile(new Point(trolleyX, trolleyY));
                     HubAccessPointsX[coli] = HubAccessPoints[Row, coli].Rpoint.X;

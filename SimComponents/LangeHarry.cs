@@ -28,6 +28,7 @@ namespace FloorSimulation
         public bool IsTargeted;
         public Distributer DButer;
         public const float HarryTravelSpeed = 150f; //cm/s
+        public const int MaxTrolleysPerHarry = 4;
 
         public List<DanishTrolley> TrolleyList;
 
@@ -43,8 +44,10 @@ namespace FloorSimulation
             id = id_;
             floor = floor_;
 
-            VHarryIMG = Image.FromFile(Program.rootfolder + @"\SimImages\LangeHarry_vertical.png");
-            HHarryIMG = Image.FromFile(Program.rootfolder + @"\SimImages\LangeHarry_horizontal.png");
+            //VHarryIMG = Image.FromFile(Program.rootfolder + @"\SimImages\LangeHarry_vertical.png");
+            VHarryIMG = Image.FromFile(Program.rootfolder + @"\SimImages\LangeHarry_vertical - kopie.png");
+            //HHarryIMG = Image.FromFile(Program.rootfolder + @"\SimImages\LangeHarry_horizontal.png");
+            HHarryIMG = Image.FromFile(Program.rootfolder + @"\SimImages\LangeHarry_horizontal - kopie.png");
 
             VRHarrySize = new Size(VHarryIMG.Width, VHarryIMG.Height);
             VHarrySize = floor.ConvertToSimSize(VRHarrySize);
@@ -74,7 +77,7 @@ namespace FloorSimulation
                 if(DButer != null)
                 {
                     Point Rp = new Point(RPoint.X + VRHarrySize.Width / 2 - DButer.VRDistributerSize.Width / 2,
-                                         RPoint.Y + 171);
+                                         RPoint.Y + 57 * MaxTrolleysPerHarry);
                     DButer.DrawObject(g, floor.ConvertToSimPoint(Rp));
                 }
             }
@@ -120,12 +123,12 @@ namespace FloorSimulation
             TrolleyList.Add(dt);
             if (IsVertical)
             {
-                dt.RPoint = new Point(RPoint.X, RPoint.Y + (3 - TrolleyList.Count()) * 57);
+                dt.RPoint = new Point(RPoint.X, RPoint.Y + (MaxTrolleysPerHarry - TrolleyList.Count()) * 57);
                 dt.SimPoint = floor.ConvertToSimPoint(dt.RPoint);
             }
             else
                 throw new Exception("Harry can't take in tolleys in horizontal mode yet");
-            return TrolleyList.Count() >= 3;
+            return TrolleyList.Count() >= MaxTrolleysPerHarry;
         }
 
         public List<DanishTrolley> DropTrolleys()
@@ -140,9 +143,9 @@ namespace FloorSimulation
             DanishTrolley t = TrolleyList[TrolleyList.Count - 1];
 
             if (t.IsVertical)
-                t.RPoint.X += 57 * (4 - TrolleyList.Count);
+                t.RPoint.X += 57 * (MaxTrolleysPerHarry + 1 - TrolleyList.Count);
             else
-                t.RPoint.Y -= 57 * (4 - TrolleyList.Count);
+                t.RPoint.Y -= 57 * (MaxTrolleysPerHarry + 1 - TrolleyList.Count);
             t.SimPoint = floor.ConvertToSimPoint(t.RPoint);
             WW.fill_tiles(t.RPoint, t.GetRSize());
 
@@ -181,7 +184,7 @@ namespace FloorSimulation
                 DanishTrolley t = TrolleyList[i];
                 t.IsVertical = !t.IsVertical;
                 if (t.IsVertical)
-                    t.RPoint = new Point(RPoint.X + GetRSize().Width - 57 * (3 - i), RPoint.Y);
+                    t.RPoint = new Point(RPoint.X + GetRSize().Width - 57 * (MaxTrolleysPerHarry - i), RPoint.Y);
                 else
                     throw new Exception("YOU SHOULDN'T ROTATE THIS TO HORIZONTAL WHEN THERE ARE TROLLEYS ON HARRY");
             }

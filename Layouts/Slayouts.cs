@@ -11,9 +11,9 @@ namespace FloorSimulation
 
     internal class SLayout : Layout
     {
-        private int UpperY;
-        private int LowestY;
-        private List<int> ShopCornersX = new List<int>(); //Keeps track of the upper corners of the shops in the street. Is used to place FullHubs
+        protected int UpperY;
+        protected int LowestY;
+        protected List<int> ShopCornersX = new List<int>(); //Keeps track of the upper corners of the shops in the street. Is used to place FullHubs
         protected int StreetWidth = 800;
         protected int ShopHeight = 170;
         private int NtrolleysPerShop = 2;
@@ -112,9 +112,15 @@ namespace FloorSimulation
             return floor.STHubs[0];
         }
 
-        public override BufferHub GetBuffHub(Distributer db)
+        public override BufferHub GetBuffHubOpen(Distributer db)
         {
-            return floor.BuffHubs[0];
+            return floor.BuffHubs[floor.BuffHubs.Count - 1];
+        }
+
+        public override BufferHub GetBuffHubFull(Distributer db)
+        {
+            floor.BuffHubs[floor.BuffHubs.Count - 1].FilledSpots(db);
+            return floor.BuffHubs[floor.BuffHubs.Count - 1];
         }
 
         public override void PlaceFullTrolleyHubs()
@@ -225,5 +231,77 @@ namespace FloorSimulation
                 .ThenBy(obj => obj.day).ToList();
             base.PlaceShops(Shops, UpperY, LowerY);
         }
+    }
+
+    internal class SLayoutDayIdBuffhub : SLayoutDayId
+    {
+        public SLayoutDayIdBuffhub(Floor floor_, ReadData rData) : base(floor_, rData)
+        {
+
+        }
+
+        public override BufferHub GetBuffHubFull(Distributer db)
+        {
+            List<BufferHub> sortedList = floor.BuffHubs.OrderBy(obj =>
+            {
+                int deltaX = obj.RFloorPoint.X - db.RDPoint.X;
+                int deltaY = obj.RFloorPoint.Y - db.RDPoint.Y;
+                return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
+            })
+            .Where(obj => obj.name != "Buffer hub")
+            .ToList();
+
+            foreach(BufferHub buffhub in sortedList) 
+            {
+                if (buffhub.FilledSpots(db).Count > 0)
+                    return buffhub;
+            }
+
+            return base.GetBuffHubFull(db);
+        }
+
+        public override BufferHub GetBuffHubOpen(Distributer db)
+        {
+            List<BufferHub> sortedList = floor.BuffHubs
+            .OrderBy(obj =>
+            {
+                int deltaX = obj.RFloorPoint.X - db.RDPoint.X;
+                int deltaY = obj.RFloorPoint.Y - db.RDPoint.Y;
+                return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
+            })
+            .Where(obj => obj.name != "Buffer hub")
+            .ToList();
+
+            foreach(BufferHub buffhub in sortedList) 
+            {
+                if (buffhub.OpenSpots(db).Count > 0)
+                    return buffhub;
+            }
+
+            return base.GetBuffHubOpen(db);
+        }
+
+        public override void PlaceFullTrolleyHubs()
+        {
+            UpperY += 880;
+            LowestY -= 880;
+
+            base.PlaceFullTrolleyHubs();
+        }
+
+        public override void PlaceBuffHubs()
+        {
+            int BuffHubWidth = 200;
+            for (int i = 0; i < ShopCornersX.Count - 1; i += 2)
+            {
+                int x = ((ShopCornersX[i] + ShopCornersX[i + 1]) / 2) - (BuffHubWidth / 2);
+                for (int y = UpperY; y < LowestY; y += LowestY - UpperY - 600)
+                    floor.BuffHubs.Add(new BufferHub("Small buffer hub", 1 + i, new Point(x, y),new Size(BuffHubWidth, 600), floor, vertical_trolleys_: false));
+            }
+
+            floor.BuffHubs.Add(new BufferHub("Buffer hub", 1, new Point(300, 40), new Size(floor.FirstWW.RSizeWW.Width - 500, 600), floor));
+            floor.HubList = floor.HubList.Concat(floor.BuffHubs).ToList();
+        }
+
     }
 }
