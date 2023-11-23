@@ -44,10 +44,8 @@ namespace FloorSimulation
             id = id_;
             floor = floor_;
 
-            //VHarryIMG = Image.FromFile(Program.rootfolder + @"\SimImages\LangeHarry_vertical.png");
-            VHarryIMG = Image.FromFile(Program.rootfolder + @"\SimImages\LangeHarry_vertical - kopie.png");
-            //HHarryIMG = Image.FromFile(Program.rootfolder + @"\SimImages\LangeHarry_horizontal.png");
-            HHarryIMG = Image.FromFile(Program.rootfolder + @"\SimImages\LangeHarry_horizontal - kopie.png");
+            VHarryIMG = Image.FromFile(Program.rootfolder + @"\SimImages\LangeHarry_vertical4.png");
+            HHarryIMG = Image.FromFile(Program.rootfolder + @"\SimImages\LangeHarry_horizontal4.png");
 
             VRHarrySize = new Size(VHarryIMG.Width, VHarryIMG.Height);
             VHarrySize = floor.ConvertToSimSize(VRHarrySize);
@@ -165,7 +163,7 @@ namespace FloorSimulation
                 if (IsVertical)
                 {
                     DanishTrolley t = TrolleyList[i];
-                    t.RPoint = new Point(RPoint.X, RPoint.Y + 57 * (2 - i));
+                    t.RPoint = new Point(RPoint.X, RPoint.Y + 57 * (MaxTrolleysPerHarry - 1 - i));
                     t.SimPoint = floor.ConvertToSimPoint(t.RPoint);
                 }
                 else

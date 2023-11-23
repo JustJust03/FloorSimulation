@@ -537,7 +537,13 @@ namespace FloorSimulation
 
         private void LHTakeEmptyTrolley()
         {
-            Harry.TakeTrolleyIn(TargetHub.GiveTrolleyToHarry(DButer.RDPoint));
+            Trolley = TargetHub.GiveTrolleyToHarry(DButer.RDPoint);
+            if (Trolley == null)
+            {
+                FailRoute();
+                return;
+            }
+            Harry.TakeTrolleyIn(Trolley);
 
             if (TargetHub.AmountOfTrolleys() > 0 && Harry.TrolleyList.Count < LangeHarry.MaxTrolleysPerHarry)
             {

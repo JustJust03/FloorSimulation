@@ -30,7 +30,7 @@ namespace FloorSimulation
         // Real size: 5000 cm x 5000 cm
         public const int RealFloorWidth = 5000; //cm
         public const int RealFloorHeight = 5000; //cm
-        public const float ScaleFactor = 0.25f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
+        public const float ScaleFactor = 0.20f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
         public Layout layout;
 
         public const int NDistributers = 34;
@@ -83,7 +83,6 @@ namespace FloorSimulation
             layout.PlaceDistributers(NDistributers, new Point(4000, 3000));
             OperationalInterval = SecondsToFullOperation / NDistributers;
 
-            TrHub = new TruckHub("Truck Hub", 6, new Point(4230, 700), this);
             TrHub = new TruckHub("Truck Hub", 6, new Point(FirstWW.RSizeWW.Width - 770, 700), this);
             HubList.Add(TrHub);
 

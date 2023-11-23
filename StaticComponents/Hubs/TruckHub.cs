@@ -16,15 +16,15 @@ namespace FloorSimulation.StaticComponents.Hubs
         private int[] HubAccessPointsY; //The Points in the hub where you can drop of trolleys
         private int NRows;
         private int NTrolleysInRow;
-        private int YSlack = 10;
+        private int YSlack = 20;
 
         public int TrolleysExported = 0;
 
         public TruckHub(string name_, int id_, Point FPoint_, Floor floor_, int initial_trolleys_ = 0) :
-            base(name_, id_, FPoint_, floor_, new Size(700, 2000), initial_trolleys: initial_trolleys_, vertical_trolleys:true)
+            base(name_, id_, FPoint_, floor_, new Size(700, 350), initial_trolleys: initial_trolleys_, vertical_trolleys:true)
         {
             DummyTrolley = new DanishTrolley(-1, floor, IsVertical_: true);
-            NRows = RHubSize.Height / DummyTrolley.GetRSize().Height + YSlack;
+            NRows = RHubSize.Height / (DummyTrolley.GetRSize().Height + YSlack);
             NTrolleysInRow = RHubSize.Width / DummyTrolley.GetRSize().Width;
             Trolleyarr = new DanishTrolley[NRows, NTrolleysInRow];
 
@@ -52,14 +52,12 @@ namespace FloorSimulation.StaticComponents.Hubs
         public override List<WalkTile> OpenSpots(Distributer DButer)
         {
             List<WalkTile> OpenSpots = new List<WalkTile>();
-            int farthest = -1;
             
             for (int rowi = 0; rowi < NRows; rowi++) 
-                for(int coli = NTrolleysInRow - 1; coli >= 0 && coli > farthest; coli--)
+                for(int coli = NTrolleysInRow - 1; coli >= 0; coli--)
                     if (Trolleyarr[rowi, coli] == null)
                     {
                         OpenSpots.Add(HubAccessPoints[rowi, coli]);
-                        farthest = coli;
                         break;
                     }
 

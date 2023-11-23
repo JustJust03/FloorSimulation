@@ -22,7 +22,7 @@ namespace FloorSimulation
         public Font BiggerSFont;
         public Brush StandardWhiteBrush;
         public bool isSimulating = false;
-        public string date = "2023-07-18";
+        public string date = "2023-05-16";
         public MetaInfo InfoPanel;
         public ControlInfo ControlPanel;
         private ReadData rd = new ReadData();
@@ -57,7 +57,7 @@ namespace FloorSimulation
             Controls.Add(InfoPanel);
 
             Paint += PaintMainDisplay;
-            SaveFileBase = date + "_" + "TESTER";
+            SaveFileBase = date + "_" + "1Street";
         }
 
         private void PaintMainDisplay(object sender, PaintEventArgs e)
