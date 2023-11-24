@@ -19,6 +19,7 @@ namespace FloorSimulation
         public readonly Pen BPen = new Pen(Color.Black);
         public readonly Pen BluePen = new Pen(Color.Blue);
         public readonly Pen YellowPen = new Pen(Color.Yellow);
+        public readonly Pen LightYellowPen = new Pen(Color.LightYellow);
         public readonly Pen GreenPen = new Pen(Color.Green);
         public int Ticks = 0;
         public double MilisecondsPerTick;
@@ -28,8 +29,6 @@ namespace FloorSimulation
         public Random rand;
 
         // Real size: 5000 cm x 5000 cm
-        public const int RealFloorWidth = 5000; //cm
-        public const int RealFloorHeight = 5000; //cm
         public const float ScaleFactor = 0.25f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
         public Layout layout;
 
@@ -58,29 +57,32 @@ namespace FloorSimulation
         {
             Display = di;
 
-            Size PixelFloorSize = new Size((int)(RealFloorWidth * ScaleFactor),
-                                           (int)(RealFloorHeight * ScaleFactor));
+            layout = new SLayoutDayId(this, rd);
+            //layout = new SLayoutDayIdBuffhub(this, rd);
+            //layout = new SLayoutDayIdBuffhub2Streets(this, rd);
+            //layout = new SLayoutDayId2Streets(this, rd);
+
+            Size PixelFloorSize = new Size((int)(layout.RealFloorWidth * ScaleFactor),
+                                           (int)(layout.RealFloorHeight * ScaleFactor));
             this.Location = PanelLocation;
             this.Size = PixelFloorSize;
             this.BackColor = FloorColor;
             MilisecondsPerTick = (1.0 / Program.TICKS_PER_SECOND) * 1000;
             FinishedD = new FinishedDistribution(this);
             rand = new Random(0);
-            //layout = new SLayoutDayId(this, rd);
-            layout = new SLayoutDayIdBuffhub(this, rd);
 
             TrolleyList = new List<DanishTrolley>();
             HubList = new List<Hub>();
             STHubs = new List<StartHub>();
             FTHubs = new List<FullTrolleyHub>();
 
-            FirstWW = new WalkWay(new Point(0, 0), new Size(RealFloorWidth, RealFloorHeight), this, DevTools_: false);
+            FirstWW = new WalkWay(new Point(0, 0), new Size(layout.RealFloorWidth, layout.RealFloorHeight), this, DevTools_: false);
 
-            FirstHarry = new LangeHarry(0, this, FirstWW, new Point(4500, 1700));
+            FirstHarry = new LangeHarry(0, this, FirstWW, new Point(FirstWW.RSizeWW.Width - 500, 1700));
 
             DistrList = new List<Distributer>();
             TotalDistrList = new List<Distributer>();
-            layout.PlaceDistributers(NDistributers, new Point(4000, 2000));
+            layout.PlaceDistributers(NDistributers, new Point(FirstWW.RSizeWW.Width - 1000, 2000));
             OperationalInterval = SecondsToFullOperation / NDistributers;
 
             TrHub = new TruckHub("Truck Hub", 6, new Point(FirstWW.RSizeWW.Width - 770, 700), this);

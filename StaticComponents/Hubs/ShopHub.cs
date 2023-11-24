@@ -107,6 +107,8 @@ namespace FloorSimulation
             {
                 if(day == "DI")
                     g.DrawRectangle(floor.YellowPen, new Rectangle(FloorPoint, HubSize));
+                else if(day == "DI_2")
+                    g.DrawRectangle(floor.LightYellowPen, new Rectangle(FloorPoint, HubSize));
                 else if (day == "WO")
                     g.DrawRectangle(floor.BluePen, new Rectangle(FloorPoint, HubSize));
                 else if (day == "DO")

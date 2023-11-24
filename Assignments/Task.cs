@@ -434,7 +434,7 @@ namespace FloorSimulation
 
             //Check if you need to empty a full trolley hub.
             FullTrolleyHub fh = DButer.floor.HasFullTrolleyHubFull(8);
-            if(fh != null)
+            if(fh != null && !Harry.IsTargeted)
             {
                 TargetHub = fh;
                 DButer.TravelToHarry(Harry);
@@ -445,7 +445,7 @@ namespace FloorSimulation
 
             //Check if you need to transport some empty trolleys to the big buffer hub.
             BufferHub bh = DButer.floor.HasFullSmallBufferHub(7);
-            if(bh != null)
+            if(bh != null && !Harry.IsTargeted)
             {
                 TargetHub = bh;
                 DButer.TravelToHarry(Harry);

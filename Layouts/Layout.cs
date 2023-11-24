@@ -11,6 +11,9 @@ namespace FloorSimulation
     {
         protected Floor floor;
         protected ReadData RData;
+        public int RealFloorWidth = 5000;
+        public int RealFloorHeight = 5000;
+
         public abstract int NTrolleysInShop { get; set; }
 
         public Layout(Floor floor_, ReadData rData)
@@ -29,7 +32,7 @@ namespace FloorSimulation
 
             for(int i  = 0; i < amount; i++)
             {
-                db = new Distributer(i, floor, floor.FirstWW, Rpoint_: new Point(x, y));
+                db = new Distributer(i, floor, floor.FirstWW, Rpoint_: new Point(x, y), MaxWaitedTicks_: 100 - i);
                 floor.TotalDistrList.Add(db);
                 x += 200;
                 if (x > floor.FirstWW.RSizeWW.Width - 250)

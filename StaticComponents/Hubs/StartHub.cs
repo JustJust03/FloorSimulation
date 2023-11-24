@@ -17,7 +17,7 @@ namespace FloorSimulation
         public const int MaxStartHubTrolleys = 8;
 
         public StartHub(string name_, int id_, Point FPoint_, Floor floor_, int initial_trolleys_ = 0, bool vertical_trolleys_ = true) : 
-            base(name_, id_, FPoint_, floor_, new Size(800, 200), initial_trolleys:initial_trolleys_, vertical_trolleys:vertical_trolleys_)
+            base(name_, id_, FPoint_, floor_, new Size(640, 200), initial_trolleys:initial_trolleys_, vertical_trolleys:vertical_trolleys_)
         {
             UndistributedTrolleys = new List<DanishTrolley>();
             StartHubEmpty = false;

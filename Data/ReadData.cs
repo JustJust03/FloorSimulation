@@ -16,11 +16,11 @@ namespace FloorSimulation
         CsvConfiguration CsvConfig;
         public Dictionary<string, ShopHub> DestPlusDayToHub;
         public List<ShopHub> UsedShopHubs;
-        public List<string> days = new List<string> { "DI", "WO" };
-        //public List<string> days = new List<string> { "DI" };
+        public List<string> days;
 
-        public ReadData()
+        public ReadData(List<string> days_)
         {
+            days = days_;
             CsvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 HasHeaderRecord = true,
@@ -79,7 +79,7 @@ namespace FloorSimulation
                 dtList.Add(t);
             }
 
-            //CalculateImportStickers(dtList);
+            CalculateImportStickers(dtList);
 
             return dtList;
         }
