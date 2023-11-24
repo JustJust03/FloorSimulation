@@ -256,7 +256,7 @@ namespace FloorSimulation
             {
                 if (!MTask.InTask)
                     return ref FillerTijd;
-                if (MTask.Waiting)
+                if (MTask.Waiting || MTask.TargetWasSaveTile)
                     return ref WachtTijd;
 
                 if(MTask.Travelling)
