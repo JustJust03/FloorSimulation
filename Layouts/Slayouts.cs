@@ -310,4 +310,17 @@ namespace FloorSimulation
         }
 
     }
+
+    internal class SLayoutDayIdBuffhub2Streets: SLayoutDayIdBuffhub
+    {
+        public SLayoutDayIdBuffhub2Streets(Floor floor_, ReadData rData) : base(floor_, rData)
+        {
+
+        }
+
+        public override void PlaceShops(List<ShopHub> Shops, int UpperY, int LowerY)
+        {
+            base.PlaceShops(Shops, UpperY, LowerY);
+        }
+    }
 }

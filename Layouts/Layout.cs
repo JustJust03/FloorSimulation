@@ -31,11 +31,11 @@ namespace FloorSimulation
             {
                 db = new Distributer(i, floor, floor.FirstWW, Rpoint_: new Point(x, y));
                 floor.TotalDistrList.Add(db);
-                x += 250;
+                x += 200;
                 if (x > floor.FirstWW.RSizeWW.Width - 250)
                 {
                     x = StartPoint.X;
-                    y += 250;
+                    y += 200;
                     if(y > floor.FirstWW.RSizeWW.Height - 250)
                         break;
                 }

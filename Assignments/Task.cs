@@ -269,10 +269,6 @@ namespace FloorSimulation
                             DButer.TravelToTile(DButer.WW.GetTile(DButer.SavePoint));
                             TargetWasSaveTile = true;
                         }
-                        else
-                        {
-                            ;
-                        }
                     }
                 }
                 else
