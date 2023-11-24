@@ -22,7 +22,7 @@ namespace FloorSimulation
         private Distributer DButer;
         private FinishedDistribution FinishedD;
         int WaitedTicks = 0;
-        bool TargetWasSaveTile = false;
+        public bool TargetWasSaveTile = false;
         public AnalyzeInfo AInfo;
 
         public readonly List<string> VerspillingTasks = new List<string>
@@ -50,16 +50,14 @@ namespace FloorSimulation
         };
         public readonly List<string> TargetIsOpenSpots = new List<string>
         {
-            "DeliveringEmptyTrolley",
-            "DeliverFullTrolley",
             "LHDeliverFinishedTrolleys",
-            "LHDeliverEmptyTrolleys"
+            "LHDeliverEmptyTrolleys",
+            "DeliverFullTrolley"
         };
         public readonly List<string> TargetIsFilledSpots = new List<string>
         {
             "LHTakeFinishedTrolley",
-            "LHTakeEmptyTrolley",
-            "TakeEmptyTrolley"
+            "LHTakeEmptyTrolley"
         };
         public readonly List<string> TargetIsHarry = new List<string>
         {
@@ -69,6 +67,19 @@ namespace FloorSimulation
         {
             "MoveEmptyTrolleyDown"
         };
+        public readonly List<string> TargetIsStartHubs = new List<string>
+        {
+            "TakeFullTrolley"
+        };
+        public readonly List<string> TargetIsFullBuffHub = new List<string>
+        {
+            "TakeEmptyTrolley"
+        };
+        public readonly List<string> TargetIsOpenBuffHub = new List<string>
+        {
+            "DeliveringEmptyTrolley",
+        };
+
 
 
         public Task(Distributer DButer_, string Goal_, FinishedDistribution FinishedD_, DanishTrolley trolley_ = default)
@@ -128,6 +139,12 @@ namespace FloorSimulation
                     TargetWasSaveTile = true;
                 }
                 return;
+            }
+
+            if (TargetWasSaveTile && Goal == "DistributePlants")
+            {
+                FailRoute();
+                DButer.TickWalk();
             }
 
             if (InTask && Travelling)
@@ -245,6 +262,18 @@ namespace FloorSimulation
                     }
                     if (DButer.route != null)
                         MovingToClose = true;
+                    else if (Floor.NDistributers > 30) //Let distributers walk to save tile when the target hub is not reachable in busy street
+                    {
+                        if(DButer.WW.GetTile(p) != DButer.WW.GetTile(DButer.RDPoint))
+                        {
+                            DButer.TravelToTile(DButer.WW.GetTile(DButer.SavePoint));
+                            TargetWasSaveTile = true;
+                        }
+                        else
+                        {
+                            ;
+                        }
+                    }
                 }
                 else
                     MovingToClose = false;
@@ -259,21 +288,38 @@ namespace FloorSimulation
                 DButer.TravelToHarry(Harry);
             else if (TargetIsTilesDownTile.Contains(Goal))
                 DButer.TravelToTile(TilesDownTile);
+            else if (TargetIsStartHubs.Contains(Goal))
+            {
+                TargetHub = DButer.floor.GetStartHub(DButer);
+                Trolley = TargetHub.PeekFirstTrolley();
+
+                if (Goal == "TakeFullTrolley" && Trolley == null)
+                {
+                    InTask = false;
+                    Travelling = false;
+                    return;
+                }
+
+                DButer.TravelToTrolley(Trolley);
+            }
+            else if (TargetIsFullBuffHub.Contains(Goal))
+            {
+                TargetHub = DButer.floor.GetBuffHubFull(DButer);
+                DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
+            }
+            else if (TargetIsOpenBuffHub.Contains(Goal))
+            {
+                TargetHub = DButer.floor.GetBuffHubOpen(DButer);
+                DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
+            }
             else
             {
                 if (Trolley == null || Trolley.IsInTransport || Trolley.IsFull()) //The trolley you want to reach was taken by someone else. Look for another trolley in the targethub.
-                {
                     Trolley = TargetHub.PeekFirstTrolley();
-                    if (Goal == "TakeFullTrolley" && Trolley == null)
-                    {
-                        InTask = false;
-                        Travelling = false;
-                        return;
-                    }
-                }
                 DButer.TravelToTrolley(Trolley);
             }
 
+            //Check if there is a new route available now
             if (DButer.route == null)
             {
                 Waiting = true;
@@ -537,7 +583,13 @@ namespace FloorSimulation
 
         private void LHTakeEmptyTrolley()
         {
-            Harry.TakeTrolleyIn(TargetHub.GiveTrolleyToHarry(DButer.RDPoint));
+            Trolley = TargetHub.GiveTrolleyToHarry(DButer.RDPoint);
+            if (Trolley == null)
+            {
+                FailRoute();
+                return;
+            }
+            Harry.TakeTrolleyIn(Trolley);
 
             if (TargetHub.AmountOfTrolleys() > 0 && Harry.TrolleyList.Count < LangeHarry.MaxTrolleysPerHarry)
             {

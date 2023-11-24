@@ -33,6 +33,10 @@ namespace FloorSimulation
         public const float ScaleFactor = 0.25f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
         public Layout layout;
 
+        public const int NDistributers = 34;
+        public const int SecondsToFullOperation = 180; //How long to wait before all distributers are running
+        public int OperationalInterval; //How long to wait between distributers
+
         public List<DanishTrolley> TrolleyList; // A list with all the trolleys that are on the floor.
         public List<Hub> HubList; // A list with all the hubs that are on the floor (starthub: 0, shophubs >= 1)
         public List<StartHub> STHubs;
@@ -40,6 +44,7 @@ namespace FloorSimulation
         public List<FullTrolleyHub> FTHubs;
         public TruckHub TrHub;
         public List<Distributer> DistrList; // A list with all the distributers that are on the floor.
+        public List<Distributer> TotalDistrList;
         public LangeHarry FirstHarry;
         public WalkWay FirstWW;
 
@@ -74,9 +79,11 @@ namespace FloorSimulation
             FirstHarry = new LangeHarry(0, this, FirstWW, new Point(4500, 1700));
 
             DistrList = new List<Distributer>();
-            layout.PlaceDistributers(8, new Point(4000, 3000));
+            TotalDistrList = new List<Distributer>();
+            layout.PlaceDistributers(NDistributers, new Point(4000, 2000));
+            OperationalInterval = SecondsToFullOperation / NDistributers;
 
-            TrHub = new TruckHub("Truck Hub", 6, new Point(4230, 700), this);
+            TrHub = new TruckHub("Truck Hub", 6, new Point(FirstWW.RSizeWW.Width - 770, 700), this);
             HubList.Add(TrHub);
 
             BuffHubs = new List<BufferHub>();
@@ -89,11 +96,28 @@ namespace FloorSimulation
         {
             Ticks += SpeedMultiplier;
             ElapsedSimTime = ElapsedSimTime.Add(TimeSpan.FromMilliseconds(MilisecondsPerTick * SpeedMultiplier));
+
+            if ((int)ElapsedSimTime.TotalSeconds <= SecondsToFullOperation)
+                AddDistr((int)ElapsedSimTime.TotalSeconds);
+
             foreach (Distributer d in DistrList)
                 d.Tick();
 
             Display.Invalidate();
             Invalidate();
+        }
+
+        public void AddDistr(int seconds)
+        {
+            int TargetAmntDistr = seconds / OperationalInterval;
+            if (TargetAmntDistr > NDistributers)
+                TargetAmntDistr = NDistributers;
+            if(DistrList.Count < TargetAmntDistr)
+            {
+                DistrList.Add(TotalDistrList[0]);
+                TotalDistrList.RemoveAt(0);
+                AddDistr(seconds);
+            }
         }
 
         public void DrawOccupiance(object sender, EventArgs e)
@@ -139,7 +163,7 @@ namespace FloorSimulation
 
         public void PlaceShops(List<ShopHub> Shops)
         {
-            layout.PlaceShops(Shops, 1040, 4270);
+            layout.PlaceShops(Shops, 1040, FirstWW.RSizeWW.Height - 730);
         }
 
         public void PlaceStartHubs()

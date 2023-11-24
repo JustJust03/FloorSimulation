@@ -23,7 +23,7 @@ namespace FloorSimulation
             bool RunSimpleCalculation = false;
 
             if (RunSimpleCalculation)
-                SimpleCalculation.GetPlantsPerTrolley("2023-07-18 Export");
+                SimpleCalculation.GetPlantsPerTrolley("2023-05-16 Export");
             else
             {
                 Application.EnableVisualStyles();

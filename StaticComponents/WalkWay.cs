@@ -110,7 +110,7 @@ namespace FloorSimulation
             int x = indices[0]; int y = indices[1]; int width = indices[2]; int height = indices[3];
 
             for (int xi = x; xi < x + width; xi++) 
-                for (int yi = y; yi < y + height; yi++)
+                for (int yi = y; yi < y + height && yi < WalkTileListHeight; yi++)
                 {
                     WalkTile t = WalkTileList[xi][yi];
                     t.occupied = true;
@@ -134,7 +134,7 @@ namespace FloorSimulation
             int x = indices[0]; int y = indices[1]; int width = indices[2]; int height = indices[3];
 
             for (int xi = x; xi < x + width; xi++) 
-                for (int yi = y; yi < y + height; yi++)
+                for (int yi = y; yi < y + height && yi < WalkTileListHeight; yi++)
                 {
                     WalkTile t = WalkTileList[xi][yi];
                     t.occupied = false;

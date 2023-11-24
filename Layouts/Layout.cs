@@ -29,14 +29,14 @@ namespace FloorSimulation
 
             for(int i  = 0; i < amount; i++)
             {
-                db = new Distributer(0, floor, floor.FirstWW, Rpoint_: new Point(x, y));
-                floor.DistrList.Add(db);
-                x += 100;
-                if (x > floor.FirstWW.RSizeWW.Width - 200)
+                db = new Distributer(i, floor, floor.FirstWW, Rpoint_: new Point(x, y));
+                floor.TotalDistrList.Add(db);
+                x += 250;
+                if (x > floor.FirstWW.RSizeWW.Width - 250)
                 {
                     x = StartPoint.X;
-                    y += 100;
-                    if(y > floor.FirstWW.RSizeWW.Height - 200)
+                    y += 250;
+                    if(y > floor.FirstWW.RSizeWW.Height - 250)
                         break;
                 }
             }

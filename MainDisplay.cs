@@ -22,7 +22,8 @@ namespace FloorSimulation
         public Font BiggerSFont;
         public Brush StandardWhiteBrush;
         public bool isSimulating = false;
-        public string date = "2023-07-18";
+        //public string date = "2023-07-18";
+        public string date = "2023-05-16";
         public MetaInfo InfoPanel;
         public ControlInfo ControlPanel;
         private ReadData rd = new ReadData();
@@ -57,7 +58,7 @@ namespace FloorSimulation
             Controls.Add(InfoPanel);
 
             Paint += PaintMainDisplay;
-            SaveFileBase = date + "_" + "top_200_Slowest";
+            SaveFileBase = date + "_" + "1Street";
         }
 
         private void PaintMainDisplay(object sender, PaintEventArgs e)
@@ -74,8 +75,8 @@ namespace FloorSimulation
         {
             List<ShopHub> shops = rd.ReadHubData(floor);
 
-            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys("2023-07-18", floor, length: "top_200");
-            //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys("2023-05-16", floor);
+            //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, length: "top_200");
+            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor);
 
             floor.PlaceShops(rd.UsedShopHubs);
             floor.PlaceStartHubs();

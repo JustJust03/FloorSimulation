@@ -162,6 +162,7 @@
     <Content Include="SimImages\Distributer.png" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Charts\" />
     <Folder Include="Results\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
