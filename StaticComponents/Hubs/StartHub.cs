@@ -25,6 +25,9 @@ namespace FloorSimulation
 
         public void AddUndistributedTrolleys(List<DanishTrolley> UT)
         {
+            if (UT.Count == 0)
+                StartHubEmpty = true;
+
             UndistributedTrolleys = UndistributedTrolleys.Union(UT).ToList();
 
             int take_amount = Math.Min(MaxStartHubTrolleys, UndistributedTrolleys.Count);

@@ -814,13 +814,17 @@ namespace FloorSimulation
         /// </summary>
         private void TakeOldTrolley()
         {
+            if (Trolley != OldTrolley)
+            {
+                Trolley = OldTrolley;
+                Console.WriteLine("This took the wrong trolley");
+            }
+
             DButer.TakeTrolleyIn(Trolley);
             DButer.floor.TrolleyList.Remove(Trolley);
             if (DButer.trolley.PeekFirstPlant() == null) //This dropped off trolley was actually empty, so deliver it to the buffer hub
             {
                 TargetHub = DButer.floor.GetBuffHubOpen(DButer);
-                if (Trolley != OldTrolley)
-                    throw new Exception("THIS TAKES THE WRONG TROLLEY!");
 
                 Trolley = DButer.trolley;
                 if(TargetHub.VerticalTrolleys != Trolley.IsVertical)

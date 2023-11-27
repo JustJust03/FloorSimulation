@@ -22,9 +22,9 @@ namespace FloorSimulation
         public Font BiggerSFont;
         public Brush StandardWhiteBrush;
         public bool isSimulating = false;
-        public string date = "2023-07-18";
+        public string date = "2023-04-14";
         //public string date = "2023-05-16";
-        public List<string> days = new List<string> { "DI", "WO" };
+        public List<string> days = new List<string> { "VR", "ZO" };
         //public List<string> days = new List<string> { "DI"};
 
         public MetaInfo InfoPanel;
@@ -62,7 +62,7 @@ namespace FloorSimulation
             Controls.Add(InfoPanel);
 
             Paint += PaintMainDisplay;
-            SaveFileBase = date + "_" + "1Street";
+            SaveFileBase = date + "_" + "2Street";
         }
 
         private void PaintMainDisplay(object sender, PaintEventArgs e)
@@ -79,8 +79,8 @@ namespace FloorSimulation
         {
             List<ShopHub> shops = rd.ReadHubData(floor);
 
-            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, length: "top_200");
-            //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor);
+            //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, length: "top_200");
+            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, DistributeSecondDay: false);
 
             floor.PlaceShops(rd.UsedShopHubs);
             floor.PlaceStartHubs();

@@ -33,7 +33,7 @@ namespace FloorSimulation
         /// </summary>
         /// <param name="date"></param>
         /// <returns></returns>
-        public List<DanishTrolley> ReadBoxHistoryToTrolleys(string date, Floor floor, string length = "")
+        public List<DanishTrolley> ReadBoxHistoryToTrolleys(string date, Floor floor, string length = "", bool DistributeSecondDay = true)
         {
             List<BoxActivity> ActivityList = new List<BoxActivity>();
             UsedShopHubs = new List<ShopHub>(); 
@@ -54,8 +54,11 @@ namespace FloorSimulation
                 {
                     var records = csv.GetRecord<BoxActivity>();
                     ShopHub s = records.InitActivity(DestPlusDayToHub);
-                    UsedShopHubs.Add(s);
-                    ActivityList.Add(records);
+                    if (s != null)
+                    {
+                        UsedShopHubs.Add(s);
+                        ActivityList.Add(records);
+                    }
                 }
             }
 
@@ -74,9 +77,12 @@ namespace FloorSimulation
             List<DanishTrolley> dtList = new List<DanishTrolley>();
             foreach(DanishTrolley t in TransactieIdToTrolley.Values.ToList())
             {
-                if (t.PlantList.Count == 0 || t.PlantList.Distinct().ToList().Count == 1)
+                if (t.PlantList.Select(obj => obj.DestinationHub).Distinct().ToList().Count <= 1)
+                    continue;
+                if (!DistributeSecondDay && !t.PlantList.Select(obj => obj.DestinationHub.day).Contains(days[0]))
                     continue;
                 dtList.Add(t);
+                
             }
 
             CalculateImportStickers(dtList);

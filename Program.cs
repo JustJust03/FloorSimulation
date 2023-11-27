@@ -20,7 +20,7 @@ namespace FloorSimulation
         [STAThread]
         static void Main()
         {
-            bool RunSimpleCalculation = true;
+            bool RunSimpleCalculation = false;
 
             if (RunSimpleCalculation)
                 SimpleCalculation.GetPlantsPerTrolley("2023-04-14 Export");

@@ -27,7 +27,15 @@ namespace FloorSimulation
         {
             Beladings_aantallen = Beladings_aantallen.Replace("[", "").Replace("]", "");
             Date = new DateTime(Datum.Year, Datum.Month, Datum.Day, Tijd.Hour, Tijd.Minute, Tijd.Second);
-            Destination = DestPlusDayToHub[Relatie_collicode + "-" + Opmerking5];
+            try
+            {
+                Destination = DestPlusDayToHub[Relatie_collicode + "-" + Opmerking5];
+            }
+            catch (KeyNotFoundException)
+            {
+                Console.WriteLine("Could not find " + Relatie_collicode + "-" + Opmerking5);
+            }
+            
             return Destination;
         }
 
