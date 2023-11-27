@@ -264,6 +264,7 @@ namespace FloorSimulation
             Trolleyarr[ArrIndexy, ArrIndexx] = dt;
             dt.Units = 0;
             dt.NStickers = 2;
+            dt.TotalStickers = 2;
             dt.IsVertical = true;
             if (MainBufferFull()) //Remove the first row
             {
@@ -282,6 +283,7 @@ namespace FloorSimulation
             Trolleyarr[ArrIndexy, ArrIndexx] = dt;
             dt.Units = 0;
             dt.NStickers = 2;
+            dt.TotalStickers = 2;
             dt.IsVertical = true;
             if (MainBufferFull()) //Remove the first row
             {
@@ -300,6 +302,7 @@ namespace FloorSimulation
             Trolleyarr[ArrIndexy, ArrIndexx] = dt;
             dt.Units = 0;
             dt.NStickers = 2;
+            dt.TotalStickers = 2;
             dt.IsVertical = false;
         }
 
