@@ -115,6 +115,8 @@ namespace FloorSimulation
                     g.DrawRectangle(floor.GreenPen, new Rectangle(FloorPoint, HubSize));
                 else if (day == "VR")
                     g.DrawRectangle(floor.PurplePen, new Rectangle(FloorPoint, HubSize));
+                else if (day == "VR_2")
+                    g.DrawRectangle(floor.PinkPen, new Rectangle(FloorPoint, HubSize));
                 else if (day == "ZO")
                     g.DrawRectangle(floor.GrayPen, new Rectangle(FloorPoint, HubSize));
                 else

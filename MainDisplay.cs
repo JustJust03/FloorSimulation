@@ -24,8 +24,8 @@ namespace FloorSimulation
         public bool isSimulating = false;
         public string date = "2023-04-14";
         //public string date = "2023-05-16";
-        public List<string> days = new List<string> { "VR", "ZO" };
-        //public List<string> days = new List<string> { "DI"};
+        //public List<string> days = new List<string> { "VR", "ZO" };
+        public List<string> days = new List<string> { "VR"};
 
         public MetaInfo InfoPanel;
         public ControlInfo ControlPanel;

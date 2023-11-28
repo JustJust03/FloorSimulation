@@ -325,7 +325,7 @@ namespace FloorSimulation
     {
         public SLayoutDayIdBuffhub2Streets(Floor floor_, ReadData rData) : base(floor_, rData)
         {
-            RealFloorWidth = 6000;
+            RealFloorWidth = 5500;
         }
 
         public override void PlaceShops(List<ShopHub> Shops, int UpperY_, int LowerY)
@@ -334,68 +334,9 @@ namespace FloorSimulation
             foreach(ShopHub s in Shops)
                 Shops2.Add(new ShopHub(s.name + "_Second-street", s.id, s.RFloorPoint, floor, s.RHubSize,
                                        initial_trolleys: 2, ColliPlusDay_: s.ColliPlusDay + "_2"));
+            Shops = Shops.Concat(Shops2).ToList();
 
             base.PlaceShops(Shops, UpperY_, LowerY);
-            ShopCornersX.RemoveAt(ShopCornersX.Count - 1);
-            Shops = Shops2;
-
-            UpperY = UpperY_;
-            int y = LowerY;
-            int x = 2720;
-            int two_per_row = 2; //Keeps track of how many cols are placed without space between them
-            int placed_shops_in_a_row = 0;
-
-            for (int i = 0; i < Shops.Count;  i++) 
-            { 
-                ShopHub Shop = Shops[i];
-                if (two_per_row == 2)
-                    Shop.HasLeftAccess = true;
-                Shop.TeleportHub(new Point(x, y));
-                
-                //Add corners when you get to a new col, or if this was the last col on the right
-                if(y == UpperY || (i == Shops.Count - 1 && two_per_row == 1))
-                {
-                    if (Shop.HasLeftAccess)
-                        ShopCornersX.Add(Shop.RFloorPoint.X);
-                    else
-                        ShopCornersX.Add(Shop.RFloorPoint.X + Shop.RHubSize.Width);
-                    if(i == Shops.Count - 1)
-                        ShopCornersX.Add(Shop.RFloorPoint.X + Shop.RHubSize.Width + StreetWidth);
-                }
-
-                placed_shops_in_a_row++;
-                if (placed_shops_in_a_row == HalfShopsInRow)
-                {
-                    placed_shops_in_a_row = 0;
-                    if (two_per_row == 1)
-                        y += 2 * ShopHeight;
-                    else
-                        y -= 2 * ShopHeight;
-                }
-
-                if (two_per_row == 1 && y < LowerY)
-                    y += ShopHeight;
-                else if (two_per_row == 2 && y > UpperY)
-                    y -= ShopHeight;
-                else
-                {
-                    placed_shops_in_a_row = 0;
-                    two_per_row++;
-                    if (two_per_row <= 2)
-                    {
-                        x += StreetWidth;
-                        y = LowerY;
-                    }
-                    else
-                    {
-                        y += 2 * ShopHeight; // Because the middle section was placed at the bottom
-                        x += 160;
-                        two_per_row = 1;
-                    }
-                }
-
-                floor.HubList.Add(Shop);
-            }
         }
 
         public override void PlaceStartHubs()

@@ -22,6 +22,7 @@ namespace FloorSimulation
         public readonly Pen LightYellowPen = new Pen(Color.LightYellow);
         public readonly Pen GreenPen = new Pen(Color.Green);
         public readonly Pen PurplePen = new Pen(Color.Purple);
+        public readonly Pen PinkPen = new Pen(Color.Pink);
         public readonly Pen GrayPen = new Pen(Color.DarkSlateGray);
         public int Ticks = 0;
         public double MilisecondsPerTick;
@@ -60,8 +61,8 @@ namespace FloorSimulation
             Display = di;
 
             //layout = new SLayoutDayId(this, rd);
-            layout = new SLayoutDayIdBuffhub(this, rd);
-            //layout = new SLayoutDayIdBuffhub2Streets(this, rd);
+            //layout = new SLayoutDayIdBuffhub(this, rd);
+            layout = new SLayoutDayIdBuffhub2Streets(this, rd);
             //layout = new SLayoutDayId2Streets(this, rd);
 
             Size PixelFloorSize = new Size((int)(layout.RealFloorWidth * ScaleFactor),
