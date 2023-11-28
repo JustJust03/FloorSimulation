@@ -145,11 +145,13 @@ namespace FloorSimulation
             List<WalkTile> OpenSpots = new List<WalkTile>();
 
             for (int rowi = 0; rowi < NRows; rowi++)
-                for (int coli = 1; coli < NTrolleysInRow - 1; coli++)
+                for (int coli = 1; coli < NTrolleysInRow; coli++)
                 {
                     if ((Trolleyarr[rowi, coli] != null || coli == NTrolleysInRow - 1) && Trolleyarr[rowi, coli - 1] == null)
                     {
                         WalkTile wt = HubAccessPoints[rowi, coli - 1];
+                        if (wt == null)
+                            wt = HubAccessPoints[rowi, coli - 2];
                         WalkTile DownTile = WW.GetTile(new Point(wt.Rpoint.X - 280, wt.Rpoint.Y + 40));
 
                         OpenSpots.Add(DownTile);
