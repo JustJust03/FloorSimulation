@@ -260,6 +260,8 @@ namespace FloorSimulation
             {
                 int deltaX = obj.RFloorPoint.X - db.RDPoint.X;
                 int deltaY = obj.RFloorPoint.Y - db.RDPoint.Y;
+                if (obj.name == "Buffer hub")
+                    deltaX = 0;
                 return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
             })
             .ToList();
@@ -280,6 +282,8 @@ namespace FloorSimulation
             {
                 int deltaX = obj.RFloorPoint.X - db.RDPoint.X;
                 int deltaY = obj.RFloorPoint.Y - db.RDPoint.Y;
+                if (obj.name == "Buffer hub")
+                    deltaX = 0;
                 return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
             })
             .ToList();

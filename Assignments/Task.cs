@@ -306,6 +306,11 @@ namespace FloorSimulation
             else if (TargetIsOpenBuffHub.Contains(Goal))
             {
                 TargetHub = DButer.floor.GetBuffHubOpen(DButer);
+
+                Trolley = DButer.trolley;
+                if(TargetHub.VerticalTrolleys != Trolley.IsVertical)
+                    DButer.RotateDistributerAndTrolley();
+
                 DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
             }
             else
@@ -882,10 +887,7 @@ namespace FloorSimulation
             TargetHub = DButer.floor.GetBuffHubOpen(DButer);
             Trolley = DButer.trolley;
             if(TargetHub.VerticalTrolleys != Trolley.IsVertical)
-            {
-                ;
                 DButer.RotateDistributerAndTrolley();
-            }
 
             DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
 

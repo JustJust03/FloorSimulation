@@ -143,19 +143,22 @@ namespace FloorSimulation
         {
             //Fills the main buffer hub from right to left end up to down.
             List<WalkTile> OpenSpots = new List<WalkTile>();
-            int farthest = -1;
 
             for (int rowi = 0; rowi < NRows; rowi++)
-                for (int coli = NTrolleysInRow - 1; coli >= 0 && coli > farthest; coli--)
-                    if (Trolleyarr[rowi, coli] == null && HubAccessPoints[rowi, coli] != null)
+                for (int coli = 1; coli < NTrolleysInRow - 1; coli++)
+                {
+                    if ((Trolleyarr[rowi, coli] != null || coli == NTrolleysInRow - 1) && Trolleyarr[rowi, coli - 1] == null)
                     {
-                        WalkTile wt = HubAccessPoints[rowi, coli];
+                        WalkTile wt = HubAccessPoints[rowi, coli - 1];
                         WalkTile DownTile = WW.GetTile(new Point(wt.Rpoint.X - 280, wt.Rpoint.Y + 40));
 
                         OpenSpots.Add(DownTile);
-                        farthest = coli;
-                        break;
+                        return OpenSpots;
                     }
+                    else if (Trolleyarr[rowi, coli] != null)// Continue to the next row
+                        break;
+                }
+            
 
             return OpenSpots;
         }
@@ -297,6 +300,12 @@ namespace FloorSimulation
 
         public override void TakeHTrolleyIn(DanishTrolley dt, Point AgentRPoint)
         {
+            if(name == "Buffer hub")
+            {
+                Console.WriteLine("Horizontal trolleys should not be deliverd to the main buffer hub");
+                ;
+                return;
+            }
             int ArrIndexx = Array.IndexOf(HubAccessPointsX, AgentRPoint.X + 10);
             int ArrIndexy = Array.IndexOf(HubAccessPointsY, AgentRPoint.Y); //The lenght of the trolley
             Trolleyarr[ArrIndexy, ArrIndexx] = dt;
