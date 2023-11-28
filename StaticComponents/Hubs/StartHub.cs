@@ -53,7 +53,7 @@ namespace FloorSimulation
 
         public override DanishTrolley GiveTrolley(Point AgentRPoint = default)
         {
-            if (UndistributedTrolleys.Count == 0)
+            if (UndistributedTrolleys.Count == 0 && HubTrolleys.Count == 1)
                 StartHubEmpty = true;
             floor.Display.InvalInfo();
             return base.GiveTrolley(AgentRPoint);

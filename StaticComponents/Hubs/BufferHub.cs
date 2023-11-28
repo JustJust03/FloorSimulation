@@ -305,7 +305,6 @@ namespace FloorSimulation
             if(name == "Buffer hub")
             {
                 Console.WriteLine("Horizontal trolleys should not be deliverd to the main buffer hub");
-                ;
                 return;
             }
             int ArrIndexx = Array.IndexOf(HubAccessPointsX, AgentRPoint.X + 10);

@@ -62,7 +62,7 @@ namespace FloorSimulation
             Controls.Add(InfoPanel);
 
             Paint += PaintMainDisplay;
-            SaveFileBase = date + "_" + "MoreBuffersNew";
+            SaveFileBase = date + "_" + "2StreetsMoreBuffers";
         }
 
         private void PaintMainDisplay(object sender, PaintEventArgs e)

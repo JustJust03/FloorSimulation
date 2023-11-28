@@ -357,7 +357,7 @@ namespace FloorSimulation
 
             StartHub s = floor.STHubs[db.id % 2];
             if (s.StartHubEmpty)
-                return floor.STHubs[db.id + 1 % 2];
+                return floor.STHubs[(db.id + 1) % 2];
             return s;
         }
 

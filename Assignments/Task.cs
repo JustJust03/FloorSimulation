@@ -477,10 +477,6 @@ namespace FloorSimulation
             DButer.floor.TrolleyList.Add(DButer.trolley);
             DButer.WW.unoccupie_by_tiles(DButer.trolley.RPoint, DButer.trolley.GetRSize()); // drop the trolley of from the distributer
             OldTrolley = DButer.GiveTrolley();
-            if(OldTrolley.PlantList.Count == 25)
-            {
-                ;
-            }
             OldTargetHub = TargetHub;
             DButer.TravelToTrolley(TargetHub.PeekFirstTrolley());
             if (DButer.route == null) //Route was not possible at this point. Try again later.
