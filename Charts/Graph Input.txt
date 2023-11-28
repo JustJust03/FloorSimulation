@@ -1,3 +1,20 @@
 https://graphmaker.imageonline.co/stackedbarchart.php
+
+#FF5733
+#3366FF
+#66CC99
+#FFD700
+#9933CC
+#FF6666
+#00CCCC
+#FF9933
+
+Tijden per trolley
+Minuten (/100)
+Layout
+
 Meer Buffers : 650,  46, 166, 5, 73, 510, 5, 150
 1 Buffer : 650,  35, 165, 5, 76, 510, 15, 240
+
+Meer Buffers : 856, 268, 215, 47, 105, 730, 165, 147
+1 Buffer : 873, 255, 215, 47, 100, 701, 155, 270

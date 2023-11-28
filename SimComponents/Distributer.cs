@@ -35,7 +35,7 @@ namespace FloorSimulation
         public int MaxWaitedTicks;
 
         public List<WalkTile> route;
-        public const float WALKSPEED = 70f; // cm/s
+        public const float WALKSPEED = 85f; // cm/s
         private float TravelSpeed = WALKSPEED;
         private float travel_dist_per_tick;
         public int distributionms_per_tick; // plant distribution per tick in ms
