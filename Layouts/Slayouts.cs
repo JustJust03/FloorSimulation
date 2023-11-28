@@ -262,7 +262,6 @@ namespace FloorSimulation
                 int deltaY = obj.RFloorPoint.Y - db.RDPoint.Y;
                 return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
             })
-            .Where(obj => obj.name != "Buffer hub")
             .ToList();
 
             foreach(BufferHub buffhub in sortedList) 
@@ -283,7 +282,6 @@ namespace FloorSimulation
                 int deltaY = obj.RFloorPoint.Y - db.RDPoint.Y;
                 return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
             })
-            .Where(obj => obj.name != "Buffer hub")
             .ToList();
 
             foreach(BufferHub buffhub in sortedList) 

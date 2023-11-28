@@ -45,7 +45,7 @@ namespace FloorSimulation
             HubAccessPointsX = new int[NTrolleysInRow];
             HubAccessPointsY = new int[NRows];
 
-            if(vertical_trolleys_) //Big buffer hub
+            if (vertical_trolleys_) //Big buffer hub
                 GenerateVerticalAccessPoints();
             else //Small buffer hub
                 GenerateHorizontalAccessPoints();
@@ -67,7 +67,7 @@ namespace FloorSimulation
                 int trolleyY = RFloorPoint.Y + y * 200;
                 for (int i = 0; i < NTrolleysInRow; i++)
                 {
-                    if(i % 20 == 19)
+                    if (i % 20 == 19)
                         continue;
                     int trolleyX = RFloorPoint.X + i * (5 + DummyTrolley.GetRSize().Width); //this point + how far in the line it is
 
@@ -81,10 +81,10 @@ namespace FloorSimulation
         private void GenerateHorizontalAccessPoints()
         {
             int trolleyX;
-            for(int x = 0; x < NTrolleysInRow; x++)
+            for (int x = 0; x < NTrolleysInRow; x++)
             {
                 trolleyX = RFloorPoint.X;
-                for(int y = 0; y < NRows; y++)
+                for (int y = 0; y < NRows; y++)
                 {
                     int trolleyY = RFloorPoint.Y + Rslack + y * (Rslack + DummyTrolley.GetRSize().Height);
 
@@ -96,7 +96,7 @@ namespace FloorSimulation
 
             HarryHubAccessPoints = new WalkTile[Trolleyarr.Length];
             HarryHubAccessPointsY = new int[Trolleyarr.Length];
-            trolleyX = RFloorPoint.X + RHubSize.Width / 2  - (DummyTrolley.GetRSize().Width / 2); //Place the trolley exactly in the middle
+            trolleyX = RFloorPoint.X + RHubSize.Width / 2 - (DummyTrolley.GetRSize().Width / 2); //Place the trolley exactly in the middle
             for (int i = 0; i < Trolleyarr.Length; i++)
             {
                 int trolleyY = RFloorPoint.Y + (i + 1) * (Rslack + DummyTrolley.GetRSize().Height) + 10;
@@ -143,10 +143,10 @@ namespace FloorSimulation
         {
             //Fills the main buffer hub from right to left end up to down.
             List<WalkTile> OpenSpots = new List<WalkTile>();
-            int farthest = -1; 
-            
-            for (int rowi = 0; rowi < NRows; rowi++) 
-                for(int coli = NTrolleysInRow - 1; coli >= 0 && coli > farthest; coli--)
+            int farthest = -1;
+
+            for (int rowi = 0; rowi < NRows; rowi++)
+                for (int coli = NTrolleysInRow - 1; coli >= 0 && coli > farthest; coli--)
                     if (Trolleyarr[rowi, coli] == null && HubAccessPoints[rowi, coli] != null)
                     {
                         WalkTile wt = HubAccessPoints[rowi, coli];
@@ -182,19 +182,19 @@ namespace FloorSimulation
                         CSpots.Add(WW.GetTile(p));
                     }
 
-            if(CSpots.Count == 0 && name == "Buffer hub") 
+            if (CSpots.Count == 0 && name == "Buffer hub")
             {
                 SpawnEmptyTrolleys(5);
                 return FilledSpots(DButer);
-            } 
+            }
             return CSpots;
         }
 
         private List<WalkTile> LangeHarryFilledSpots()
         {
             List<WalkTile> FilledSpots = new List<WalkTile>();
-            
-            for (int i = 0; i < Trolleyarr.Length; i++) 
+
+            for (int i = 0; i < Trolleyarr.Length; i++)
                 if (Trolleyarr[i, 0] != null)
                     FilledSpots.Add(HarryHubAccessPoints[i]);
 
@@ -204,7 +204,7 @@ namespace FloorSimulation
         public void SpawnEmptyTrolleys(int amnt = 5)
         {
             amnt = Math.Min(amnt, HubAccessPointsX.Length);
-            for(int i = 0; i < amnt; i++)
+            for (int i = 0; i < amnt; i++)
             {
                 Point p = new Point(HubAccessPointsX[i], HubAccessPointsY[0]);
                 DanishTrolley dt = new DanishTrolley(0, floor, p, true);
@@ -285,7 +285,7 @@ namespace FloorSimulation
             dt.NStickers = 2;
             dt.TotalStickers = 2;
             dt.IsVertical = true;
-            if (MainBufferFull()) //Remove the first row
+            if (MainBufferFull() || ArrIndexy == HubAccessPointsY.Length - 1) //Remove the first row
             {
                 Point p = new Point(RFloorPoint.X, RFloorPoint.Y + (NRows - 1) * 200);
                 Size s = new Size(RHubSize.Width, 200);
