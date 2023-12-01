@@ -22,9 +22,9 @@ namespace FloorSimulation
         public Font BiggerSFont;
         public Brush StandardWhiteBrush;
         public bool isSimulating = false;
-        //public string date = "2023-04-14";
-        public string date = "2023-07-18";
-        public List<string> days = new List<string> { "DI", "WO" };
+        public string date = "2023-04-14";
+        //public string date = "2023-07-18";
+        public List<string> days = new List<string> { "VR", "ZO" };
         //public List<string> days = new List<string> { "VR"};
 
         public MetaInfo InfoPanel;
@@ -32,7 +32,7 @@ namespace FloorSimulation
         private ReadData rd;
         public string SaveFileBase;
 
-        public bool LoadHeatMap = true;
+        public bool LoadHeatMap = false;
         public string HeatMapName = "2023-07-18_HeatMapTesting";
 
 
@@ -43,8 +43,7 @@ namespace FloorSimulation
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             UpdateStyles();
 
-            //this.Size = new Size(1422, 840); //40px for the top bar.
-            this.Size = new Size(1422, 1240); //40px for the top bar.
+            this.Size = new Size(1422, 840); //40px for the top bar.
             this.BackColor = Color.DarkSlateGray;
             this.Text = "AllGreen Floor Simulation";
             StandardFont = new Font("Segoe UI", 12.0f, FontStyle.Bold);
@@ -84,8 +83,8 @@ namespace FloorSimulation
         {
             List<ShopHub> shops = rd.ReadHubData(floor);
 
-            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, length: "top_200");
-            //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, DistributeSecondDay: false);
+            //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, length: "top_200");
+            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor);
 
             floor.PlaceShops(rd.UsedShopHubs);
             floor.PlaceStartHubs();
