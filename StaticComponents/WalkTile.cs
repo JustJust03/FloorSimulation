@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Messaging;
 
 namespace FloorSimulation
 {
@@ -33,9 +35,16 @@ namespace FloorSimulation
         public int TravelCost = int.MaxValue;
         public bool visited = false;
         public WalkTile Parent = null;  //From which tile did you get to here. (start tiles and unreachable tiles are null)
+        public int visits;
 
         public const int Rwidth = 10;
         public const int Rheight = 10;
+
+        public int AverageVisits = 0;
+        private int Startx;
+        private int Starty;
+        private int Endx;
+        private int Endy;
 
         public WalkTile(int tileX_, int tileY_, Point Simpoint_, Point Rpoint_, Size SimSize_, bool occupied_, WalkWay ww_)
         {
@@ -73,6 +82,31 @@ namespace FloorSimulation
                 Pen p = new Pen(Color.Orange);
                 g.DrawRectangle(p, new Rectangle(Simpoint, SimSize));
             }
+        }
+
+        public int UpdateAverageVisits()
+        {
+            AverageVisits = 0;
+            Startx = Math.Max(TileX - 4, 0);
+            Starty = Math.Max(TileY - 4, 0);
+            Endx = Math.Min(TileX + 5, WW.WalkTileListWidth);
+            Endy = Math.Min(TileY + 5, WW.WalkTileListHeight);
+
+            for (int x = Startx; x < Endx; x++)
+                for (int y = Starty; y < Endy; y++)
+                    AverageVisits += WW.WalkTileList[x][y].visits;
+            AverageVisits = AverageVisits / 81;
+            return AverageVisits;
+        }
+
+        /// <summary>
+        /// You need to run UpdateAverageVisits first...
+        /// </summary>
+        public void DrawHeatmap(Graphics g, int max)
+        {
+            int opacity = Math.Min((AverageVisits * 100) / max, 255);
+            Brush b = new SolidBrush(Color.FromArgb(opacity, 255, 0, 0));
+            g.FillRectangle(b, new Rectangle(Simpoint, SimSize));
         }
 
         /// <summary>

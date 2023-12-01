@@ -38,6 +38,7 @@ namespace FloorSimulation
             ShowOccupiance_button.Text = "Draw Occupiance";
             ShowOccupiance_button.ForeColor = Color.White;
             ShowOccupiance_button.Location = new Point(5, 200);
+            ShowOccupiance_button.Click += new EventHandler(floor.DrawHeatMap);
             ShowOccupiance_button.Click += new EventHandler(floor.DrawOccupiance);
 
             //Timer
