@@ -1,20 +1,48 @@
 https://graphmaker.imageonline.co/stackedbarchart.php
 
-#FF5733
-#3366FF
-#66CC99
-#FFD700
-#9933CC
-#FF6666
-#00CCCC
-#FF9933
+FF5733
+3366FF
+66CC99
+FFD700
+9933CC
+FF6666
+00CCCC
+FF9933
+
+
+Verdeel tijd
+Wacht tijd
+Herindeel tijd
+Nieuw bord tijd
+Laag bij tijd
+Verdeel transport tijd
+Nieuwe shop kar tijd
+Nieuwe volle kar tijd
+
 
 Tijden per trolley
 Minuten (/100)
 Layout
 
+//	Buffer vergelijkingen
+//v1 Te snel
 Meer Buffers : 650,  46, 166, 5, 73, 510, 5, 150
 1 Buffer : 650,  35, 165, 5, 76, 510, 15, 240
 
+v2 Verhouding verdelen tegen lopen klopt niet
 Meer Buffers : 856, 268, 215, 47, 105, 730, 165, 147
 1 Buffer : 873, 255, 215, 47, 100, 701, 155, 270
+
+//v3
+Meer Buffers : 960, 255, 212, 47, 105, 730, 128, 125
+1 Buffer : 955, 308, 215, 46, 103, 735, 167, 235
+
+
+// 	Twee straten
+Meer buffers: 620, 135, 140, 25, 67, 443, 45, 87
+
+
+//	Verhoudingen: 
+1Street meer buffers: 446, 118, 99, 22, 49, 339, 59, 58
+2Street meer buffers: 442, 96, 100, 18, 48, 316, 32, 62
+
