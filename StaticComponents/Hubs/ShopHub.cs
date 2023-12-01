@@ -107,10 +107,18 @@ namespace FloorSimulation
             {
                 if(day == "DI")
                     g.DrawRectangle(floor.YellowPen, new Rectangle(FloorPoint, HubSize));
+                else if(day == "DI_2")
+                    g.DrawRectangle(floor.LightYellowPen, new Rectangle(FloorPoint, HubSize));
                 else if (day == "WO")
                     g.DrawRectangle(floor.BluePen, new Rectangle(FloorPoint, HubSize));
                 else if (day == "DO")
                     g.DrawRectangle(floor.GreenPen, new Rectangle(FloorPoint, HubSize));
+                else if (day == "VR")
+                    g.DrawRectangle(floor.PurplePen, new Rectangle(FloorPoint, HubSize));
+                else if (day == "VR_2")
+                    g.DrawRectangle(floor.PinkPen, new Rectangle(FloorPoint, HubSize));
+                else if (day == "ZO")
+                    g.DrawRectangle(floor.GrayPen, new Rectangle(FloorPoint, HubSize));
                 else
                     g.DrawRectangle(floor.BPen, new Rectangle(FloorPoint, HubSize));
             }

@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Messaging;
+using System.CodeDom.Compiler;
 
 namespace FloorSimulation
 {
@@ -33,9 +36,16 @@ namespace FloorSimulation
         public int TravelCost = int.MaxValue;
         public bool visited = false;
         public WalkTile Parent = null;  //From which tile did you get to here. (start tiles and unreachable tiles are null)
+        public int visits;
 
         public const int Rwidth = 10;
         public const int Rheight = 10;
+
+        public int AverageVisits = 0;
+        private int Startx;
+        private int Starty;
+        private int Endx;
+        private int Endy;
 
         public WalkTile(int tileX_, int tileY_, Point Simpoint_, Point Rpoint_, Size SimSize_, bool occupied_, WalkWay ww_)
         {
@@ -73,6 +83,47 @@ namespace FloorSimulation
                 Pen p = new Pen(Color.Orange);
                 g.DrawRectangle(p, new Rectangle(Simpoint, SimSize));
             }
+        }
+
+        public int UpdateAverageVisits()
+        {
+            int Neighbours = 10;
+            float deltax = 0;
+            float deltay = 0;
+            float temp = 0;
+            AverageVisits = 0;
+            Startx = Math.Max(TileX - Neighbours, 0);
+            Starty = Math.Max(TileY - Neighbours, 0);
+            Endx = Math.Min(TileX + Neighbours + 1, WW.WalkTileListWidth);
+            Endy = Math.Min(TileY + Neighbours + 1, WW.WalkTileListHeight);
+
+            for (int x = Startx; x < Endx; x++)
+                for (int y = Starty; y < Endy; y++)
+                {
+                    deltax = 1 - (Math.Abs(TileX - x) / (float)Neighbours);
+                    deltay = 1 - (Math.Abs(TileY - y) / (float)Neighbours);
+
+                    temp = deltax * deltay;
+                    AverageVisits += (int)(WW.WalkTileList[x][y].visits * temp);
+                }
+            AverageVisits = AverageVisits / ((Neighbours * 2 + 1) * (Neighbours * 2 + 1));
+            return AverageVisits;
+        }
+
+        /// <summary>
+        /// You need to run UpdateAverageVisits first...
+        /// </summary>
+        public void DrawHeatmap(Graphics g, int max)
+        {
+            double x = Math.Min((double)AverageVisits / (double)max, 1.0);
+            double y = Math.Sqrt(1 - (1 - x) * (1 - x));
+            int Red = (int)(y * 255);
+            if (AverageVisits > 10 && AverageVisits < 90)
+                ;
+            int Blue = 255 - Red;
+
+            Brush b = new SolidBrush(Color.FromArgb(Red, Red, 0, Blue));
+            g.FillRectangle(b, new Rectangle(Simpoint, SimSize));
         }
 
         /// <summary>

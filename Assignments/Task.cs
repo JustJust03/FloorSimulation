@@ -269,10 +269,6 @@ namespace FloorSimulation
                             DButer.TravelToTile(DButer.WW.GetTile(DButer.SavePoint));
                             TargetWasSaveTile = true;
                         }
-                        else
-                        {
-                            ;
-                        }
                     }
                 }
                 else
@@ -310,6 +306,11 @@ namespace FloorSimulation
             else if (TargetIsOpenBuffHub.Contains(Goal))
             {
                 TargetHub = DButer.floor.GetBuffHubOpen(DButer);
+
+                Trolley = DButer.trolley;
+                if(TargetHub.VerticalTrolleys != Trolley.IsVertical)
+                    DButer.RotateDistributerAndTrolley();
+
                 DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
             }
             else
@@ -438,7 +439,7 @@ namespace FloorSimulation
 
             //Check if you need to empty a full trolley hub.
             FullTrolleyHub fh = DButer.floor.HasFullTrolleyHubFull(8);
-            if(fh != null)
+            if(fh != null && !Harry.IsTargeted)
             {
                 TargetHub = fh;
                 DButer.TravelToHarry(Harry);
@@ -449,7 +450,7 @@ namespace FloorSimulation
 
             //Check if you need to transport some empty trolleys to the big buffer hub.
             BufferHub bh = DButer.floor.HasFullSmallBufferHub(7);
-            if(bh != null)
+            if(bh != null && !Harry.IsTargeted)
             {
                 TargetHub = bh;
                 DButer.TravelToHarry(Harry);
@@ -476,10 +477,6 @@ namespace FloorSimulation
             DButer.floor.TrolleyList.Add(DButer.trolley);
             DButer.WW.unoccupie_by_tiles(DButer.trolley.RPoint, DButer.trolley.GetRSize()); // drop the trolley of from the distributer
             OldTrolley = DButer.GiveTrolley();
-            if(OldTrolley.PlantList.Count == 25)
-            {
-                ;
-            }
             OldTargetHub = TargetHub;
             DButer.TravelToTrolley(TargetHub.PeekFirstTrolley());
             if (DButer.route == null) //Route was not possible at this point. Try again later.
@@ -818,13 +815,17 @@ namespace FloorSimulation
         /// </summary>
         private void TakeOldTrolley()
         {
+            if (Trolley != OldTrolley)
+            {
+                Trolley = OldTrolley;
+                Console.WriteLine("This took the wrong trolley");
+            }
+
             DButer.TakeTrolleyIn(Trolley);
             DButer.floor.TrolleyList.Remove(Trolley);
             if (DButer.trolley.PeekFirstPlant() == null) //This dropped off trolley was actually empty, so deliver it to the buffer hub
             {
                 TargetHub = DButer.floor.GetBuffHubOpen(DButer);
-                if (Trolley != OldTrolley)
-                    throw new Exception("THIS TAKES THE WRONG TROLLEY!");
 
                 Trolley = DButer.trolley;
                 if(TargetHub.VerticalTrolleys != Trolley.IsVertical)
@@ -882,10 +883,7 @@ namespace FloorSimulation
             TargetHub = DButer.floor.GetBuffHubOpen(DButer);
             Trolley = DButer.trolley;
             if(TargetHub.VerticalTrolleys != Trolley.IsVertical)
-            {
-                ;
                 DButer.RotateDistributerAndTrolley();
-            }
 
             DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
 

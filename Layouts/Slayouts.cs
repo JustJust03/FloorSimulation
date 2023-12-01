@@ -18,6 +18,8 @@ namespace FloorSimulation
         protected int ShopHeight = 170;
         private int NtrolleysPerShop = 2;
 
+        protected int HalfShopsInRow = 0;
+
         public SLayout(Floor floor_, ReadData rData) : base(floor_, rData) 
         { 
 
@@ -37,25 +39,24 @@ namespace FloorSimulation
             int x = 0;
             int two_per_row = 1; //Keeps track of how many cols are placed without space between them
             int placed_shops_in_a_row = 0;
-            int HalfShopsInRow = 0;
 
             bool FirstColFinished = false;
-            for (int i = 0; i < Shops.Count;  i++) 
-            { 
+            for (int i = 0; i < Shops.Count; i++)
+            {
                 ShopHub Shop = Shops[i];
                 if (two_per_row == 2)
                     Shop.HasLeftAccess = true;
                 Shop.TeleportHub(new Point(x, y));
-                
+
                 //Add corners when you get to a new col, or if this was the last col on the right
-                if(y == UpperY || (i == Shops.Count - 1 && two_per_row == 1))
+                if (y == UpperY || (i == Shops.Count - 1 && two_per_row == 1))
                 {
                     if (Shop.HasLeftAccess)
                         ShopCornersX.Add(Shop.RFloorPoint.X);
                     else
                         ShopCornersX.Add(Shop.RFloorPoint.X + Shop.RHubSize.Width);
-                    if(i == Shops.Count - 1)
-                        ShopCornersX.Add(Shop.RFloorPoint.X + Shop.RHubSize.Width + StreetWidth);
+                    if (i == Shops.Count - 1)
+                        ShopCornersX.Add(Shop.RFloorPoint.X + StreetWidth);
                 }
 
                 placed_shops_in_a_row++;
@@ -141,17 +142,24 @@ namespace FloorSimulation
             base.PlaceFullTrolleyHubs();
         }
 
+        /// <summary>
+        /// Places a starthub per day.
+        /// </summary>
         public override void PlaceStartHubs()
         {
-            floor.STHubs.Add(new StartHub("Start hub", 0, new Point(200, floor.FirstWW.RSizeWW.Height - 250), floor, vertical_trolleys_: true));
-            floor.STHubs.Add(new StartHub("Start hub", 1, new Point(1200, floor.FirstWW.RSizeWW.Height - 250), floor, vertical_trolleys_: true));
+            int x = 160;
+            for (int i = 0; i < RData.days.Count; i++)
+            {
+                floor.STHubs.Add(new StartHub("Start hub", i, new Point(x, floor.FirstWW.RSizeWW.Height - 250), floor, vertical_trolleys_: true));
+                x += 960;
+            }
 
             base.PlaceStartHubs();
         }
 
         public override void PlaceBuffHubs()
         {
-            floor.BuffHubs.Add(new BufferHub("Buffer hub", 1, new Point(0, 40), new Size(floor.FirstWW.RSizeWW.Width - 200, 600), floor));
+            floor.BuffHubs.Add(new BufferHub("Buffer hub", 1, new Point(40, 40), new Size(floor.FirstWW.RSizeWW.Width - 200, 600), floor));
 
             base.PlaceBuffHubs();
         }
@@ -245,6 +253,10 @@ namespace FloorSimulation
         {
 
         }
+        public override string ToString()
+        {
+            return "S-Layout grouped by Day first and Id second, With more small buffhubs in the street";
+        }
 
         public override BufferHub GetBuffHubFull(Distributer db)
         {
@@ -252,9 +264,10 @@ namespace FloorSimulation
             {
                 int deltaX = obj.RFloorPoint.X - db.RDPoint.X;
                 int deltaY = obj.RFloorPoint.Y - db.RDPoint.Y;
+                if (obj.name == "Buffer hub")
+                    deltaX = 0;
                 return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
             })
-            .Where(obj => obj.name != "Buffer hub")
             .ToList();
 
             foreach(BufferHub buffhub in sortedList) 
@@ -273,9 +286,10 @@ namespace FloorSimulation
             {
                 int deltaX = obj.RFloorPoint.X - db.RDPoint.X;
                 int deltaY = obj.RFloorPoint.Y - db.RDPoint.Y;
+                if (obj.name == "Buffer hub")
+                    deltaX = 0;
                 return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
             })
-            .Where(obj => obj.name != "Buffer hub")
             .ToList();
 
             foreach(BufferHub buffhub in sortedList) 
@@ -309,5 +323,129 @@ namespace FloorSimulation
             floor.HubList = floor.HubList.Concat(floor.BuffHubs).ToList();
         }
 
+    }
+
+    internal class SLayoutDayIdBuffhub2Streets: SLayoutDayIdBuffhub
+    {
+        public SLayoutDayIdBuffhub2Streets(Floor floor_, ReadData rData) : base(floor_, rData)
+        {
+            RealFloorWidth = 5500;
+        }
+        public override string ToString()
+        {
+            return "2 Streets, S-Layout grouped by Day first and Id second, With more small buffhubs in the street";
+        }
+
+        public override void PlaceShops(List<ShopHub> Shops, int UpperY_, int LowerY)
+        {
+            List<ShopHub> Shops2 = new List<ShopHub>();
+            foreach(ShopHub s in Shops)
+                Shops2.Add(new ShopHub(s.name + "_Second-street", s.id, s.RFloorPoint, floor, s.RHubSize,
+                                       initial_trolleys: 2, ColliPlusDay_: s.ColliPlusDay + "_2"));
+            Shops = Shops.Concat(Shops2).ToList();
+
+            base.PlaceShops(Shops, UpperY_, LowerY);
+        }
+
+        public override void PlaceStartHubs()
+        {
+            int x = 2080;
+            for (int i = 0; i < RData.days.Count; i++)
+            {
+                floor.STHubs.Add(new StartHub("Start hub", i + RData.days.Count, new Point(x, floor.FirstWW.RSizeWW.Height - 250), floor, vertical_trolleys_: true));
+                x += 960;
+            }
+            base.PlaceStartHubs();
+        }
+
+        public override StartHub GetStartHub(Distributer db)
+        {
+            if (floor.STHubs.Count > 2)
+                throw new NotImplementedException("This function has not been implemented yet");
+
+            StartHub s = floor.STHubs[db.id % 2];
+            if (s.StartHubEmpty)
+                return floor.STHubs[(db.id + 1) % 2];
+            return s;
+        }
+
+        /// <summary>
+        /// Place index holds the information to which starthub should receive the next trolley.
+        /// </summary>
+        /// <param name="dtList"></param>
+        public override void DistributeTrolleys(List<DanishTrolley> dtList)
+        {
+            int[] PlaceIndex = new int[RData.days.Count];
+            List<List<DanishTrolley>> TrolleysPerDayPerStreet = new List<List<DanishTrolley>> ();
+            for (int j = 0; j < 2; j++)
+                for (int i = 0; i < RData.days.Count; i++)
+                    TrolleysPerDayPerStreet.Add(new List<DanishTrolley>());
+
+            foreach(DanishTrolley d in dtList)
+            {
+                int i = d.PlantList.Select(p => RData.days.IndexOf(p.DestinationHub.day)).Min();
+                int dayindex = PlaceIndex[i];
+                int index = dayindex + i * 2;
+                TrolleysPerDayPerStreet[index].Add(d);
+
+                if (++PlaceIndex[i] > 1)
+                    PlaceIndex[i] = 0;
+                else
+                    ChangeDestination(d);
+            }
+
+            for (int i = 0; i <  TrolleysPerDayPerStreet.Count; i++)
+                floor.STHubs[i].AddUndistributedTrolleys(TrolleysPerDayPerStreet[i]);
+        }
+
+        private void ChangeDestination(DanishTrolley d)
+        {
+            foreach(plant p in d.PlantList)
+            {
+                p.DestinationHub = (ShopHub)floor.HubList.First(h => h.name == p.DestinationHub.name + "_Second-street");
+            }
+        }
+
+    }
+
+
+    internal class SLayoutDayId2Streets: SLayoutDayIdBuffhub2Streets
+    {
+        public SLayoutDayId2Streets(Floor floor_, ReadData rData) : base(floor_, rData)
+        {
+            RealFloorWidth = 6000;
+        }
+        public override string ToString()
+        {
+            return "2 streets, S-Layout grouped by Day first and Id second";
+        }
+
+        public override void PlaceBuffHubs()
+        {
+            floor.BuffHubs.Add(new BufferHub("Buffer hub", 1, new Point(40, 40), new Size(floor.FirstWW.RSizeWW.Width - 200, 600), floor));
+            floor.HubList = floor.HubList.Concat(floor.BuffHubs).ToList();
+        }
+
+        public override void PlaceFullTrolleyHubs()
+        {
+            int FullTrolleyHubWidth = 200;
+            for (int i = 0; i < ShopCornersX.Count - 1; i += 2)
+            {
+                int x = ((ShopCornersX[i] + ShopCornersX[i + 1]) / 2) - (FullTrolleyHubWidth / 2);
+                floor.FTHubs.Add(new FullTrolleyHub("Full Trolley Hub", 2 + i / 2, new Point(x, UpperY), floor, new Size(FullTrolleyHubWidth, LowestY - UpperY)));
+            }
+
+            floor.HubList = floor.HubList.Concat(floor.FTHubs).ToList();
+        }
+        public override BufferHub GetBuffHubOpen(Distributer db)
+        {
+            return floor.BuffHubs[floor.BuffHubs.Count - 1];
+        }
+
+        public override BufferHub GetBuffHubFull(Distributer db)
+        {
+            floor.BuffHubs[floor.BuffHubs.Count - 1].FilledSpots(db);
+            return floor.BuffHubs[floor.BuffHubs.Count - 1];
+        }
     }
 }

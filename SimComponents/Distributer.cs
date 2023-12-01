@@ -32,9 +32,10 @@ namespace FloorSimulation
         public const int BordTime = 34000; //ms
         public const int LaagTime = 30000; //ms
         public const int HerTime = 20000; //ms
+        public int MaxWaitedTicks;
 
         public List<WalkTile> route;
-        public const float WALKSPEED = 70f; // cm/s
+        public const float WALKSPEED = 85f; // cm/s
         private float TravelSpeed = WALKSPEED;
         private float travel_dist_per_tick;
         public int distributionms_per_tick; // plant distribution per tick in ms
@@ -53,7 +54,7 @@ namespace FloorSimulation
         public WalkWay WW;
 
         
-        public Distributer(int id_, Floor floor_, WalkWay WW_, Point Rpoint_ = default, bool IsVertical_ = true)
+        public Distributer(int id_, Floor floor_, WalkWay WW_, Point Rpoint_ = default, bool IsVertical_ = true, int MaxWaitedTicks_ = 100)
         {
             id = id_;
             floor = floor_;
@@ -62,6 +63,7 @@ namespace FloorSimulation
                 SavePoint = Rpoint_;
             WW = WW_;
             IsVertical = IsVertical_;
+            MaxWaitedTicks = MaxWaitedTicks_;
             IsOnHarry = false;
 
             VDistributerIMG = Image.FromFile(Program.rootfolder + @"\SimImages\Distributer_vertical.png");

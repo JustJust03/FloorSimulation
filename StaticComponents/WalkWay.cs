@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FloorSimulation
 {
@@ -32,6 +33,7 @@ namespace FloorSimulation
         public const int WALK_TILE_HEIGHT = 10; //cm
 
         public bool DevTools;
+        public bool DrawHeatMap;
 
         /// <summary>
         /// 
@@ -47,6 +49,7 @@ namespace FloorSimulation
             RSizeWW = RS;
             SizeWW = floor.ConvertToSimSize(RS);
             DevTools = DevTools_;
+            DrawHeatMap = DevTools_;
 
             WalkTileListWidth = RSizeWW.Width / WALK_TILE_WIDTH;
             WalkTileListHeight = RSizeWW.Height / WALK_TILE_HEIGHT;
@@ -70,6 +73,15 @@ namespace FloorSimulation
                 foreach(List<WalkTile> l in WalkTileList)
                     foreach(WalkTile t in l)
                         t.DrawOccupiance(g);
+            }
+            if (DrawHeatMap)
+            {
+                int max = floor.WWHeatMap.UpdateAverages();
+                if (max <= 0)
+                    return;
+                foreach (List<WalkTile> l in WalkTileList)
+                    foreach (WalkTile t in l)
+                        t.DrawHeatmap(g, max);
             }
         }
 

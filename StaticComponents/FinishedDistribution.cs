@@ -56,6 +56,7 @@ namespace FloorSimulation
             Layout = floor.layout.ToString();
             TotalTime = floor.ElapsedSimTime.ToString(@"hh\:mm\:ss");
             WriteFile();
+            WriteHeatMap();
         }
 
         /// <summary>
@@ -74,6 +75,19 @@ namespace FloorSimulation
 
             DistributionCompleted();
             return true;
+        }
+
+        public void WriteHeatMap()
+        {
+            int[,] intArray = new int[floor.FirstWW.WalkTileList.Count, floor.FirstWW.WalkTileList[0].Count];
+
+            for(int x = 0; x < floor.FirstWW.WalkTileList.Count; x++)
+                for(int y = 0; y < floor.FirstWW.WalkTileList[0].Count; y++)
+                    intArray[x, y] = floor.FirstWW.WalkTileList[x][y].visits;
+
+            string json = JsonConvert.SerializeObject(intArray);
+            string FilePath = Program.rootfolder + @"\Results\HeatMap Results\" + floor.Display.SaveFileBase + ".json";
+            File.WriteAllText(FilePath, json);
         }
 
 

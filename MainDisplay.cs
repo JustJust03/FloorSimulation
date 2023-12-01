@@ -22,13 +22,20 @@ namespace FloorSimulation
         public Font BiggerSFont;
         public Brush StandardWhiteBrush;
         public bool isSimulating = false;
+        public string date = "2023-04-14";
         //public string date = "2023-07-18";
-        public string date = "2023-05-16";
+        public List<string> days = new List<string> { "VR", "ZO" };
+        //public List<string> days = new List<string> { "VR"};
+
         public MetaInfo InfoPanel;
         public ControlInfo ControlPanel;
-        private ReadData rd = new ReadData();
+        private ReadData rd;
         public string SaveFileBase;
-        
+
+        public bool LoadHeatMap = false;
+        public string HeatMapName = "2023-07-18_HeatMapTesting";
+
+
         public MainDisplay()
         {
             //Smoother display
@@ -44,6 +51,7 @@ namespace FloorSimulation
             StandardWhiteBrush = Brushes.White;
 
             //Floor
+            rd = new ReadData(days);
             floor = new Floor(new Point(0, 0), this, rd);
             Controls.Add(floor);
 
@@ -58,7 +66,7 @@ namespace FloorSimulation
             Controls.Add(InfoPanel);
 
             Paint += PaintMainDisplay;
-            SaveFileBase = date + "_" + "1Street";
+            SaveFileBase = date + "_" + "HeatMapTesting";
         }
 
         private void PaintMainDisplay(object sender, PaintEventArgs e)
@@ -83,6 +91,9 @@ namespace FloorSimulation
             floor.PlaceBuffHubs();
             floor.PlaceFullTrolleyHubs();
             floor.DistributeTrolleys(L);
+
+            if (LoadHeatMap)
+                rd.LoadHeatMap(HeatMapName, floor.FirstWW);
         }
     }
 }

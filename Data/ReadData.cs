@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Newtonsoft.Json;
 
 namespace FloorSimulation
 {
@@ -16,11 +18,11 @@ namespace FloorSimulation
         CsvConfiguration CsvConfig;
         public Dictionary<string, ShopHub> DestPlusDayToHub;
         public List<ShopHub> UsedShopHubs;
-        public List<string> days = new List<string> { "DI", "WO" };
-        //public List<string> days = new List<string> { "DI" };
+        public List<string> days;
 
-        public ReadData()
+        public ReadData(List<string> days_)
         {
+            days = days_;
             CsvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 HasHeaderRecord = true,
@@ -33,7 +35,7 @@ namespace FloorSimulation
         /// </summary>
         /// <param name="date"></param>
         /// <returns></returns>
-        public List<DanishTrolley> ReadBoxHistoryToTrolleys(string date, Floor floor, string length = "")
+        public List<DanishTrolley> ReadBoxHistoryToTrolleys(string date, Floor floor, string length = "", bool DistributeSecondDay = true)
         {
             List<BoxActivity> ActivityList = new List<BoxActivity>();
             UsedShopHubs = new List<ShopHub>(); 
@@ -54,8 +56,11 @@ namespace FloorSimulation
                 {
                     var records = csv.GetRecord<BoxActivity>();
                     ShopHub s = records.InitActivity(DestPlusDayToHub);
-                    UsedShopHubs.Add(s);
-                    ActivityList.Add(records);
+                    if (s != null)
+                    {
+                        UsedShopHubs.Add(s);
+                        ActivityList.Add(records);
+                    }
                 }
             }
 
@@ -74,12 +79,19 @@ namespace FloorSimulation
             List<DanishTrolley> dtList = new List<DanishTrolley>();
             foreach(DanishTrolley t in TransactieIdToTrolley.Values.ToList())
             {
-                if (t.PlantList.Count == 0 || t.PlantList.Distinct().ToList().Count == 1)
+                if (t.PlantList.Select(obj => obj.DestinationHub).Distinct().ToList().Count <= 1)
+                {
+                    if (t.PlantList.Count > 1)
+                        ;
+                    continue;
+                }
+                if (!DistributeSecondDay && !t.PlantList.Select(obj => obj.DestinationHub.day).Contains(days[0]))
                     continue;
                 dtList.Add(t);
+                
             }
 
-            //CalculateImportStickers(dtList);
+            CalculateImportStickers(dtList);
 
             return dtList;
         }
@@ -176,5 +188,18 @@ namespace FloorSimulation
             double Stickersd = Math.Sqrt(VarStickersPerTrolley);
         }
             
+        public void LoadHeatMap(string FileName, WalkWay WW)
+        {
+            string FullPath = Program.rootfolder + @"\Results\HeatMap Results\" + FileName + ".json";
+            string jsonContent = File.ReadAllText(FullPath);
+            int[,] intArray;
+            intArray = JsonConvert.DeserializeObject<int[,]>(jsonContent);
+
+            for (int x = 0; x < intArray.GetLength(0); x++) 
+                for(int y = 0; y < intArray.GetLength(1); y++)
+                    WW.WalkTileList[x][y].visits = intArray[x, y];
+
+            WW.DrawHeatMap = true;
+        }
     }
 }
