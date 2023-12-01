@@ -104,6 +104,7 @@ namespace FloorSimulation
             DanishTrolley t = TransactieIdToTrolley[b.Transactieid];
             if(days.Contains(b.Destination.day))
             {
+                b.Destination.StickersToReceive++;
                 plant p = new plant(b.Destination, b.GetUnits(), name_: b.Product_omschrijving_1);
                 t.TakePlantIn(p);
             }

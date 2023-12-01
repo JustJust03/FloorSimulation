@@ -18,6 +18,7 @@ namespace FloorSimulation
     {
         public string ColliPlusDay;
         public string day;
+        public int StickersToReceive; //While reading the data, the amount of stickers this shop gets is updated.
 
         /// <summary>
         /// Shop hub has a standard size: (200cm x 200cm)

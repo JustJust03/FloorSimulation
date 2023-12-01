@@ -13,7 +13,7 @@ namespace FloorSimulation
         protected ReadData RData;
         public int RealFloorWidth = 5000;
         public int RealFloorHeight = 5000;
-
+        public int NLowpads = 0;
         public abstract int NTrolleysInShop { get; set; }
 
         public Layout(Floor floor_, ReadData rData)

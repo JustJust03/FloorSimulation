@@ -90,6 +90,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assignments\DistributerTask.cs" />
+    <Compile Include="Assignments\RegionDistributerTask.cs" />
+    <Compile Include="Assignments\LowPadTask.cs" />
     <Compile Include="Assignments\Task.cs" />
     <Compile Include="ControlInfo.cs">
       <SubType>Component</SubType>
@@ -98,6 +101,7 @@
     <Compile Include="Data\HubData.cs" />
     <Compile Include="Data\ReadData.cs" />
     <Compile Include="Layouts\Layout.cs" />
+    <Compile Include="Layouts\LowPadSlayout.cs" />
     <Compile Include="Layouts\Reckthoek.cs" />
     <Compile Include="Layouts\Slayouts.cs" />
     <Compile Include="MetaInfo.cs">
@@ -105,6 +109,7 @@
     </Compile>
     <Compile Include="PathFinding\AstarWalkWays.cs" />
     <Compile Include="PathFinding\DijkstraWalkWays.cs" />
+    <Compile Include="SimComponents\LowPad.cs" />
     <Compile Include="SimComponents\Distributer.cs" />
     <Compile Include="SimComponents\LangeHarry.cs" />
     <Compile Include="SimpleCalculation.cs" />

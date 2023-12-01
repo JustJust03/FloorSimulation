@@ -5,6 +5,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Net.Mail;
 using FloorSimulation.PathFinding;
+using FloorSimulation;
 
 namespace FloorSimulation
 {
@@ -82,7 +83,10 @@ namespace FloorSimulation
 
             travel_dist_per_tick = TravelSpeed / Program.TICKS_PER_SECOND;
             distributionms_per_tick = (int)(1000f / Program.TICKS_PER_SECOND);
-            MainTask = new Task(this, "TakeFullTrolley", floor.FinishedD);
+            if (floor.layout.NLowpads == 0)
+                MainTask = new DistributerTask(this, "TakeFullTrolley", floor.FinishedD);
+            else
+                MainTask = new RegionDistributerTask(this);
             trolley = null;
 
             AWW = new AstarWalkWays(WW, this);

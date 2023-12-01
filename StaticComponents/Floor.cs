@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using FloorSimulation.StaticComponents.Hubs;
 using System.Linq;
+using FloorSimulation.SimComponents;
 
 namespace FloorSimulation
 {
@@ -35,8 +36,8 @@ namespace FloorSimulation
         public const float ScaleFactor = 0.25f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
         public Layout layout;
 
-        public const int NDistributers = 8;
-        public const int SecondsToFullOperation = 180; //How long to wait before all distributers are running
+        public const int NDistributers = 34;
+        public const int SecondsToFullOperation = 0; //How long to wait before all distributers are running
         public int OperationalInterval; //How long to wait between distributers
 
         public List<DanishTrolley> TrolleyList; // A list with all the trolleys that are on the floor.
@@ -46,6 +47,7 @@ namespace FloorSimulation
         public List<FullTrolleyHub> FTHubs;
         public TruckHub TrHub;
         public List<Distributer> DistrList; // A list with all the distributers that are on the floor.
+        public List<LowPad> LPList;
         public List<Distributer> TotalDistrList;
         public LangeHarry FirstHarry;
         public WalkWay FirstWW;
@@ -62,9 +64,10 @@ namespace FloorSimulation
             Display = di;
 
             //layout = new SLayoutDayId(this, rd);
-            layout = new SLayoutDayIdBuffhub(this, rd);
+            //layout = new SLayoutDayIdBuffhub(this, rd);
             //layout = new SLayoutDayIdBuffhub2Streets(this, rd);
             //layout = new SLayoutDayId2Streets(this, rd);
+            layout = new LowPadSlayoutBuffhub(this, rd);
 
             Size PixelFloorSize = new Size((int)(layout.RealFloorWidth * ScaleFactor),
                                            (int)(layout.RealFloorHeight * ScaleFactor));
@@ -104,7 +107,7 @@ namespace FloorSimulation
             Ticks += SpeedMultiplier;
             ElapsedSimTime = ElapsedSimTime.Add(TimeSpan.FromMilliseconds(MilisecondsPerTick * SpeedMultiplier));
 
-            if ((int)ElapsedSimTime.TotalSeconds <= SecondsToFullOperation)
+            if ((int)ElapsedSimTime.TotalSeconds <= SecondsToFullOperation + 2)
                 AddDistr((int)ElapsedSimTime.TotalSeconds);
 
             foreach (Distributer d in DistrList)
@@ -117,6 +120,14 @@ namespace FloorSimulation
 
         public void AddDistr(int seconds)
         {
+            if(TotalDistrList.Count ==  0) 
+                return;
+            if(OperationalInterval == 0)
+            {
+                DistrList = TotalDistrList.ToList();
+                TotalDistrList.Clear();
+                return;
+            }
             int TargetAmntDistr = seconds / OperationalInterval;
             if (TargetAmntDistr > NDistributers)
                 TargetAmntDistr = NDistributers;
