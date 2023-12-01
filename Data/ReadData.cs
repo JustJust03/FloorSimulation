@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Newtonsoft.Json;
 
 namespace FloorSimulation
 {
@@ -186,5 +188,18 @@ namespace FloorSimulation
             double Stickersd = Math.Sqrt(VarStickersPerTrolley);
         }
             
+        public void LoadHeatMap(string FileName, WalkWay WW)
+        {
+            string FullPath = Program.rootfolder + @"\Results\HeatMap Results\" + FileName + ".json";
+            string jsonContent = File.ReadAllText(FullPath);
+            int[,] intArray;
+            intArray = JsonConvert.DeserializeObject<int[,]>(jsonContent);
+
+            for (int x = 0; x < intArray.GetLength(0); x++) 
+                for(int y = 0; y < intArray.GetLength(1); y++)
+                    WW.WalkTileList[x][y].visits = intArray[x, y];
+
+            WW.DrawHeatMap = true;
+        }
     }
 }

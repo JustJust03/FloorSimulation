@@ -31,7 +31,11 @@ namespace FloorSimulation
         public ControlInfo ControlPanel;
         private ReadData rd;
         public string SaveFileBase;
-        
+
+        public bool LoadHeatMap = true;
+        public string HeatMapName = "2023-07-18_HeatMapTesting";
+
+
         public MainDisplay()
         {
             //Smoother display
@@ -39,7 +43,8 @@ namespace FloorSimulation
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             UpdateStyles();
 
-            this.Size = new Size(1422, 840); //40px for the top bar.
+            //this.Size = new Size(1422, 840); //40px for the top bar.
+            this.Size = new Size(1422, 1240); //40px for the top bar.
             this.BackColor = Color.DarkSlateGray;
             this.Text = "AllGreen Floor Simulation";
             StandardFont = new Font("Segoe UI", 12.0f, FontStyle.Bold);
@@ -79,7 +84,7 @@ namespace FloorSimulation
         {
             List<ShopHub> shops = rd.ReadHubData(floor);
 
-            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, length: "short");
+            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, length: "top_200");
             //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, DistributeSecondDay: false);
 
             floor.PlaceShops(rd.UsedShopHubs);
@@ -87,6 +92,9 @@ namespace FloorSimulation
             floor.PlaceBuffHubs();
             floor.PlaceFullTrolleyHubs();
             floor.DistributeTrolleys(L);
+
+            if (LoadHeatMap)
+                rd.LoadHeatMap(HeatMapName, floor.FirstWW);
         }
     }
 }

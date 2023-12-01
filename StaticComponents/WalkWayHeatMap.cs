@@ -48,7 +48,7 @@ namespace FloorSimulation
             int[] SortedArray = WW.WalkTileList.SelectMany(row => row.Select(obj => obj.AverageVisits)).ToArray();
             Array.Sort(SortedArray);
             Array.Reverse(SortedArray);
-            int Max = SortedArray[10000];
+            int Max = SortedArray[100];
             ;
             return Max;
         }
