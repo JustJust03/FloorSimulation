@@ -253,6 +253,10 @@ namespace FloorSimulation
         {
 
         }
+        public override string ToString()
+        {
+            return "S-Layout grouped by Day first and Id second, With more small buffhubs in the street";
+        }
 
         public override BufferHub GetBuffHubFull(Distributer db)
         {
@@ -326,6 +330,10 @@ namespace FloorSimulation
         public SLayoutDayIdBuffhub2Streets(Floor floor_, ReadData rData) : base(floor_, rData)
         {
             RealFloorWidth = 5500;
+        }
+        public override string ToString()
+        {
+            return "2 Streets, S-Layout grouped by Day first and Id second, With more small buffhubs in the street";
         }
 
         public override void PlaceShops(List<ShopHub> Shops, int UpperY_, int LowerY)
@@ -406,6 +414,10 @@ namespace FloorSimulation
         public SLayoutDayId2Streets(Floor floor_, ReadData rData) : base(floor_, rData)
         {
             RealFloorWidth = 6000;
+        }
+        public override string ToString()
+        {
+            return "2 streets, S-Layout grouped by Day first and Id second";
         }
 
         public override void PlaceBuffHubs()
