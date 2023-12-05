@@ -4,7 +4,6 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using FloorSimulation.StaticComponents.Hubs;
 using System.Linq;
-using FloorSimulation.SimComponents;
 
 namespace FloorSimulation
 {
@@ -25,6 +24,7 @@ namespace FloorSimulation
         public readonly Pen PurplePen = new Pen(Color.Purple);
         public readonly Pen PinkPen = new Pen(Color.Pink);
         public readonly Pen GrayPen = new Pen(Color.DarkSlateGray);
+        public readonly Pen RedOrangePen = new Pen(Color.OrangeRed);
         public int Ticks = 0;
         public double MilisecondsPerTick;
         public TimeSpan ElapsedSimTime = TimeSpan.Zero;
@@ -36,7 +36,7 @@ namespace FloorSimulation
         public const float ScaleFactor = 0.25f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
         public Layout layout;
 
-        public const int NDistributers = 34;
+        public const int NDistributers = 32;
         public const int SecondsToFullOperation = 0; //How long to wait before all distributers are running
         public int OperationalInterval; //How long to wait between distributers
 
@@ -53,6 +53,7 @@ namespace FloorSimulation
         public WalkWay FirstWW;
         public WalkWayHeatMap WWHeatMap;
 
+        public Dictionary<ShopHub, LowPadAccessHub> ShopHubPerRegion;
 
         /// <summary>
         /// Sets the pixel floor size by using the ScaleFactor.
@@ -64,10 +65,11 @@ namespace FloorSimulation
             Display = di;
 
             //layout = new SLayoutDayId(this, rd);
-            //layout = new SLayoutDayIdBuffhub(this, rd);
+            layout = new SLayoutDayIdBuffhub(this, rd);
             //layout = new SLayoutDayIdBuffhub2Streets(this, rd);
             //layout = new SLayoutDayId2Streets(this, rd);
-            layout = new LowPadSlayoutBuffhub(this, rd);
+
+            //layout = new LowPadSlayoutBuffhub(this, rd);
 
             Size PixelFloorSize = new Size((int)(layout.RealFloorWidth * ScaleFactor),
                                            (int)(layout.RealFloorHeight * ScaleFactor));
@@ -83,6 +85,8 @@ namespace FloorSimulation
             STHubs = new List<StartHub>();
             FTHubs = new List<FullTrolleyHub>();
 
+            ShopHubPerRegion = new Dictionary<ShopHub, LowPadAccessHub>();
+
             FirstWW = new WalkWay(new Point(0, 0), new Size(layout.RealFloorWidth, layout.RealFloorHeight), this, DevTools_: false);
             WWHeatMap = new WalkWayHeatMap(FirstWW, this);
 
@@ -90,6 +94,7 @@ namespace FloorSimulation
 
             DistrList = new List<Distributer>();
             TotalDistrList = new List<Distributer>();
+            LPList = new List<LowPad>();
             layout.PlaceDistributers(NDistributers, new Point(FirstWW.RSizeWW.Width - 1000, 2000));
             OperationalInterval = SecondsToFullOperation / NDistributers;
 
@@ -112,6 +117,10 @@ namespace FloorSimulation
 
             foreach (Distributer d in DistrList)
                 d.Tick();
+
+            foreach (LowPad lp in LPList)
+                lp.Tick();
+            
 
             WWHeatMap.TickHeatMap();
             Display.Invalidate();
@@ -183,6 +192,8 @@ namespace FloorSimulation
             foreach (Distributer d in DistrList)
                 if (!d.IsOnHarry)
                     d.DrawObject(g);
+            foreach (LowPad lp in LPList)
+                lp.DrawObject(g);
         }
 
         public void PlaceShops(List<ShopHub> Shops)
@@ -210,6 +221,11 @@ namespace FloorSimulation
             layout.DistributeTrolleys(dtList);
         }
 
+        public void AssignRegions(List<DanishTrolley> dtList)
+        {
+            layout.AssignRegionsToTrolleys(dtList);
+        }
+
         /// <summary>
         /// Returns the closes FullTrolley Hub to the distributer
         /// </summary>
@@ -217,7 +233,7 @@ namespace FloorSimulation
         {
             FullTrolleyHub ClosestHub = FTHubs[0];
             foreach (FullTrolleyHub FThub in FTHubs)
-                if (Math.Abs(db.RDPoint.X - FThub.RFloorPoint.X) < Math.Abs(db.RDPoint.X - ClosestHub.RFloorPoint.X))
+                if (Math.Abs(db.RPoint.X - FThub.RFloorPoint.X) < Math.Abs(db.RPoint.X - ClosestHub.RFloorPoint.X))
                     ClosestHub = FThub;
 
             return ClosestHub;

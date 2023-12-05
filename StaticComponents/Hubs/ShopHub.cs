@@ -20,6 +20,9 @@ namespace FloorSimulation
         public string day;
         public int StickersToReceive; //While reading the data, the amount of stickers this shop gets is updated.
 
+        public bool DrawRegions = false;
+        public bool RegionStartOrEnd = false;
+
         /// <summary>
         /// Shop hub has a standard size: (200cm x 200cm)
         /// Usually horizontal trolleys
@@ -103,8 +106,16 @@ namespace FloorSimulation
         /// <param name="DrawOutline"></param>
         public override void DrawHub(Graphics g, bool DrawOutline = false)
         {
+            if (DrawRegions)
+            {
+                if(RegionStartOrEnd) 
+                    g.DrawRectangle(floor.RedOrangePen, new Rectangle(FloorPoint, HubSize));
+                else
+                    g.DrawRectangle(floor.BPen, new Rectangle(FloorPoint, HubSize));
+
+            }
             //outline
-            if (DrawOutline)
+            else if (DrawOutline)
             {
                 if(day == "DI")
                     g.DrawRectangle(floor.YellowPen, new Rectangle(FloorPoint, HubSize));
@@ -119,7 +130,7 @@ namespace FloorSimulation
                 else if (day == "VR_2")
                     g.DrawRectangle(floor.PinkPen, new Rectangle(FloorPoint, HubSize));
                 else if (day == "ZO")
-                    g.DrawRectangle(floor.GrayPen, new Rectangle(FloorPoint, HubSize));
+                    g.DrawRectangle(floor.RedOrangePen, new Rectangle(FloorPoint, HubSize));
                 else
                     g.DrawRectangle(floor.BPen, new Rectangle(FloorPoint, HubSize));
             }

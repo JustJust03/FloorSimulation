@@ -116,7 +116,7 @@ namespace FloorSimulation
         /// </summary>
         /// <param name="Rp"></param>
         /// <param name="Rs"></param>
-        public void fill_tiles(Point Rp, Size Rs, Distributer DButer = null)
+        public void fill_tiles(Point Rp, Size Rs, Agent agent = null)
         {
             int[] indices = TileListIndices(Rp, Rs);
             int x = indices[0]; int y = indices[1]; int width = indices[2]; int height = indices[3];
@@ -127,8 +127,8 @@ namespace FloorSimulation
                     WalkTile t = WalkTileList[xi][yi];
                     t.occupied = true;
 
-                    if (DButer != null)
-                        t.occupied_by = DButer;
+                    if (agent != null)
+                        t.occupied_by = agent;
                     else
                         t.occupied_by = null;
                 }

@@ -28,13 +28,13 @@ namespace FloorSimulation
                 {
                     foreach(Distributer db in floor.DistrList)
                         if(db.MainTask.Travelling)
-                            WW.GetTile(db.RDPoint).visits += 100;
+                            WW.GetTile(db.RPoint).visits += 100;
                 }
                 else
                 {
                     foreach(Distributer db in floor.DistrList)
                         if(db.MainTask.Travelling && db.MainTask.Goal != "TakeFullTrolley")
-                            WW.GetTile(db.RDPoint).visits += 100;
+                            WW.GetTile(db.RPoint).visits += 100;
 
                 }
             }

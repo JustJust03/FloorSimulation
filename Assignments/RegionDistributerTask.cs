@@ -9,17 +9,19 @@ namespace FloorSimulation
     internal class RegionDistributerTask : Task
     {
         private Distributer DButer;
-        private Floor floor;
+        private FinishedDistribution FinishedD;
 
-        public RegionDistributerTask(Distributer db_) 
-        { 
-            DButer = db_;
-            floor = DButer.floor;
+        public RegionDistributerTask(Distributer DButer_, string Goal_, FinishedDistribution FinishedD_, DanishTrolley trolley_ = default): 
+            base(Goal_, trolley_)
+        {
+            DButer = DButer_;
+            FinishedD = FinishedD_;
         }
 
         public override void PerformTask()
         {
-            throw new NotImplementedException();
+            return;
+            //throw new NotImplementedException();
         }
 
         public override void RouteCompleted()

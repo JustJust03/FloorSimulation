@@ -262,8 +262,8 @@ namespace FloorSimulation
         {
             List<BufferHub> sortedList = floor.BuffHubs.OrderBy(obj =>
             {
-                int deltaX = obj.RFloorPoint.X - db.RDPoint.X;
-                int deltaY = obj.RFloorPoint.Y - db.RDPoint.Y;
+                int deltaX = obj.RFloorPoint.X - db.RPoint.X;
+                int deltaY = obj.RFloorPoint.Y - db.RPoint.Y;
                 if (obj.name == "Buffer hub")
                     deltaX = 0;
                 return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
@@ -284,8 +284,8 @@ namespace FloorSimulation
             List<BufferHub> sortedList = floor.BuffHubs
             .OrderBy(obj =>
             {
-                int deltaX = obj.RFloorPoint.X - db.RDPoint.X;
-                int deltaY = obj.RFloorPoint.Y - db.RDPoint.Y;
+                int deltaX = obj.RFloorPoint.X - db.RPoint.X;
+                int deltaY = obj.RFloorPoint.Y - db.RPoint.Y;
                 if (obj.name == "Buffer hub")
                     deltaX = 0;
                 return deltaX * deltaX + deltaY * deltaY; // Return the squared distance

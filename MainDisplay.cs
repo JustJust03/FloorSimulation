@@ -90,6 +90,7 @@ namespace FloorSimulation
             floor.PlaceStartHubs();
             floor.PlaceBuffHubs();
             floor.PlaceFullTrolleyHubs();
+            floor.AssignRegions(L);
             floor.DistributeTrolleys(L);
 
             if (LoadHeatMap)

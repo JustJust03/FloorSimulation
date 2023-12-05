@@ -6,19 +6,19 @@ using System.Text;
 using System.Threading.Tasks;
 using Priority_Queue;
 
-namespace FloorSimulation.PathFinding
+namespace FloorSimulation
 {
     internal class AstarWalkWays
     { 
         private WalkWay WW;
         private SimplePriorityQueue<WalkTile> TileQueue;
-        private Distributer DButer;
+        private Agent agent;
         private WalkTile ClosesTargetTile;
 
-        public AstarWalkWays(WalkWay WW_, Distributer distributer_)
+        public AstarWalkWays(WalkWay WW_, Agent agent_)
         {
             WW = WW_;
-            DButer = distributer_; 
+            agent = agent_; 
             TileQueue = new SimplePriorityQueue<WalkTile>();
         }
 
@@ -54,10 +54,10 @@ namespace FloorSimulation.PathFinding
         {
             if (TargetTrolley == null)
                 return null;
-            WalkTile StartTile = WW.GetTile(DButer.RDPoint);
+            WalkTile StartTile = WW.GetTile(agent.RPoint);
             int[] tindices = WW.TileListIndices(TargetTrolley.RPoint, TargetTrolley.GetRSize());
             int tx = tindices[0]; int ty = tindices[1]; int twidth = tindices[2]; int theight = tindices[3];
-            int[] dindices = WW.TileListIndices(DButer.RDPoint, DButer.RDistributerSize);
+            int[] dindices = WW.TileListIndices(agent.RPoint, agent.GetRSize());
             int dx = dindices[0]; int dy = dindices[1]; int dwidth = dindices[2]; int dheight = dindices[3];
 
             List<WalkTile> TargetTiles = new List<WalkTile>();
@@ -87,10 +87,10 @@ namespace FloorSimulation.PathFinding
 
         public List<WalkTile> RunAlgoDistrToHarry(LangeHarry Harry)
         {
-            WalkTile StartTile = WW.GetTile(DButer.RDPoint);
+            WalkTile StartTile = WW.GetTile(agent.RPoint);
             int[] hindices = WW.TileListIndices(Harry.RPoint, Harry.GetRSize());
             int hx = hindices[0]; int hy = hindices[1]; int hwidth = hindices[2]; int hheight = hindices[3];
-            int[] dindices = WW.TileListIndices(DButer.RDPoint, DButer.RDistributerSize);
+            int[] dindices = WW.TileListIndices(agent.RPoint, agent.GetRSize());
             int dx = dindices[0]; int dy = dindices[1]; int dwidth = dindices[2]; int dheight = dindices[3];
 
             List<WalkTile> TargetTiles = new List<WalkTile>();
@@ -147,7 +147,7 @@ namespace FloorSimulation.PathFinding
             List<int> tiles_to_remove = new List<int>();
             for (int i = 0; i < target_tiles.Count; i++)
             {
-                WW.WWC.UpdateLocalClearances(DButer, DButer.GetDButerTileSize(), target_tiles[i]);
+                WW.WWC.UpdateLocalClearances(agent, agent.GetTileSize(), target_tiles[i]);
                 if (!IsTileAccessible(target_tiles[i]))
                     tiles_to_remove.Add(i);
             }
@@ -159,7 +159,7 @@ namespace FloorSimulation.PathFinding
 
             TileQueue.Clear();
             ResetTravelCosts();
-            WW.WWC.UpdateClearances(DButer, DButer.GetDButerTileSize());
+            WW.WWC.UpdateClearances(agent, agent.GetTileSize());
  
             start_tile.TravelCost = 0;
             start_tile.visited = true;
@@ -258,7 +258,7 @@ namespace FloorSimulation.PathFinding
         /// </summary>
         public bool IsTileAccessible(WalkTile tile)
         {
-            return tile != null && (tile.accessible || tile.occupied_by == DButer) && !tile.inaccessible_by_static;
+            return tile != null && (tile.accessible || tile.occupied_by == agent) && !tile.inaccessible_by_static;
         }
     }
 }

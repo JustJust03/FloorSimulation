@@ -37,7 +37,7 @@ namespace FloorSimulation
 
             HubAccessPoints = new WalkTile[Trolleyarr.Length];
             HubAccessPointsY = new int[Trolleyarr.Length];
-            int trolleyX = RFloorPoint.X + RHubSize.Width / 2  - (DummyTrolley.GetRSize().Width / 2 + DummyDistributer.GetRDbuterSize().Width - 10); //Place the trolley exactly in the middle
+            int trolleyX = RFloorPoint.X + RHubSize.Width / 2  - (DummyTrolley.GetRSize().Width / 2 + DummyDistributer.GetRSize().Width - 10); //Place the trolley exactly in the middle
 
             for (int i = 0; i < Trolleyarr.Length; i++)
             {

@@ -38,8 +38,8 @@ namespace FloorSimulation
 
         public const float TrolleyTravelSpeed = 50f; //cm/s
 
-        //TODO: Keep track of maximum plants per trolley.
         public List<plant> PlantList;
+        public List<LowPadAccessHub> TargetRegions;
 
         /// <summary>
         /// Constructer initializing the variables
@@ -150,6 +150,7 @@ namespace FloorSimulation
             return TransactieId + " plants: " + PlantList.Count;
         }
 
+        //Not used anymore
         public void SwitchPlants(int FirsIndex, int SecondeIndex)
         {
             plant p = PlantList[FirsIndex];

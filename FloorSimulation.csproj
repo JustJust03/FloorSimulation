@@ -108,7 +108,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="PathFinding\AstarWalkWays.cs" />
-    <Compile Include="PathFinding\DijkstraWalkWays.cs" />
+    <Compile Include="SimComponents\Agent.cs" />
     <Compile Include="SimComponents\LowPad.cs" />
     <Compile Include="SimComponents\Distributer.cs" />
     <Compile Include="SimComponents\LangeHarry.cs" />
@@ -128,6 +128,7 @@
     <Compile Include="StaticComponents\Hubs\BufferHub.cs" />
     <Compile Include="StaticComponents\Hubs\FullTrolleyHub.cs" />
     <Compile Include="StaticComponents\Hubs\Hub.cs" />
+    <Compile Include="StaticComponents\Hubs\LowPadAccessHub.cs" />
     <Compile Include="StaticComponents\Hubs\TruckHub.cs" />
     <Compile Include="StaticComponents\plant.cs" />
     <Compile Include="StaticComponents\Hubs\ShopHub.cs" />

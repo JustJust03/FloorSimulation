@@ -23,7 +23,7 @@ namespace FloorSimulation
         public bool accessible; //The square is accessible by the agent taking into account its dimensions. 
         public bool IsAgentsTile; //The agent is standing on this tile.
         public bool IsStatic; //A tile that is occupied and inaccessible For ever (walls and columns)
-        public Distributer occupied_by;
+        public Agent occupied_by;
         public bool inaccessible_by_static; //Is this tile unavailable because of a static object.
 
         private WalkWay WW;

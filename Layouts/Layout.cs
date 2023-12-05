@@ -68,5 +68,9 @@ namespace FloorSimulation
         {
             floor.HubList = floor.HubList.Concat(floor.BuffHubs).ToList();
         }
+        public virtual void AssignRegionsToTrolleys(List<DanishTrolley> dtlist)
+        {
+            return;
+        }
     }
 }

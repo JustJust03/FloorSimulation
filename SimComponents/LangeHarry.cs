@@ -74,7 +74,7 @@ namespace FloorSimulation
                 g.DrawImage(VHarryIMG, new Rectangle(SimPoint, VHarrySize));
                 if(DButer != null)
                 {
-                    Point Rp = new Point(RPoint.X + VRHarrySize.Width / 2 - DButer.VRDistributerSize.Width / 2,
+                    Point Rp = new Point(RPoint.X + VRHarrySize.Width / 2 - DButer.GetRSize(OnlyAgentSize: true).Width / 2,
                                          RPoint.Y + 57 * MaxTrolleysPerHarry);
                     DButer.DrawObject(g, floor.ConvertToSimPoint(Rp));
                 }
@@ -85,7 +85,7 @@ namespace FloorSimulation
                 if(DButer != null)
                 {
                     Point Rp = new Point(RPoint.X,
-                                         RPoint.Y + HRHarrySize.Height / 2 - DButer.HRDistributerSize.Height / 2);
+                                         RPoint.Y + HRHarrySize.Height / 2 - DButer.GetRSize(OnlyAgentSize: true).Height / 2);
                     DButer.DrawObject(g, floor.ConvertToSimPoint(Rp));
                 }
             }
@@ -154,8 +154,8 @@ namespace FloorSimulation
         public void TravelHarry()
         {
             WW.unfill_tiles(RPoint, GetRSize());
-            RPoint = DButer.RDPoint;
-            SimPoint = DButer.DPoint;
+            RPoint = DButer.RPoint;
+            SimPoint = DButer.SimPoint;
             WW.fill_tiles(RPoint, GetRSize(), DButer);
 
             for (int i = 0; i < TrolleyList.Count; i++)

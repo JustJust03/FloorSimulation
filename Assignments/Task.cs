@@ -11,10 +11,9 @@ namespace FloorSimulation
     internal abstract class Task
     {
         public DanishTrolley Trolley;
-        public LangeHarry Harry;
         public Hub TargetHub;
-        public bool WasOnTopLeft;
         public bool TargetWasSaveTile = false;
+
         public AnalyzeInfo AInfo;
 
         public readonly List<string> VerspillingTasks = new List<string>
@@ -71,6 +70,12 @@ namespace FloorSimulation
         {
             "DeliveringEmptyTrolley",
         };
+
+        public Task(string Goal_, DanishTrolley trolley_ = default)
+        {
+            Trolley = trolley_;
+            Goal = Goal_;
+        }
 
         public abstract void PerformTask();
         public abstract void RouteCompleted();

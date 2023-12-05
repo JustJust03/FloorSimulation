@@ -50,7 +50,7 @@ namespace FloorSimulation
         /// </summary>
         /// <param name="DButer"></param>
         /// <param name="ObjSize"></param>
-        public void UpdateClearances(Distributer DButer, Size ObjSize)
+        public void UpdateClearances(Agent agent, Size ObjSize)
         {
             TilesChecked = 0;
             TilesChanged = 0;
@@ -58,15 +58,15 @@ namespace FloorSimulation
 
             ClearAccessibility(ObjSize);
 
-            int[] indices = WW.TileListIndices(DButer.RDPoint, DButer.GetRDbuterSize());
+            int[] indices = WW.TileListIndices(agent.RPoint, agent.GetRSize());
             int x = indices[0]; int y = indices[1]; int width = indices[2]; int height = indices[3];
             foreach (List<WalkTile> TileCol in WW.WalkTileList)
                 foreach (WalkTile t in TileCol)
                 {
                     TilesChecked++;
                     if(t.TileX >= x && t.TileX < x + width && t.TileY >= y && t.TileY < y + height)
-                        UpdateTileClearance(t, ObjSize, DButer);
-                    else if (t.occupied && t.occupied_by != DButer) 
+                        UpdateTileClearance(t, ObjSize, agent);
+                    else if (t.occupied && t.occupied_by != agent) 
                         UpdateTileClearance(t, ObjSize);
                 }
                     
@@ -79,7 +79,7 @@ namespace FloorSimulation
         /// Only updates the necessary tiles for an object to walk to 1 tile
         /// Size is in tiles
         /// </summary>
-        public void UpdateLocalClearances(Distributer DButer, Size ObjSize, WalkTile TargetTile)
+        public void UpdateLocalClearances(Agent agent, Size ObjSize, WalkTile TargetTile)
         {
             TilesChecked = 0;
             TilesChanged = 0;
@@ -88,7 +88,7 @@ namespace FloorSimulation
             //ClearAccessibility(new Size (ObjSize.Width + WalkWay.WALK_TILE_WIDTH, ObjSize.Height + WalkWay.WALK_TILE_HEIGHT));
             ClearAccessibility(ObjSize);
 
-            int[] indices = WW.TileListIndices(DButer.RDPoint, DButer.GetRDbuterSize());
+            int[] indices = WW.TileListIndices(agent.RPoint, agent.GetRSize());
             int dx = indices[0]; int dy = indices[1]; int dwidth = indices[2]; int dheight = indices[3];
 
             int maxx = Math.Min(TargetTile.TileX + ObjSize.Width, WW.WalkTileListWidth);
@@ -103,8 +103,8 @@ namespace FloorSimulation
                     t = WW.WalkTileList[x][y];
                     TilesChecked++;
                     if(t.TileX >= dx && t.TileX < dx + dwidth && t.TileY >= dy && t.TileY < dy + dheight)
-                        UpdateTileClearance(t, ObjSize, DButer);
-                    else if (t.occupied && t.occupied_by != DButer) 
+                        UpdateTileClearance(t, ObjSize, agent);
+                    else if (t.occupied && t.occupied_by != agent) 
                         UpdateTileClearance(t, ObjSize);
                 }
 
@@ -117,7 +117,7 @@ namespace FloorSimulation
         /// Updates the accessibility of a tile based on the object size that needs to traverse the walkway
         /// Creates a space above and to the left of this tile which will become inaccessible
         /// </summary>
-        private void UpdateTileClearance(WalkTile t, Size ObjSize, Distributer DButer = null)
+        private void UpdateTileClearance(WalkTile t, Size ObjSize, Agent agent = null)
         {
             int leftx = Math.Min(ObjSize.Width, t.TileX);
             int topy = Math.Min(ObjSize.Height, t.TileY);
@@ -132,22 +132,22 @@ namespace FloorSimulation
                         if (targett.occupied)
                         {
                             targett.accessible = false;
-                            if (DButer != null)
-                                targett.occupied_by = DButer;
+                            if (agent != null)
+                                targett.occupied_by = agent;
                             else
                                 targett.inaccessible_by_static = true;
                         }
                         continue;
                     }
 
-                    if(targett.occupied && (targett.occupied_by == DButer))
+                    if(targett.occupied && (targett.occupied_by == agent))
                         topy = t.TileY - targett.TileY;
 
                     TilesChanged++;
                     targett.accessible = false;
 
-                    if (DButer != null)
-                        targett.occupied_by = DButer;
+                    if (agent != null)
+                        targett.occupied_by = agent;
                     else
                         targett.inaccessible_by_static = true;
                 }
