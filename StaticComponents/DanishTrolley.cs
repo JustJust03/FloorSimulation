@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FloorSimulation
 {
@@ -133,6 +134,15 @@ namespace FloorSimulation
             return p;
         }
 
+        public plant GiveFirstPlantInRegion(LowPadAccessHub Regionhub)
+        {
+            plant p2 = PlantList.FirstOrDefault(p => Regionhub.shops.Contains(p.DestinationHub));
+            PlantList.Remove(p2);
+            if (!PlantList.Any(p => Regionhub.shops.Contains(p.DestinationHub)))
+                TargetRegions.Remove(Regionhub);
+            return p2;
+        }
+
         public bool IsFull()
         {
             if (TotalStickers >= MaxTotalStickers)
@@ -158,6 +168,12 @@ namespace FloorSimulation
             PlantList[SecondeIndex] = p;
         }
 
+        public bool FinishedRegion(LowPadAccessHub RegionHub)
+        {
+            if (TargetRegions.Contains(RegionHub))
+                return false;
+            return true;
+        }
         // TODO: Create a function that assigns every new trolley an unique id.
     }
 }

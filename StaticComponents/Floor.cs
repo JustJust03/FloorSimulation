@@ -45,6 +45,7 @@ namespace FloorSimulation
         public List<StartHub> STHubs;
         public List<BufferHub> BuffHubs;
         public List<FullTrolleyHub> FTHubs;
+        public List<LowPadAccessHub> LPHubs;
         public TruckHub TrHub;
         public List<Distributer> DistrList; // A list with all the distributers that are on the floor.
         public List<LowPad> LPList;
@@ -84,6 +85,7 @@ namespace FloorSimulation
             HubList = new List<Hub>();
             STHubs = new List<StartHub>();
             FTHubs = new List<FullTrolleyHub>();
+            LPHubs = new List<LowPadAccessHub>();
 
             ShopHubPerRegion = new Dictionary<ShopHub, LowPadAccessHub>();
 

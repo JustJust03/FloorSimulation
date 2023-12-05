@@ -25,7 +25,7 @@ namespace FloorSimulation
         public int MaxWaitedTicks;
 
         public List<WalkTile> route;
-        public float TravelSpeed = 85f; // cm/s
+        public float TravelSpeed; // cm/s
 
         protected float travel_dist_per_tick;
         protected float ticktravel = 0f; //The distance that has been traveled, but not registered to walkway yet
@@ -39,7 +39,7 @@ namespace FloorSimulation
         protected AstarWalkWays AWW;
         public WalkWay WW;
 
-        public Agent(int id_, Floor floor_, WalkWay WW_, string BaseImgFileName, Point Rpoint_ = default, bool IsVertical_ = true, int MaxWaitedTicks_ = 100) 
+        public Agent(int id_, Floor floor_, WalkWay WW_, string BaseImgFileName, float TravelSpeed_, Point Rpoint_ = default, bool IsVertical_ = true, int MaxWaitedTicks_ = 100) 
         {
             id = id_;
             floor = floor_;
@@ -47,6 +47,7 @@ namespace FloorSimulation
             if (Rpoint_ != null)
                 SavePoint = Rpoint_;
             WW = WW_;
+            TravelSpeed = TravelSpeed_;
             IsVertical = IsVertical_;
             MaxWaitedTicks = MaxWaitedTicks_;
 
@@ -133,7 +134,7 @@ namespace FloorSimulation
         /// If the walking distance is bigger than the width of a tile, move the distributer.
         /// </summary>
         /// <returns>true if there de distributer is walking, false if route has been completed</returns>
-        public void TickWalk()
+        public virtual void TickWalk()
         {
             if (route == null)
             {

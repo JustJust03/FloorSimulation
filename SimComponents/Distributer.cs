@@ -27,19 +27,24 @@ namespace FloorSimulation
         public bool TrolleyOnTopLeft; //True when the trolley is to the left or on top of the distributer
         public string SideActivity;
 
+        public LowPadAccessHub RegionHub;
+        public plant PlantInHand;
+
         
-        public Distributer(int id_, Floor floor_, WalkWay WW_, Point Rpoint_ = default, bool IsVertical_ = true, int MaxWaitedTicks_ = 100):
-            base(id_, floor_, WW_, "Distributer", Rpoint_, IsVertical_, MaxWaitedTicks_)
+        public Distributer(int id_, Floor floor_, WalkWay WW_, Point Rpoint_ = default, bool IsVertical_ = true, int MaxWaitedTicks_ = 100, LowPadAccessHub RHub = null):
+            base(id_, floor_, WW_, "Distributer", WALKSPEED, Rpoint_, IsVertical_, MaxWaitedTicks_)
         {
             IsOnHarry = false;
             if(id == -1)
                 return;
 
             distributionms_per_tick = (int)(1000f / Program.TICKS_PER_SECOND);
+            RegionHub = RHub;
+
             if (floor.layout.NLowpads == 0)
                 MainTask = new DistributerTask(this, "TakeFullTrolley", floor.FinishedD);
             else
-                MainTask = new RegionDistributerTask(this, "TakeFullTrolley", floor.FinishedD);
+                MainTask = new RegionDistributerTask(this, "TakeFullTrolley", floor.FinishedD, RegionHub);
         }
 
         /// <summary>

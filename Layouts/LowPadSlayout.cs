@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Core.Common;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -53,6 +54,7 @@ namespace FloorSimulation
 
         private void PlaceLPAccessHubs()
         {
+            Distributer db;
             ShopHub FirstHub;
             ShopHub LastHub;
             int id = 0;
@@ -64,25 +66,32 @@ namespace FloorSimulation
                 int HighestY;
                 int LowestY;
                 int HubX;
+                int DBX;
 
                 if (FirstHub.HasLeftAccess)
                 {
                     HighestY = LastHub.RFloorPoint.Y + FirstHub.RHubSize.Height;
                     LowestY = FirstHub.RFloorPoint.Y;
                     HubX = FirstHub.RFloorPoint.X - 160;
+                    DBX = FirstHub.RFloorPoint.X - 100;
                 }
                 else
                 {
                     HighestY = FirstHub.RFloorPoint.Y + FirstHub.RHubSize.Height;
                     LowestY = LastHub.RFloorPoint.Y;
                     HubX = FirstHub.RFloorPoint.X + FirstHub.RHubSize.Width + 100;
+                    DBX = FirstHub.RFloorPoint.X + FirstHub.RHubSize.Width + 40;
                 }
 
                 int HubY = LowestY + ((HighestY - LowestY) / 2) - 70;
 
                 LowPadAccessHub LPAHub = new LowPadAccessHub("LowPad Access Hub (X, Y): (" + HubX + ", " + HubY + ")",
-                    id, new Point(HubX, HubY), floor, new Size(60, 150));
+                    id, new Point(HubX, HubY), floor, new Size(50, 130), region);
+                db = new Distributer(id, floor, floor.FirstWW, Rpoint_: new Point(DBX, HubY), MaxWaitedTicks_: 100 - id, IsVertical_: false, RHub: LPAHub);
+
+                floor.DistrList.Add(db);
                 floor.HubList.Add(LPAHub);
+                floor.LPHubs.Add(LPAHub);
 
                 foreach(ShopHub shop in region) 
                     floor.ShopHubPerRegion[shop] = LPAHub;
@@ -93,23 +102,6 @@ namespace FloorSimulation
 
         public override void PlaceDistributers(int amount, Point StartPoint)
         {
-            Distributer db;
-            int y = StartPoint.Y;
-            int x = StartPoint.X;
-
-            for(int i  = 0; i < amount; i++)
-            {
-                db = new Distributer(i, floor, floor.FirstWW, Rpoint_: new Point(x, y), MaxWaitedTicks_: 100 - i);
-                floor.TotalDistrList.Add(db);
-                x += 200;
-                if (x > floor.FirstWW.RSizeWW.Width - 250)
-                {
-                    x = StartPoint.X;
-                    y += 200;
-                    if(y > floor.FirstWW.RSizeWW.Height - 250)
-                        break;
-                }
-            }
             if (NLowpads > 0)
                 PlaceLowPads(new Point(50, 50));
         }
@@ -138,7 +130,7 @@ namespace FloorSimulation
 
         private List<List<ShopHub>> CreateDistributionRegions(List<ShopHub> Shops)
         {
-            int nDbuters = floor.TotalDistrList.Count;
+            int nDbuters = Floor.NDistributers;
             Shops = Shops.OrderBy(obj => obj.StickersToReceive).ToList();
 
             int[] dbIndexes = new int[nDbuters];

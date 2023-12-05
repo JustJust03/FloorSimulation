@@ -85,6 +85,43 @@ namespace FloorSimulation
             return RunAlgo(StartTile, TargetTiles);
         }
 
+        public List<WalkTile> RunAlgoLowPadToTrolley(DanishTrolley TargetTrolley)
+        {
+            if (TargetTrolley == null)
+                return null;
+            WalkTile StartTile = WW.GetTile(agent.RPoint);
+            int[] tindices = WW.TileListIndices(TargetTrolley.RPoint, TargetTrolley.GetRSize());
+            int tx = tindices[0]; int ty = tindices[1]; int twidth = tindices[2]; int theight = tindices[3];
+            int[] dindices = WW.TileListIndices(agent.RPoint, agent.GetRSize());
+            int dx = dindices[0]; int dy = dindices[1]; int dwidth = dindices[2]; int dheight = dindices[3];
+
+            List<WalkTile> TargetTiles = new List<WalkTile>();
+            if (TargetTrolley.IsVertical) //Vertical target trolley's
+            {
+                int middlepoint = ty + ((theight - dheight) / 2);
+                int rightpoint = tx + twidth;
+                int leftpoint = tx - dwidth;
+
+                if (leftpoint > 0)
+                    TargetTiles.Add(WW.WalkTileList[leftpoint][middlepoint]); //top accesspoint to trolley
+                if (rightpoint < WW.WalkTileList.Count)
+                    TargetTiles.Add(WW.WalkTileList[rightpoint][middlepoint]); //bot accesspoint to trolley
+            }
+            else //Horizontal target trolley
+            {
+                int middlepoint = tx + ((twidth - dwidth) / 2);
+                int toppoint = ty - dheight;
+                int botpoint = ty + theight;
+
+                if (toppoint > 0)
+                    TargetTiles.Add(WW.WalkTileList[middlepoint][toppoint]); //top accesspoint to trolley
+                if (botpoint < WW.WalkTileList[0].Count)
+                    TargetTiles.Add(WW.WalkTileList[middlepoint][botpoint]); //bot accesspoint to trolley
+            }
+
+            return RunAlgo(StartTile, TargetTiles);
+        }
+
         public List<WalkTile> RunAlgoDistrToHarry(LangeHarry Harry)
         {
             WalkTile StartTile = WW.GetTile(agent.RPoint);
