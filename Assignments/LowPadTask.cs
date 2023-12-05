@@ -15,36 +15,32 @@ namespace FloorSimulation
         public LowPadTask(LowPad LP_, Floor floor_, string Goal_, DanishTrolley trolley_ = default): 
             base(Goal_, trolley_)
         {
+            LP = LP_;
             floor = floor_;
-
         }
 
         public override void PerformTask()
         {
-            /*
             if (!InTask && Goal == "TakeFullTrolley")
             {
-                TargetHub = floor.GetStartHub(DButer);
+                TargetHub = floor.GetStartHub(LP);
                 Trolley = TargetHub.PeekFirstTrolley();
                 if (Trolley != null)
                 {
-                    LowPad.TravelToTrolley(Trolley);
-                    if (DButer.route == null) //Route was not possible at this point. Try again later.
+                    LP.TravelToTrolley(Trolley);
+                    if (LP.route == null) //Route was not possible at this point. Try again later.
                         return;
                     InTask = true;
                     Travelling = true;
                 }
                 else //When the distribution is finished, travel to your savepoint.
                 {
-                    DButer.TravelToTile(DButer.WW.GetTile(DButer.SavePoint));
+                    LP.TravelToTile(LP.WW.GetTile(LP.SavePoint));
                     InTask = true;
                     Travelling = true;
                     TargetWasSaveTile = true;
                 }
             }
-            */
-            
-            throw new NotImplementedException();
         }
 
         public override void RouteCompleted()

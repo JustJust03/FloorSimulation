@@ -49,10 +49,9 @@ namespace FloorSimulation
 
         public abstract void DistributeTrolleys(List<DanishTrolley> dtList);
 
-        public abstract StartHub GetStartHub(Distributer db);
-
-        public abstract BufferHub GetBuffHubOpen(Distributer db);
-        public abstract BufferHub GetBuffHubFull(Distributer db);
+        public abstract StartHub GetStartHub(Agent agent);
+        public abstract BufferHub GetBuffHubOpen(Agent agent);
+        public abstract BufferHub GetBuffHubFull(Agent agent);
 
         public virtual void PlaceFullTrolleyHubs()
         {

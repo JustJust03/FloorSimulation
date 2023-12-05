@@ -45,7 +45,7 @@ namespace FloorSimulation
             return HubTrolleys[0];
         }
 
-        public override List<WalkTile> OpenSpots(Distributer DButer)
+        public override List<WalkTile> OpenSpots(Agent agent)
         {
             return new List<WalkTile> { Accesspoint[0] };
         }

@@ -182,12 +182,12 @@ namespace FloorSimulation
             return DistributionRegions;
         }
 
-        public override BufferHub GetBuffHubFull(Distributer db)
+        public override BufferHub GetBuffHubFull(Agent agent)
         {
             List<BufferHub> sortedList = floor.BuffHubs.OrderBy(obj =>
             {
-                int deltaX = obj.RFloorPoint.X - db.RPoint.X;
-                int deltaY = obj.RFloorPoint.Y - db.RPoint.Y;
+                int deltaX = obj.RFloorPoint.X - agent.RPoint.X;
+                int deltaY = obj.RFloorPoint.Y - agent.RPoint.Y;
                 if (obj.name == "Buffer hub")
                     deltaX = 0;
                 return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
@@ -196,20 +196,20 @@ namespace FloorSimulation
 
             foreach(BufferHub buffhub in sortedList) 
             {
-                if (buffhub.FilledSpots(db).Count > 0)
+                if (buffhub.FilledSpots(agent).Count > 0)
                     return buffhub;
             }
 
-            return base.GetBuffHubFull(db);
+            return base.GetBuffHubFull(agent);
         }
 
-        public override BufferHub GetBuffHubOpen(Distributer db)
+        public override BufferHub GetBuffHubOpen(Agent agent)
         {
             List<BufferHub> sortedList = floor.BuffHubs
             .OrderBy(obj =>
             {
-                int deltaX = obj.RFloorPoint.X - db.RPoint.X;
-                int deltaY = obj.RFloorPoint.Y - db.RPoint.Y;
+                int deltaX = obj.RFloorPoint.X - agent.RPoint.X;
+                int deltaY = obj.RFloorPoint.Y - agent.RPoint.Y;
                 if (obj.name == "Buffer hub")
                     deltaX = 0;
                 return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
@@ -218,11 +218,11 @@ namespace FloorSimulation
 
             foreach(BufferHub buffhub in sortedList) 
             {
-                if (buffhub.OpenSpots(db).Count > 0)
+                if (buffhub.OpenSpots(agent).Count > 0)
                     return buffhub;
             }
 
-            return base.GetBuffHubOpen(db);
+            return base.GetBuffHubOpen(agent);
         }
 
         public override void PlaceFullTrolleyHubs()

@@ -199,7 +199,6 @@ namespace FloorSimulation
             return;
         }
 
-
         /// <summary>
         /// Takes in the trolley in it's trolley list.
         /// </summary>
@@ -215,7 +214,7 @@ namespace FloorSimulation
         /// Should only be used by the bufferhub and the FullTrolleyHub
         /// This is for both vertical and horizontal hubs
         /// </summary>
-        public virtual List<WalkTile> OpenSpots(Distributer DButer)
+        public virtual List<WalkTile> OpenSpots(Agent agent)
         {
             return null;
         }
@@ -226,7 +225,7 @@ namespace FloorSimulation
         /// Should only be used by the bufferhub and the FullTrolleyHub
         /// This is for both vertical and horizontal hubs
         /// </summary>
-        public virtual List<WalkTile> FilledSpots(Distributer DButer)
+        public virtual List<WalkTile> FilledSpots(Agent agent)
         {
             return null;
         }

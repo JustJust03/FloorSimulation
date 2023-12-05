@@ -62,7 +62,7 @@ namespace FloorSimulation
         /// <summary>
         /// To which tile should the distributer walk to drop off this trolley.
         /// </summary>
-        public override List<WalkTile> OpenSpots(Distributer DButer)
+        public override List<WalkTile> OpenSpots(Agent agent)
         {
             List<WalkTile> OpenSpots = new List<WalkTile>();
             
@@ -76,7 +76,7 @@ namespace FloorSimulation
         /// <summary>
         /// To which tile should LangeHarry drive to pick finished trolleys up
         /// </summary>
-        public override List<WalkTile> FilledSpots(Distributer DButer)
+        public override List<WalkTile> FilledSpots(Agent agent)
         {
             List<WalkTile> FilledSpots = new List<WalkTile>();
             

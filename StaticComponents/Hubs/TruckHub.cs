@@ -49,7 +49,7 @@ namespace FloorSimulation.StaticComponents.Hubs
         /// <summary>
         /// Returns only the most right open spots in each row
         /// </summary>
-        public override List<WalkTile> OpenSpots(Distributer DButer)
+        public override List<WalkTile> OpenSpots(Agent agent)
         {
             List<WalkTile> OpenSpots = new List<WalkTile>();
             

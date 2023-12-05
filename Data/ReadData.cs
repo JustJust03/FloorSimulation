@@ -81,8 +81,6 @@ namespace FloorSimulation
             {
                 if (t.PlantList.Select(obj => obj.DestinationHub).Distinct().ToList().Count <= 1)
                 {
-                    if (t.PlantList.Count > 1)
-                        ;
                     continue;
                 }
                 if (!DistributeSecondDay && !t.PlantList.Select(obj => obj.DestinationHub.day).Contains(days[0]))

@@ -42,11 +42,6 @@ namespace FloorSimulation
                 MainTask = new RegionDistributerTask(this, "TakeFullTrolley", floor.FinishedD);
         }
 
-        public void Tick()
-        {
-            MainTask.PerformTask();
-        }
-
         /// <summary>
         /// Makes the distributer walk towards LangeHarry using it's accesspoints.
         /// </summary>

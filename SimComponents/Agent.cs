@@ -64,6 +64,10 @@ namespace FloorSimulation
             AWW = new AstarWalkWays(WW, this);
             WW.fill_tiles(RPoint, GetRSize(), this);
         }
+        public void Tick()
+        {
+            MainTask.PerformTask();
+        }
 
         public virtual Size GetRSize(bool OnlyAgentSize = false)
         {

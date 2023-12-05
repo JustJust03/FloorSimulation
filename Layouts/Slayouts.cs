@@ -114,19 +114,19 @@ namespace FloorSimulation
             floor.STHubs[0].AddUndistributedTrolleys(dtList);
         }
 
-        public override StartHub GetStartHub(Distributer db)
+        public override StartHub GetStartHub(Agent agent)
         {
             return floor.STHubs[0];
         }
 
-        public override BufferHub GetBuffHubOpen(Distributer db)
+        public override BufferHub GetBuffHubOpen(Agent agent)
         {
             return floor.BuffHubs[floor.BuffHubs.Count - 1];
         }
 
-        public override BufferHub GetBuffHubFull(Distributer db)
+        public override BufferHub GetBuffHubFull(Agent agent)
         {
-            floor.BuffHubs[floor.BuffHubs.Count - 1].FilledSpots(db);
+            floor.BuffHubs[floor.BuffHubs.Count - 1].FilledSpots(agent);
             return floor.BuffHubs[floor.BuffHubs.Count - 1];
         }
 
@@ -218,7 +218,7 @@ namespace FloorSimulation
             ;
         }
 
-        public override StartHub GetStartHub(Distributer db)
+        public override StartHub GetStartHub(Agent agent)
         {
             foreach (StartHub sth in floor.STHubs)
                 if (sth.TotalUndistributedTrolleys() > 0)
@@ -258,12 +258,12 @@ namespace FloorSimulation
             return "S-Layout grouped by Day first and Id second, With more small buffhubs in the street";
         }
 
-        public override BufferHub GetBuffHubFull(Distributer db)
+        public override BufferHub GetBuffHubFull(Agent agent)
         {
             List<BufferHub> sortedList = floor.BuffHubs.OrderBy(obj =>
             {
-                int deltaX = obj.RFloorPoint.X - db.RPoint.X;
-                int deltaY = obj.RFloorPoint.Y - db.RPoint.Y;
+                int deltaX = obj.RFloorPoint.X - agent.RPoint.X;
+                int deltaY = obj.RFloorPoint.Y - agent.RPoint.Y;
                 if (obj.name == "Buffer hub")
                     deltaX = 0;
                 return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
@@ -272,20 +272,20 @@ namespace FloorSimulation
 
             foreach(BufferHub buffhub in sortedList) 
             {
-                if (buffhub.FilledSpots(db).Count > 0)
+                if (buffhub.FilledSpots(agent).Count > 0)
                     return buffhub;
             }
 
-            return base.GetBuffHubFull(db);
+            return base.GetBuffHubFull(agent);
         }
 
-        public override BufferHub GetBuffHubOpen(Distributer db)
+        public override BufferHub GetBuffHubOpen(Agent agent)
         {
             List<BufferHub> sortedList = floor.BuffHubs
             .OrderBy(obj =>
             {
-                int deltaX = obj.RFloorPoint.X - db.RPoint.X;
-                int deltaY = obj.RFloorPoint.Y - db.RPoint.Y;
+                int deltaX = obj.RFloorPoint.X - agent.RPoint.X;
+                int deltaY = obj.RFloorPoint.Y - agent.RPoint.Y;
                 if (obj.name == "Buffer hub")
                     deltaX = 0;
                 return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
@@ -294,11 +294,11 @@ namespace FloorSimulation
 
             foreach(BufferHub buffhub in sortedList) 
             {
-                if (buffhub.OpenSpots(db).Count > 0)
+                if (buffhub.OpenSpots(agent).Count > 0)
                     return buffhub;
             }
 
-            return base.GetBuffHubOpen(db);
+            return base.GetBuffHubOpen(agent);
         }
 
         public override void PlaceFullTrolleyHubs()
@@ -358,14 +358,14 @@ namespace FloorSimulation
             base.PlaceStartHubs();
         }
 
-        public override StartHub GetStartHub(Distributer db)
+        public override StartHub GetStartHub(Agent agent)
         {
             if (floor.STHubs.Count > 2)
                 throw new NotImplementedException("This function has not been implemented yet");
 
-            StartHub s = floor.STHubs[db.id % 2];
+            StartHub s = floor.STHubs[agent.id % 2];
             if (s.StartHubEmpty)
-                return floor.STHubs[(db.id + 1) % 2];
+                return floor.STHubs[(agent.id + 1) % 2];
             return s;
         }
 
@@ -437,14 +437,14 @@ namespace FloorSimulation
 
             floor.HubList = floor.HubList.Concat(floor.FTHubs).ToList();
         }
-        public override BufferHub GetBuffHubOpen(Distributer db)
+        public override BufferHub GetBuffHubOpen(Agent agent)
         {
             return floor.BuffHubs[floor.BuffHubs.Count - 1];
         }
 
-        public override BufferHub GetBuffHubFull(Distributer db)
+        public override BufferHub GetBuffHubFull(Agent agent)
         {
-            floor.BuffHubs[floor.BuffHubs.Count - 1].FilledSpots(db);
+            floor.BuffHubs[floor.BuffHubs.Count - 1].FilledSpots(agent);
             return floor.BuffHubs[floor.BuffHubs.Count - 1];
         }
     }

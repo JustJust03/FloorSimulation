@@ -109,14 +109,14 @@ namespace FloorSimulation
         /// <summary>
         /// To which tile should the distributer walk to drop off this trolley.
         /// </summary>
-        public override List<WalkTile> OpenSpots(Distributer DButer)
+        public override List<WalkTile> OpenSpots(Agent agent)
         {
             List<WalkTile> OpenSpots = new List<WalkTile>();
 
             if (VerticalTrolleys)
             {
-                if (DButer.IsOnHarry)
-                    return LangeHarryOpenSpots(DButer);
+                if (agent.IsOnHarry)
+                    return LangeHarryOpenSpots(agent);
                 for (int coli = NTrolleysInRow - 1; coli >= 0; coli--)
                     for (int rowi = 0; rowi < NRows; rowi++)
                         if (Trolleyarr[rowi, coli] == null)
@@ -139,7 +139,7 @@ namespace FloorSimulation
             return OpenSpots;
         }
 
-        private List<WalkTile> LangeHarryOpenSpots(Distributer DButer)
+        private List<WalkTile> LangeHarryOpenSpots(Agent agent)
         {
             //Fills the main buffer hub from right to left end up to down.
             List<WalkTile> OpenSpots = new List<WalkTile>();
@@ -168,9 +168,9 @@ namespace FloorSimulation
         /// <summary>
         /// To which tile should the distributer walk to take an empty trolley.
         /// </summary>
-        public override List<WalkTile> FilledSpots(Distributer DButer)
+        public override List<WalkTile> FilledSpots(Agent agent)
         {
-            if (DButer.IsOnHarry)
+            if (agent.IsOnHarry)
                 return LangeHarryFilledSpots();
 
             List<WalkTile> CSpots = new List<WalkTile>();
@@ -190,7 +190,7 @@ namespace FloorSimulation
             if (CSpots.Count == 0 && name == "Buffer hub")
             {
                 SpawnEmptyTrolleys(5);
-                return FilledSpots(DButer);
+                return FilledSpots(agent);
             }
             return CSpots;
         }

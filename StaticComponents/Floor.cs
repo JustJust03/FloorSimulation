@@ -65,11 +65,11 @@ namespace FloorSimulation
             Display = di;
 
             //layout = new SLayoutDayId(this, rd);
-            layout = new SLayoutDayIdBuffhub(this, rd);
+            //layout = new SLayoutDayIdBuffhub(this, rd);
             //layout = new SLayoutDayIdBuffhub2Streets(this, rd);
             //layout = new SLayoutDayId2Streets(this, rd);
 
-            //layout = new LowPadSlayoutBuffhub(this, rd);
+            layout = new LowPadSlayoutBuffhub(this, rd);
 
             Size PixelFloorSize = new Size((int)(layout.RealFloorWidth * ScaleFactor),
                                            (int)(layout.RealFloorHeight * ScaleFactor));
@@ -239,19 +239,19 @@ namespace FloorSimulation
             return ClosestHub;
         }
 
-        public StartHub GetStartHub(Distributer db)
+        public StartHub GetStartHub(Agent agent)
         {
-            return layout.GetStartHub(db);
+            return layout.GetStartHub(agent);
         }
 
-        public BufferHub GetBuffHubFull(Distributer db)
+        public BufferHub GetBuffHubFull(Agent agent)
         {
-            return layout.GetBuffHubFull(db);
+            return layout.GetBuffHubFull(agent);
         }
 
-        public BufferHub GetBuffHubOpen(Distributer db)
+        public BufferHub GetBuffHubOpen(Agent agent)
         {
-            return layout.GetBuffHubOpen(db);
+            return layout.GetBuffHubOpen(agent);
         }
 
         public int TotalUndistributedTrolleys()
