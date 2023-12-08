@@ -36,8 +36,9 @@ namespace FloorSimulation
         public const float ScaleFactor = 0.25f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
         public Layout layout;
 
+        public bool TickingHeatMap = false;
         public const int NDistributers = 32;
-        public const int SecondsToFullOperation = 0; //How long to wait before all distributers are running
+        public const int SecondsToFullOperation = 240; //How long to wait before all distributers are running
         public int OperationalInterval; //How long to wait between distributers
 
         public List<DanishTrolley> TrolleyList; // A list with all the trolleys that are on the floor.
@@ -48,8 +49,10 @@ namespace FloorSimulation
         public List<LowPadAccessHub> LPHubs;
         public TruckHub TrHub;
         public List<Distributer> DistrList; // A list with all the distributers that are on the floor.
+        public Distributer LHDriver;
         public List<LowPad> LPList;
         public List<Distributer> TotalDistrList;
+        public List<LowPad> TotalLPList;
         public LangeHarry FirstHarry;
         public WalkWay FirstWW;
         public WalkWayHeatMap WWHeatMap;
@@ -97,8 +100,11 @@ namespace FloorSimulation
             FirstHarry = new LangeHarry(0, this, FirstWW, new Point(FirstWW.RSizeWW.Width - 500, 1700));
 
             DistrList = new List<Distributer>();
-            TotalDistrList = new List<Distributer>();
             LPList = new List<LowPad>();
+
+            TotalDistrList = new List<Distributer>();
+            TotalLPList = new List<LowPad>();
+
             layout.PlaceDistributers(NDistributers, new Point(FirstWW.RSizeWW.Width - 1000, 2000));
             OperationalInterval = SecondsToFullOperation / NDistributers;
 
@@ -117,21 +123,52 @@ namespace FloorSimulation
             ElapsedSimTime = ElapsedSimTime.Add(TimeSpan.FromMilliseconds(MilisecondsPerTick * SpeedMultiplier));
 
             if ((int)ElapsedSimTime.TotalSeconds <= SecondsToFullOperation + 2)
-                AddDistr((int)ElapsedSimTime.TotalSeconds);
+                AddAgent((int)ElapsedSimTime.TotalSeconds);
 
             foreach (Distributer d in DistrList)
                 d.Tick();
+            if (LHDriver != null)
+                LHDriver.Tick();
 
             foreach (LowPad lp in LPList)
                 lp.Tick();
-            
 
-            WWHeatMap.TickHeatMap();
+            if (TickingHeatMap)
+                WWHeatMap.TickHeatMap();
             Display.Invalidate();
             Invalidate();
         }
 
-        public void AddDistr(int seconds)
+        private void AddAgent(int seconds)
+        {
+            if (layout.NLowpads > 0)
+                AddLowPad(seconds);
+            else
+                AddDistr(seconds);
+        }
+
+        private void AddLowPad(int seconds)
+        {
+            if(TotalLPList.Count ==  0) 
+                return;
+            if(OperationalInterval == 0)
+            {
+                LPList = TotalLPList.ToList();
+                TotalLPList.Clear();
+                return;
+            }
+            int TargetAmntLP = seconds / OperationalInterval;
+            if (TargetAmntLP > layout.NLowpads)
+                TargetAmntLP = layout.NLowpads;
+            if(LPList.Count < TargetAmntLP)
+            {
+                LPList.Add(TotalLPList[0]);
+                TotalLPList.RemoveAt(0);
+                AddLowPad(seconds);
+            }
+        }
+
+        private void AddDistr(int seconds)
         {
             if(TotalDistrList.Count ==  0) 
                 return;
@@ -155,12 +192,17 @@ namespace FloorSimulation
         public void DrawOccupiance(object sender, EventArgs e)
         {
             FirstWW.DevTools = !FirstWW.DevTools;
+            if (!TickingHeatMap)
+                Invalidate();
         }
 
         public void DrawHeatMap(object sender, EventArgs e)
         {
-            FirstWW.DrawHeatMap = !FirstWW.DrawHeatMap;
-            Invalidate();
+            if (TickingHeatMap)
+            {
+                FirstWW.DrawHeatMap = !FirstWW.DrawHeatMap;
+                Invalidate();
+            }
         }
 
         /// <summary>
@@ -282,6 +324,16 @@ namespace FloorSimulation
                 if(Hub.name == "Buffer hub")
                     continue;
                 else if(Hub.AmountOfTrolleys() >= MinimumTrolleys)
+                    return Hub;
+            return null;
+        }
+
+        public BufferHub HasEmptySmallBufferHub(int MaximumTrolleys) 
+        {
+            foreach (BufferHub Hub in BuffHubs)
+                if(Hub.name == "Buffer hub")
+                    continue;
+                else if(Hub.AmountOfTrolleys() <= MaximumTrolleys)
                     return Hub;
             return null;
         }

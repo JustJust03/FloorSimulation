@@ -152,7 +152,11 @@ namespace FloorSimulation
                         WalkTile wt = HubAccessPoints[rowi, coli - 1];
                         if (wt == null)
                             wt = HubAccessPoints[rowi, coli - 2];
-                        WalkTile DownTile = WW.GetTile(new Point(wt.Rpoint.X - 280, wt.Rpoint.Y + 40));
+                        WalkTile DownTile;
+                        if(VerticalTrolleys)
+                            DownTile = WW.GetTile(new Point(wt.Rpoint.X - 280, wt.Rpoint.Y + 40));
+                        else
+                            DownTile = WW.GetTile(new Point(wt.Rpoint.X - 40, wt.Rpoint.Y));
 
                         OpenSpots.Add(DownTile);
                         return OpenSpots;
@@ -164,6 +168,7 @@ namespace FloorSimulation
 
             return OpenSpots;
         }
+
 
         /// <summary>
         /// To which tile should the distributer walk to take an empty trolley.
@@ -281,10 +286,12 @@ namespace FloorSimulation
             }
         }
 
+
         public override void LHTakeVTrolleyIn(DanishTrolley dt, Point AgentRPoint)
         {
             int ArrIndexx = Array.IndexOf(HubAccessPointsX, AgentRPoint.X + 280);
             int ArrIndexy = Array.IndexOf(HubAccessPointsY, AgentRPoint.Y - 40);
+
             Trolleyarr[ArrIndexy, ArrIndexx] = dt;
             dt.Units = 0;
             dt.NStickers = 2;
@@ -298,6 +305,18 @@ namespace FloorSimulation
                 for (int coli = NTrolleysInRow - 1; coli >= 0; coli--)
                     Trolleyarr[NRows - 1, coli] = null;
             }
+        }
+
+        public override void LHTakeHTrolleyIn(DanishTrolley dt, Point AgentRPoint)
+        {
+            int ArrIndexx = Array.IndexOf(HubAccessPointsX, AgentRPoint.X + 40);
+            int ArrIndexy = Array.IndexOf(HubAccessPointsY, AgentRPoint.Y);
+
+            Trolleyarr[ArrIndexy, ArrIndexx] = dt;
+            dt.Units = 0;
+            dt.NStickers = 2;
+            dt.TotalStickers = 2;
+            dt.IsVertical = false;
         }
 
         public override void TakeHTrolleyIn(DanishTrolley dt, Point AgentRPoint)

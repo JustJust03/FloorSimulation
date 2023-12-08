@@ -91,6 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assignments\DistributerTask.cs" />
+    <Compile Include="Assignments\LHDriverTask.cs" />
     <Compile Include="Assignments\RegionDistributerTask.cs" />
     <Compile Include="Assignments\LowPadTask.cs" />
     <Compile Include="Assignments\Task.cs" />

@@ -14,7 +14,7 @@ namespace FloorSimulation
 
         public LowPadSlayoutBuffhub(Floor floor_, ReadData rData) : base(floor_, rData)
         {
-            NLowpads = 1;
+            NLowpads = 10;
         }
         public override string ToString()
         {
@@ -105,7 +105,9 @@ namespace FloorSimulation
         public override void PlaceDistributers(int amount, Point StartPoint)
         {
             if (NLowpads > 0)
-                PlaceLowPads(new Point(50, 50));
+                PlaceLowPads(new Point(floor.FirstWW.RSizeWW.Width - 1000, 2000));
+            floor.LHDriver = new Distributer(-8, floor, floor.FirstWW, Rpoint_: floor.FirstHarry.RPoint);
+
         }
 
         private void PlaceLowPads(Point StartPoint)
@@ -117,7 +119,7 @@ namespace FloorSimulation
             for(int i  = 0; i < NLowpads; i++)
             {
                 lp = new LowPad(i, floor, floor.FirstWW, Rpoint_: new Point(x, y), MaxWaitedTicks_: 100 - i);
-                floor.LPList.Add(lp);
+                floor.TotalLPList.Add(lp);
                 x += 200;
                 if (x > floor.FirstWW.RSizeWW.Width - 250)
                 {
@@ -215,7 +217,7 @@ namespace FloorSimulation
                     return buffhub;
             }
 
-            return base.GetBuffHubOpen(agent);
+            return null;
         }
 
         public override void PlaceFullTrolleyHubs()

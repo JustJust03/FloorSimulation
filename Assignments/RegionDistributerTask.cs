@@ -245,11 +245,6 @@ namespace FloorSimulation
                 {
                     Goal = "TravelToLP";
                     DButer.TravelToTile(RegionHub.DbOpenSpots());
-                    if(DButer.route == null)
-                    {
-                        FailRoute();
-                        return;
-                    }
 
                     InTask = true;
                     Travelling = true;

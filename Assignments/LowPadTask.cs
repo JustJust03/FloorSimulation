@@ -12,6 +12,7 @@ namespace FloorSimulation
         LowPad LP;
         public const bool ContinueBeforeDistribution = false; //Travel to the next hub as soon as the distributer takes the plant.
         private List<WalkTile> TargetTiles = new List<WalkTile>();
+        int WaitedTicks = 0;
 
         public LowPadTask(LowPad LP_, Floor floor_, string Goal_, DanishTrolley trolley_ = default): 
             base(Goal_, trolley_)
@@ -29,8 +30,6 @@ namespace FloorSimulation
                 if (Trolley != null)
                 {
                     LP.TravelToTrolley(Trolley);
-                    if (LP.route == null) //Route was not possible at this point. Try again later.
-                        return;
                     InTask = true;
                     Travelling = true;
                 }
@@ -46,11 +45,6 @@ namespace FloorSimulation
             {
                 TargetTiles = LP.ClosestRegion(LP.trolley.TargetRegions);
                 LP.TravelToClosestTile(TargetTiles);
-                if(LP.route == null)
-                {
-                    FailRoute();
-                    return;
-                }
 
                 TargetHub.GiveTrolley();
                 TargetHub.Targeted = false;
@@ -63,17 +57,31 @@ namespace FloorSimulation
 
                 TargetTiles = LP.ClosestRegion(LP.trolley.TargetRegions);
                 LP.TravelToClosestTile(TargetTiles);
-
-                if(LP.route == null)
-                {
-                    FailRoute();
-                    return;
-                }
-
                 TargetHub.GiveTrolley();
                 TargetHub.Targeted = false;
+
                 InTask = true;
                 Travelling = true;
+            }
+
+            if (Waiting)
+            {
+                FailRoute();
+                if (LP.route != null)
+                    WaitedTicks = 0;
+
+                WaitedTicks++;
+
+                if (WaitedTicks > 100)
+                {
+                    WaitedTicks = 0;
+                    LP.TravelToTile(LP.WW.GetTile(LP.SavePoint));
+                    Waiting = false;
+                    InTask = true;
+                    Travelling = true;
+                    TargetWasSaveTile = true;
+                }
+                return;
             }
 
             if (InTask && Travelling)
@@ -82,6 +90,13 @@ namespace FloorSimulation
 
         public override void RouteCompleted()
         {
+            if (TargetWasSaveTile)
+            {
+                TargetWasSaveTile = false;
+                FailRoute();
+                return;
+            }
+
             if (Goal == "TakeFullTrolley")
                 TakeFullTrolley();
             else if (Goal == "TravelToLPAccessHub")
@@ -102,11 +117,19 @@ namespace FloorSimulation
             {
                 TargetTiles = LP.ClosestRegion(LP.trolley.TargetRegions);
                 LP.TravelToClosestTile(TargetTiles);
-                if(LP.route == null)
-                {
-                    FailRoute();
-                    return;
-                }
+            }
+
+            if (LP.route == null)
+                Waiting = true;
+            else if (LP.route.Count == 0)
+                RouteCompleted();
+            else
+            {
+                if (Waiting)
+                    //AInfo.UpdateWachtFreq();
+                    ;
+                LP.TickWalk();
+                Waiting = false;
             }
         }
 

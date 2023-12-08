@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
 using System.Collections.Generic;
+using FloorSimulation.Assignments;
 
 namespace FloorSimulation
 {
@@ -43,6 +44,8 @@ namespace FloorSimulation
 
             if (floor.layout.NLowpads == 0)
                 MainTask = new DistributerTask(this, "TakeFullTrolley", floor.FinishedD);
+            else if(id_ == -8)
+                MainTask = new LHDriverTask(this);
             else
                 MainTask = new RegionDistributerTask(this, "TakeFullTrolley", floor.FinishedD, RegionHub);
         }

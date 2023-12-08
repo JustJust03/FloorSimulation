@@ -200,6 +200,11 @@ namespace FloorSimulation
             return;
         }
 
+        public virtual void LHTakeHTrolleyIn(DanishTrolley t, Point DeliveryPoint = default)
+        {
+            return;
+        }
+
         /// <summary>
         /// Takes in the trolley in it's trolley list.
         /// </summary>

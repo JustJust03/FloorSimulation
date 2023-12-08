@@ -63,7 +63,8 @@ namespace FloorSimulation
             trolley = null;
 
             AWW = new AstarWalkWays(WW, this);
-            WW.fill_tiles(RPoint, GetRSize(), this);
+            if(RPoint.X != 0 || RPoint.Y != 0)
+                WW.fill_tiles(RPoint, GetRSize(), this);
         }
         public void Tick()
         {
@@ -157,6 +158,7 @@ namespace FloorSimulation
 
                     if (!AWW.IsTileAccessible(destination)) //Route failed, there was something occupying the calculated route
                     {
+                        route = null;
                         ticktravel = 0;
                         MainTask.FailRoute();
                         return;
