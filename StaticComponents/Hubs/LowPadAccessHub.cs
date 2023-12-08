@@ -9,7 +9,6 @@ namespace FloorSimulation
 {
     internal class LowPadAccessHub : Hub
     {
-        public bool Targeted = false;
         public List<ShopHub> shops = new List<ShopHub>();
         WalkTile DbAccesspoint;
 

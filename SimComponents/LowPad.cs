@@ -9,7 +9,7 @@ namespace FloorSimulation
 {
     internal class LowPad : Agent
     {
-        public const float RIDESPEED = 65f; // cm/s
+        public const float RIDESPEED = 110f; // cm/s
 
         public LowPad(int id_, Floor floor_, WalkWay WW_, Point Rpoint_ = default, bool IsVertical_ = true, int MaxWaitedTicks_ = 100):
             base(id_, floor_, WW_, "LowPad", RIDESPEED, Rpoint_, IsVertical_, MaxWaitedTicks_)
@@ -98,6 +98,7 @@ namespace FloorSimulation
 
         public override void TakeTrolleyIn(DanishTrolley t)
         {
+            WW.unfill_tiles(RPoint, GetRSize());
             trolley = t;
             RPoint = t.RPoint;
         }
@@ -107,17 +108,12 @@ namespace FloorSimulation
             route = AWW.RunAlgoLowPadToTrolley(t);
         }
 
-        public LowPadAccessHub ClosestRegion(List<LowPadAccessHub> Regions)
+        public List<WalkTile> ClosestRegion(List<LowPadAccessHub> Regions)
         {
-            LowPadAccessHub ClosestHub = Regions[0];
-            foreach (LowPadAccessHub LPhub in Regions)
-                if (!LPhub.Targeted && Math.Abs(RPoint.X - LPhub.RFloorPoint.X) < Math.Abs(RPoint.X - ClosestHub.RFloorPoint.X))
-                    ClosestHub = LPhub;
-            if (ClosestHub.Targeted) //All regions were targeted already.
-                return null;
-
-            ClosestHub.Targeted = true;
-            return ClosestHub;
+            return Regions
+                .Where(obj => !obj.Targeted)
+                .Select(obj => obj.OpenSpots(this)[0])
+                .ToList();
         }
     }
 }

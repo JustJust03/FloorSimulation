@@ -10,7 +10,6 @@ namespace FloorSimulation
     internal class DistributerTask : Task
     {
         public LangeHarry Harry;
-        public bool WasOnTopLeft;
 
         private DanishTrolley OldTrolley; //Is only used to save which trolley you were working on when delivering a full trolley.
         private Hub OldTargetHub; //Is only used to save which Shop you were working on when delivering a full trolley.

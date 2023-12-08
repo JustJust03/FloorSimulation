@@ -10,6 +10,8 @@ namespace FloorSimulation
     {
         Floor floor;
         LowPad LP;
+        public const bool ContinueBeforeDistribution = false; //Travel to the next hub as soon as the distributer takes the plant.
+        private List<WalkTile> TargetTiles = new List<WalkTile>();
 
         public LowPadTask(LowPad LP_, Floor floor_, string Goal_, DanishTrolley trolley_ = default): 
             base(Goal_, trolley_)
@@ -40,17 +42,36 @@ namespace FloorSimulation
                     TargetWasSaveTile = true;
                 }
             }
-            else if(!InTask && Goal == "TravelToLPAccessHub" && LP.trolley.FinishedRegion((LowPadAccessHub)TargetHub))
+            else if(ContinueBeforeDistribution && !InTask && Goal == "TravelToLPAccessHub" && LP.trolley.FinishedRegion((LowPadAccessHub)TargetHub))
             {
-                //TODO: Remove this one from the hub
-                TargetHub = LP.ClosestRegion(LP.trolley.TargetRegions);
-                LP.TravelToClosestTile(TargetHub.OpenSpots(LP));
+                TargetTiles = LP.ClosestRegion(LP.trolley.TargetRegions);
+                LP.TravelToClosestTile(TargetTiles);
                 if(LP.route == null)
                 {
                     FailRoute();
                     return;
                 }
 
+                TargetHub.GiveTrolley();
+                TargetHub.Targeted = false;
+                InTask = true;
+                Travelling = true;
+            }
+            else if(!InTask && Goal == "TravelToLPAccessHub" && LP.trolley.ContinueDistribution)
+            {
+                LP.trolley.ContinueDistribution = false;
+
+                TargetTiles = LP.ClosestRegion(LP.trolley.TargetRegions);
+                LP.TravelToClosestTile(TargetTiles);
+
+                if(LP.route == null)
+                {
+                    FailRoute();
+                    return;
+                }
+
+                TargetHub.GiveTrolley();
+                TargetHub.Targeted = false;
                 InTask = true;
                 Travelling = true;
             }
@@ -69,8 +90,24 @@ namespace FloorSimulation
 
         public override void FailRoute()
         {
-            return;
-            //throw new NotImplementedException();
+            TargetWasSaveTile = false;
+            if(Goal == "TakeFullTrolley")
+            {
+                if(TargetHub.PeekFirstTrolley() == null) // Distribution has been completed.
+                    return;
+                InTask = false;
+                Travelling = false;
+            }
+            else if(Goal == "TravelToLPAccessHub")
+            {
+                TargetTiles = LP.ClosestRegion(LP.trolley.TargetRegions);
+                LP.TravelToClosestTile(TargetTiles);
+                if(LP.route == null)
+                {
+                    FailRoute();
+                    return;
+                }
+            }
         }
 
         public override void DistributionCompleted()
@@ -93,8 +130,8 @@ namespace FloorSimulation
             DanishTrolley t = TargetHub.GiveTrolley();
             LP.TakeTrolleyIn(t);
 
-            TargetHub = LP.ClosestRegion(LP.trolley.TargetRegions);
-            LP.TravelToClosestTile(TargetHub.OpenSpots(LP));
+            TargetTiles = LP.ClosestRegion(LP.trolley.TargetRegions);
+            LP.TravelToClosestTile(TargetTiles);
             if(LP.route == null)
             {
                 FailRoute();
@@ -107,10 +144,15 @@ namespace FloorSimulation
 
         private void TravelToLPAccessHub()
         {
+            TargetHub = floor.AccessPointPerRegion[LP.RPoint];
             TargetHub.TakeVTrolleyIn(LP.trolley);
 
-            if(LP.trolley.TargetRegions.Count == 1) //Change the goal.
-                throw new NotImplementedException();
+            if(LP.trolley.TargetRegions.Count == 1)
+            {
+                LP.GiveTrolley();
+                InTask = false;
+                Goal = "TakeFullTrolley";
+            }
             else
             {
                 InTask = false;

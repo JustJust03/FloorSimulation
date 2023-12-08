@@ -73,14 +73,14 @@ namespace FloorSimulation
                     HighestY = LastHub.RFloorPoint.Y + FirstHub.RHubSize.Height;
                     LowestY = FirstHub.RFloorPoint.Y;
                     HubX = FirstHub.RFloorPoint.X - 160;
-                    DBX = FirstHub.RFloorPoint.X - 100;
+                    DBX = FirstHub.RFloorPoint.X - 40;
                 }
                 else
                 {
                     HighestY = FirstHub.RFloorPoint.Y + FirstHub.RHubSize.Height;
                     LowestY = LastHub.RFloorPoint.Y;
                     HubX = FirstHub.RFloorPoint.X + FirstHub.RHubSize.Width + 100;
-                    DBX = FirstHub.RFloorPoint.X + FirstHub.RHubSize.Width + 40;
+                    DBX = FirstHub.RFloorPoint.X + FirstHub.RHubSize.Width + 10;
                 }
 
                 int HubY = LowestY + ((HighestY - LowestY) / 2) - 70;
@@ -88,6 +88,8 @@ namespace FloorSimulation
                 LowPadAccessHub LPAHub = new LowPadAccessHub("LowPad Access Hub (X, Y): (" + HubX + ", " + HubY + ")",
                     id, new Point(HubX, HubY), floor, new Size(50, 130), region);
                 db = new Distributer(id, floor, floor.FirstWW, Rpoint_: new Point(DBX, HubY), MaxWaitedTicks_: 100 - id, IsVertical_: false, RHub: LPAHub);
+
+                floor.AccessPointPerRegion[LPAHub.OpenSpots(default)[0].Rpoint] = LPAHub;
 
                 floor.DistrList.Add(db);
                 floor.HubList.Add(LPAHub);
@@ -124,7 +126,6 @@ namespace FloorSimulation
                     if(y > floor.FirstWW.RSizeWW.Height - 250)
                         break;
                 }
-                floor.LPList.Add(lp);
             }
         }
 

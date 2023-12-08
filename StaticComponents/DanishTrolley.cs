@@ -42,6 +42,8 @@ namespace FloorSimulation
         public List<plant> PlantList;
         public List<LowPadAccessHub> TargetRegions;
 
+        public bool ContinueDistribution = false; //The distributer can flip this bool, to tell the lowpad to continue travelling.
+
         /// <summary>
         /// Constructer initializing the variables
         /// Use the image to generate the sim and real sizes.

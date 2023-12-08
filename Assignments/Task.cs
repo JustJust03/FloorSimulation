@@ -13,6 +13,7 @@ namespace FloorSimulation
         public DanishTrolley Trolley;
         public Hub TargetHub;
         public bool TargetWasSaveTile = false;
+        public bool WasOnTopLeft;
 
         public AnalyzeInfo AInfo;
 

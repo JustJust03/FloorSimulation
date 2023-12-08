@@ -26,6 +26,7 @@ namespace FloorSimulation
         protected int Rslack = 20;
         public bool HasLeftAccess = false;
         public bool VerticalTrolleys;
+        public bool Targeted = false;
         protected List<WalkTile> Accesspoint;
 
         public Hub(string name_, int id_, Point FPoint_, Floor floor_, Size RHubSize_, int initial_trolleys = 0, 

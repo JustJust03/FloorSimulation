@@ -55,6 +55,7 @@ namespace FloorSimulation
         public WalkWayHeatMap WWHeatMap;
 
         public Dictionary<ShopHub, LowPadAccessHub> ShopHubPerRegion;
+        public Dictionary<Point, LowPadAccessHub> AccessPointPerRegion;
 
         /// <summary>
         /// Sets the pixel floor size by using the ScaleFactor.
@@ -88,6 +89,7 @@ namespace FloorSimulation
             LPHubs = new List<LowPadAccessHub>();
 
             ShopHubPerRegion = new Dictionary<ShopHub, LowPadAccessHub>();
+            AccessPointPerRegion = new Dictionary<Point, LowPadAccessHub>();
 
             FirstWW = new WalkWay(new Point(0, 0), new Size(layout.RealFloorWidth, layout.RealFloorHeight), this, DevTools_: false);
             WWHeatMap = new WalkWayHeatMap(FirstWW, this);
