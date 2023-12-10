@@ -231,7 +231,7 @@ namespace FloorSimulation
             if(trolley.IsVertical)
                 return new Size(Math.Max(VRAgentSize.Width, trolley.GetRSize().Width), VRAgentSize.Height + trolley.GetRSize().Height);
             
-            return new Size(VRAgentSize.Width + trolley.GetRSize().Width, Math.Max(HRAgentSize.Height, trolley.GetRSize().Height));
+            return new Size(HRAgentSize.Width + trolley.GetRSize().Width, Math.Max(HRAgentSize.Height, trolley.GetRSize().Height));
         }
 
         protected override void RotateAgentOnly()

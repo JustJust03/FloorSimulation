@@ -125,7 +125,10 @@ namespace FloorSimulation
                 dt.SimPoint = floor.ConvertToSimPoint(dt.RPoint);
             }
             else
-                throw new Exception("Harry can't take in tolleys in horizontal mode yet");
+            {
+                dt.RPoint = new Point(RPoint.X + GetRSize().Width - (TrolleyList.Count() * 57), RPoint.Y);
+                dt.SimPoint = floor.ConvertToSimPoint(dt.RPoint);
+            }
             return TrolleyList.Count() >= MaxTrolleysPerHarry;
         }
 
@@ -184,7 +187,7 @@ namespace FloorSimulation
                 if (t.IsVertical)
                     t.RPoint = new Point(RPoint.X + GetRSize().Width - 57 * (MaxTrolleysPerHarry - i), RPoint.Y);
                 else
-                    throw new Exception("YOU SHOULDN'T ROTATE THIS TO HORIZONTAL WHEN THERE ARE TROLLEYS ON HARRY");
+                    t.RPoint = new Point(RPoint.X, RPoint.Y + GetRSize().Height - 57 * (MaxTrolleysPerHarry - i));
             }
         }
     }

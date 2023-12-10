@@ -53,7 +53,7 @@ namespace FloorSimulation.Assignments
                     return;
             }
 
-            if(DButer.floor.HasEmptySmallBufferHub(2) != null)
+            if(DButer.floor.HasEmptySmallBufferHub(0) != null)
             {
                 TargetHub = floor.BuffHubs[floor.BuffHubs.Count -1];
                 if(TargetHub.AmountOfTrolleys() == 0)
@@ -162,9 +162,11 @@ namespace FloorSimulation.Assignments
             }
             else
             {
-                TargetHub = floor.HasEmptySmallBufferHub(2);
+                TargetHub = floor.HasEmptySmallBufferHub(0);
                 if(TargetHub == null)
                     TargetHub = DButer.floor.BuffHubs[DButer.floor.BuffHubs.Count - 1];
+                if (!Harry.IsVertical)
+                    DButer.RotateDistributerAndHarry();
 
                 DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer)); //Automaticaly checks if dbuter is on harry, which it is.
                 Goal = "LHDeliverEmptyTrolleys";
@@ -195,9 +197,9 @@ namespace FloorSimulation.Assignments
             }
             else
             {
-                if(TargetHub.AmountOfTrolleys() == 4)
+                if(TargetHub.AmountOfTrolleys() == 2)
                 {
-                    TargetHub = floor.HasEmptySmallBufferHub(2);
+                    TargetHub = floor.HasEmptySmallBufferHub(0);
                     if(TargetHub == null)
                         TargetHub = floor.BuffHubs[floor.BuffHubs.Count - 1];
                 }

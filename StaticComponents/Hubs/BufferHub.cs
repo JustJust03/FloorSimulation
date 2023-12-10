@@ -112,6 +112,8 @@ namespace FloorSimulation
         public override List<WalkTile> OpenSpots(Agent agent)
         {
             List<WalkTile> OpenSpots = new List<WalkTile>();
+            if (agent.IsOnHarry)
+                return LangeHarryOpenSpots(agent);
 
             if (VerticalTrolleys)
             {
@@ -133,6 +135,8 @@ namespace FloorSimulation
                         if (Trolleyarr[rowi, coli] == null)
                         {
                             OpenSpots.Add(HubAccessPoints[rowi, coli]);
+                            if (floor.layout.NLowpads > 0)
+                                return OpenSpots;
                         }
             }
 
@@ -140,6 +144,33 @@ namespace FloorSimulation
         }
 
         private List<WalkTile> LangeHarryOpenSpots(Agent agent)
+        {
+            if (VerticalTrolleys)
+                return LangeHarryOpenSpotsMainBuffer(agent);
+            return LangeHarryOpenSpotsSmallBuffer(agent);
+        }
+
+        private List<WalkTile> LangeHarryOpenSpotsSmallBuffer(Agent agent)
+        {
+            //Fills the main buffer hub from right to left end up to down.
+            List<WalkTile> OpenSpots = new List<WalkTile>();
+
+            for (int rowi = 0; rowi < NRows; rowi++)
+            {
+                if (Trolleyarr[rowi, 0] == null)
+                {
+                    WalkTile wt = HarryHubAccessPoints[rowi];
+
+                    OpenSpots.Add(wt);
+                    return OpenSpots;
+                }
+            }
+
+            return OpenSpots;
+        }
+
+
+        private List<WalkTile> LangeHarryOpenSpotsMainBuffer(Agent agent)
         {
             //Fills the main buffer hub from right to left end up to down.
             List<WalkTile> OpenSpots = new List<WalkTile>();
@@ -153,10 +184,8 @@ namespace FloorSimulation
                         if (wt == null)
                             wt = HubAccessPoints[rowi, coli - 2];
                         WalkTile DownTile;
-                        if(VerticalTrolleys)
-                            DownTile = WW.GetTile(new Point(wt.Rpoint.X - 280, wt.Rpoint.Y + 40));
-                        else
-                            DownTile = WW.GetTile(new Point(wt.Rpoint.X - 40, wt.Rpoint.Y));
+
+                        DownTile = WW.GetTile(new Point(wt.Rpoint.X - 280, wt.Rpoint.Y + 40));
 
                         OpenSpots.Add(DownTile);
                         return OpenSpots;
@@ -190,6 +219,8 @@ namespace FloorSimulation
                         else
                             p.X -= 20;
                         CSpots.Add(WW.GetTile(p));
+                        if (floor.layout.NLowpads > 0)
+                            return CSpots;
                     }
 
             if (CSpots.Count == 0 && name == "Buffer hub")
@@ -201,6 +232,36 @@ namespace FloorSimulation
         }
 
         private List<WalkTile> LangeHarryFilledSpots()
+        {
+            if (VerticalTrolleys)
+                return LangeHarryFilledSpotsMainBuffer();
+            return LangeHarryFilledSpotsSmallBuffer();
+        }
+
+        private List<WalkTile> LangeHarryFilledSpotsMainBuffer()
+        {
+            List<WalkTile> FilledSpots = new List<WalkTile>();
+
+            for (int rowi = 0; rowi < NRows; rowi++)
+            {
+                for (int coli = 0; coli < NTrolleysInRow; coli++)
+                {
+                    if (Trolleyarr[rowi, coli] != null)
+                    {
+                        WalkTile wt = HubAccessPoints[rowi, coli];
+                        WalkTile DownTile = WW.GetTile(new Point(wt.Rpoint.X - 280, wt.Rpoint.Y + 40));
+
+                        FilledSpots.Add(DownTile);
+                        break;
+                    }
+                }
+            }
+
+            return FilledSpots;
+        }
+
+
+        private List<WalkTile> LangeHarryFilledSpotsSmallBuffer()
         {
             List<WalkTile> FilledSpots = new List<WalkTile>();
 
@@ -252,10 +313,23 @@ namespace FloorSimulation
 
         public override DanishTrolley GiveTrolleyToHarry(Point AgentRPoint)
         {
+            if (VerticalTrolleys)
+                return GiveTrolleyToHarryFromMainBuffer(AgentRPoint);
             int ArrIndex = Array.IndexOf(HarryHubAccessPointsY, AgentRPoint.Y);
             if (ArrIndex == -1 || Trolleyarr[ArrIndex, 0] == null) return null;
             DanishTrolley t = Trolleyarr[ArrIndex, 0];
             Trolleyarr[ArrIndex, 0] = null;
+            WW.unfill_tiles(t.RPoint, t.GetRSize());
+
+            return t;
+        }
+
+        private DanishTrolley GiveTrolleyToHarryFromMainBuffer(Point AgentRPoint)
+        {
+            int ArrIndexx = Array.IndexOf(HubAccessPointsX, AgentRPoint.X + 280);
+            int ArrIndexy = Array.IndexOf(HubAccessPointsY, AgentRPoint.Y - 40);
+
+            DanishTrolley t = Trolleyarr[ArrIndexy, ArrIndexx];
             WW.unfill_tiles(t.RPoint, t.GetRSize());
 
             return t;
@@ -309,8 +383,8 @@ namespace FloorSimulation
 
         public override void LHTakeHTrolleyIn(DanishTrolley dt, Point AgentRPoint)
         {
-            int ArrIndexx = Array.IndexOf(HubAccessPointsX, AgentRPoint.X + 40);
-            int ArrIndexy = Array.IndexOf(HubAccessPointsY, AgentRPoint.Y);
+            int ArrIndexx = 0;
+            int ArrIndexy = Array.IndexOf(HarryHubAccessPointsY, AgentRPoint.Y);
 
             Trolleyarr[ArrIndexy, ArrIndexx] = dt;
             dt.Units = 0;
