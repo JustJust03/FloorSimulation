@@ -42,6 +42,13 @@ namespace FloorSimulation.Assignments
             InTask = true;
             Travelling = true;
 
+            if (Harry.TrolleyList.Count > 0 && Harry.TrolleyList[0].PlantList.Count > 0)
+            {
+                TargetHub = DButer.floor.HasFullTrolleyHubFull(4);
+                DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
+                return;
+            }
+
             TargetHub = DButer.floor.HasFullSmallBufferHub(5);
             if (TargetHub != null)
             {
@@ -72,8 +79,6 @@ namespace FloorSimulation.Assignments
                 }
 
                 Goal = "FillSmallBuffHub";
-                if(!DButer.Harry.IsVertical)
-                    DButer.RotateDistributerAndHarry();
                 DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
                 if(DButer.route != null)
                     return;
@@ -108,7 +113,7 @@ namespace FloorSimulation.Assignments
             else if (Goal == "LHDeliverEmptyTrolleys")
                 LHDeliverEmptyTrolleys();
             else if (Goal == "FillSmallBuffHub")
-                EmptySmallBuffHub();
+                FillSmallBuffHub();
             else if (Goal == "LHTakeFinishedTrolley")
                 LHTakeFinishedTrolley();
             else if (Goal == "LHDeliverFinishedTrolleys")
@@ -178,6 +183,44 @@ namespace FloorSimulation.Assignments
             Travelling = true;
         }
 
+        private void FillSmallBuffHub()
+        {
+            if (Harry.IsVertical == TargetHub.VerticalTrolleys)
+                DButer.RotateDistributerAndHarry();
+
+            Trolley = TargetHub.GiveTrolleyToHarry(DButer.RPoint);
+            if (Trolley == null)
+            {
+                FailRoute();
+                return;
+            }
+            Harry.TakeTrolleyIn(Trolley);
+
+            if (TargetHub.AmountOfTrolleys() > 0 && Harry.TrolleyList.Count < LangeHarry.MaxTrolleysPerHarry)
+            {
+                DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
+                if (DButer.route == null) //Route was not possible at this point
+                    FailRoute();
+            }
+            else
+            {
+                TargetHub = floor.HasEmptySmallBufferHub(0);
+                if(TargetHub == null)
+                    TargetHub = DButer.floor.BuffHubs[DButer.floor.BuffHubs.Count - 1];
+                if (!Harry.IsVertical)
+                    DButer.RotateDistributerAndHarry();
+
+                DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer)); //Automaticaly checks if dbuter is on harry, which it is.
+                Goal = "LHDeliverEmptyTrolleys";
+                if (DButer.route == null) //Route was not possible
+                    FailRoute();
+            }
+
+            InTask = true;
+            Travelling = true;
+
+        }
+
         private void LHDeliverEmptyTrolleys()
         {
             if (Harry.IsVertical == TargetHub.VerticalTrolleys)
@@ -192,6 +235,7 @@ namespace FloorSimulation.Assignments
 
             if (Harry.TrolleyList.Count < 1)
             {
+                Goal = "TravelToStartTile";
                 InTask = false;
                 Travelling = false;
             }
@@ -243,6 +287,7 @@ namespace FloorSimulation.Assignments
 
             if (Harry.TrolleyList.Count < 1)
             {
+                Goal = "TravelToStartTile";
                 InTask = false;
                 Travelling = false;
             }

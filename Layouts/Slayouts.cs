@@ -36,7 +36,7 @@ namespace FloorSimulation
         {
             UpperY = UpperY_;
             int y = LowerY;
-            int x = 0;
+            int x = 50;
             int two_per_row = 1; //Keeps track of how many cols are placed without space between them
             int placed_shops_in_a_row = 0;
 

@@ -183,10 +183,9 @@ namespace FloorSimulation
             {
                 int deltaX = obj.RFloorPoint.X - agent.RPoint.X;
                 int deltaY = obj.RFloorPoint.Y - agent.RPoint.Y;
-                if (obj.name == "Buffer hub")
-                    deltaX = 0;
                 return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
             })
+            .Where(obj => obj.name != "Buffer hub")
             .ToList();
 
             foreach(BufferHub buffhub in sortedList) 
@@ -195,7 +194,7 @@ namespace FloorSimulation
                     return buffhub;
             }
 
-            return base.GetBuffHubFull(agent);
+            return null;
         }
 
         public override BufferHub GetBuffHubOpen(Agent agent)

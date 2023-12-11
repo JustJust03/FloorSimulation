@@ -143,6 +143,14 @@ namespace FloorSimulation
                     SwitchDistributerTrolley();
                 }
             }
+            else
+            {
+                if (RPoint.X < trolley.RPoint.X)
+                    TrolleyOnTopLeft = true;
+                else 
+                    SwitchDistributerTrolley();
+            }
+
             trolley.IsInTransport = true;
 
             WW.unfill_tiles(trolley.RPoint, trolley.GetRSize());

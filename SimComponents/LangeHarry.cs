@@ -123,11 +123,13 @@ namespace FloorSimulation
             {
                 dt.RPoint = new Point(RPoint.X, RPoint.Y + (MaxTrolleysPerHarry - TrolleyList.Count()) * 57);
                 dt.SimPoint = floor.ConvertToSimPoint(dt.RPoint);
+                dt.IsVertical = false;
             }
             else
             {
                 dt.RPoint = new Point(RPoint.X + GetRSize().Width - (TrolleyList.Count() * 57), RPoint.Y);
                 dt.SimPoint = floor.ConvertToSimPoint(dt.RPoint);
+                dt.IsVertical = true;
             }
             return TrolleyList.Count() >= MaxTrolleysPerHarry;
         }
@@ -143,7 +145,7 @@ namespace FloorSimulation
         {
             DanishTrolley t = TrolleyList[TrolleyList.Count - 1];
 
-            if (t.IsVertical)
+            if (!IsVertical)
                 t.RPoint.X += 57 * (MaxTrolleysPerHarry + 1 - TrolleyList.Count);
             else
                 t.RPoint.Y -= 57 * (MaxTrolleysPerHarry + 1 - TrolleyList.Count);

@@ -810,7 +810,6 @@ namespace FloorSimulation
             DButer.SideActivity = "Bord";
             AInfo.UpdateFreq(Goal, true);
             Trolley.NStickers = 0;
-            ;
         }
 
         /// <summary>

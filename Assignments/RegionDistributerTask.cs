@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
 
 namespace FloorSimulation
 {
@@ -11,6 +12,9 @@ namespace FloorSimulation
         private Distributer DButer;
         private FinishedDistribution FinishedD;
         private LowPadAccessHub RegionHub;
+
+        private WalkTile OldWalkTile; //Is only used to save on which spot you picked up a finished trolley.
+        private ShopHub OldTargetHub;
 
         private readonly List<string> TargetIsOpenSpotsRegionDb = new List<string>
         {
@@ -88,6 +92,10 @@ namespace FloorSimulation
                 TakeRegionHubTrolley();
             else if (Goal == "DeliverEmptyTrolley")
                 DeliverEmptyTrolley();
+            else if (Goal == "TakeEmptyTrolley")
+                TakeEmptyTrolley();
+            else if (Goal == "DeliverEmptyTrolleyToShop")
+                DeliverEmptyTrolleyToShop();
             else if (Goal == "TravelToStartTile")
                 TravelToStartTile();
             else if (Goal == "DeliverFullTrolley")
@@ -104,7 +112,24 @@ namespace FloorSimulation
             else if (Goal == "TravelToStartTile")
                 DButer.TravelToTile(DButer.WW.GetTile(DButer.SavePoint));
             else if (TargetIsOpenSpotsRegionDb.Contains(Goal))
+            {
+                if (TargetHub == null)
+                    return;
                 DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
+            }
+            else if (TargetIsFullBuffHub.Contains(Goal))
+            {
+                if (RegionHub.HubTrolleys.Count > 0)
+                    DButer.floor.FirstWW.unfill_tiles(RegionHub.HubTrolleys[0].RPoint, RegionHub.HubTrolleys[0].GetRSize());
+                TargetHub = DButer.floor.GetBuffHubFull(DButer);
+                DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
+            }
+            else if (TargetIsOldWalktile.Contains(Goal))
+            {
+                if (RegionHub.HubTrolleys.Count > 0)
+                    DButer.floor.FirstWW.unfill_tiles(RegionHub.HubTrolleys[0].RPoint, RegionHub.HubTrolleys[0].GetRSize());
+                DButer.TravelToTile(OldWalkTile);
+            }
             else if (Goal == "DeliverFullTrolley")
                 DeliverFullTrolley();
 
@@ -200,6 +225,59 @@ namespace FloorSimulation
             Travelling = true;
         }
 
+        private void TakeEmptyTrolley()
+        {
+            DanishTrolley t = TargetHub.GiveTrolley(DButer.RPoint);
+            //The trolley in buffhub was already taken
+            if (t == null)
+            {
+                TargetHub = DButer.floor.GetBuffHubFull(DButer);
+                DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
+                if (DButer.route == null) //Route was not possible at this point. Try again later.
+                    FailRoute();
+                return;
+            }
+            Trolley = t;
+            DButer.TakeTrolleyIn(t);
+
+
+            if (!WasOnTopLeft)
+                OldWalkTile = DButer.WW.GetTile(new Point(OldTargetHub.HubTrolleys[1].RPoint.X, OldWalkTile.Rpoint.Y)); //Because dbuter is on the left of the trolley.
+            else 
+                OldWalkTile = DButer.WW.GetTile(new Point(OldWalkTile.Rpoint.X + 30, OldWalkTile.Rpoint.Y)); //Because dbuter is on the left of the trolley.
+            DButer.TravelToTile(OldWalkTile);
+            TargetHub = OldTargetHub;
+
+            Goal = "DeliverEmptyTrolleyToShop"; //New goal
+            InTask = true;
+            Travelling = true;
+        }
+
+        private void DeliverEmptyTrolleyToShop()
+        {
+            if (!WasOnTopLeft)
+                DButer.SwitchDistributerTrolley();
+            TargetHub.TakeHTrolleyIn(Trolley);
+            DButer.GiveTrolley();
+
+            if (RegionHub.HubTrolleys.Count > 0)
+                DButer.floor.FirstWW.fill_tiles(RegionHub.HubTrolleys[0].RPoint, RegionHub.HubTrolleys[0].GetRSize());
+
+            if(RegionHub.HubTrolleys.Count > 0) 
+            {
+                Goal = "TravelToLP";
+                DButer.TravelToTile(RegionHub.DbOpenSpots());
+
+                InTask = true;
+                Travelling = true;
+            }
+            else
+            {
+                InTask = false;
+                Travelling = false;
+            }
+        }
+
         private void TravelToStartTile()
         {
             Goal = "TravelToLP";
@@ -213,9 +291,12 @@ namespace FloorSimulation
             DButer.WW.unoccupie_by_tiles(DButer.trolley.RPoint, DButer.trolley.GetRSize()); // drop the trolley of from the distributer
             DButer.GiveTrolley();
 
-            Goal = "TravelToStartTile"; //New goal
-            DButer.TravelToTile(DButer.WW.GetTile(DButer.SavePoint));
-            if(DButer.route == null)
+            TargetHub = DButer.floor.GetBuffHubFull(DButer);
+            if (TargetHub == null)
+                return;
+            DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
+            Goal = "TakeEmptyTrolley"; //New goal
+            if (DButer.route == null) //Route was not possible at this point. Try again later.
             {
                 FailRoute();
                 return;
@@ -260,12 +341,18 @@ namespace FloorSimulation
         private void ShopTrolleyBecameFull()
         {
             TargetHub.SwapIfOtherTrolley(Trolley);
+            OldTargetHub = (ShopHub)TargetHub;
+
+            OldWalkTile = DButer.WW.GetTile(DButer.RPoint);
 
             DButer.TakeTrolleyIn(TargetHub.GiveTrolley());
             WasOnTopLeft = DButer.TrolleyOnTopLeft;
             Trolley = DButer.trolley;
             TargetHub = DButer.floor.ClosestFTHub(DButer);
             DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
+
+            if (RegionHub.HubTrolleys.Count > 0)
+                DButer.floor.FirstWW.unfill_tiles(RegionHub.HubTrolleys[0].RPoint, RegionHub.HubTrolleys[0].GetRSize());
 
             Goal = "DeliverFullTrolley"; //New goal
             InTask = true;

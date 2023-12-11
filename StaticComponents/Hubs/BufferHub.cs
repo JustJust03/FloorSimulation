@@ -209,7 +209,7 @@ namespace FloorSimulation
 
             List<WalkTile> CSpots = new List<WalkTile>();
 
-            for (int rowi = 0; rowi < NRows; rowi++)
+            for (int rowi = NRows - 1; rowi >= 0; rowi--)
                 for (int coli = NTrolleysInRow - 1; coli >= 0; coli--)
                     if (Trolleyarr[rowi, coli] != null)
                     {
@@ -275,9 +275,16 @@ namespace FloorSimulation
         public void SpawnEmptyTrolleys(int amnt = 5)
         {
             amnt = Math.Min(amnt, HubAccessPointsX.Length);
-            for (int i = 0; i < amnt; i++)
+            for (int i = HubAccessPointsX.Length; i > 0; i--)
             {
-                Point p = new Point(HubAccessPointsX[i], HubAccessPointsY[0]);
+                Point p;
+                if(floor.layout.NLowpads > 0)
+                {
+                    WalkTile wt = HubAccessPoints[0, i];
+                    p = new Point(wt.Rpoint.X - 280, wt.Rpoint.Y + 40);
+                }
+                else
+                    p = new Point(HubAccessPointsX[i], HubAccessPointsY[0]);
                 DanishTrolley dt = new DanishTrolley(0, floor, p, true);
                 WW.fill_tiles(p, dt.GetRSize());
                 Trolleyarr[0, i] = dt;
@@ -317,7 +324,7 @@ namespace FloorSimulation
                 return GiveTrolleyToHarryFromMainBuffer(AgentRPoint);
             int ArrIndex = Array.IndexOf(HarryHubAccessPointsY, AgentRPoint.Y);
             if (ArrIndex == -1 || Trolleyarr[ArrIndex, 0] == null) return null;
-            DanishTrolley t = Trolleyarr[ArrIndex, 0];
+                DanishTrolley t = Trolleyarr[ArrIndex, 0];
             Trolleyarr[ArrIndex, 0] = null;
             WW.unfill_tiles(t.RPoint, t.GetRSize());
 
@@ -330,6 +337,7 @@ namespace FloorSimulation
             int ArrIndexy = Array.IndexOf(HubAccessPointsY, AgentRPoint.Y - 40);
 
             DanishTrolley t = Trolleyarr[ArrIndexy, ArrIndexx];
+            Trolleyarr[0, ArrIndexx] = null;
             WW.unfill_tiles(t.RPoint, t.GetRSize());
 
             return t;
