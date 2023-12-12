@@ -106,7 +106,10 @@ namespace FloorSimulation
             TotalLPList = new List<LowPad>();
 
             layout.PlaceDistributers(NDistributers, new Point(FirstWW.RSizeWW.Width - 1000, 2000));
-            OperationalInterval = SecondsToFullOperation / NDistributers;
+            if(layout.NLowpads > 0)
+                OperationalInterval = SecondsToFullOperation / layout.NLowpads;
+            else
+                OperationalInterval = SecondsToFullOperation / NDistributers;
 
             TrHub = new TruckHub("Truck Hub", 6, new Point(FirstWW.RSizeWW.Width - 770, 700), this);
             HubList.Add(TrHub);
