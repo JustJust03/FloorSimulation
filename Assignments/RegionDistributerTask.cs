@@ -31,15 +31,15 @@ namespace FloorSimulation
             FinishedD = FinishedD_;
             RegionHubs = RHubs_;
             AInfo = new AnalyzeInfo(DButer, this, DButer.distributionms_per_tick);
-            Waiting = true;
+            Waiting = false;
             RegionHub = RegionHubs[0];
         }
 
         public override void PerformTask()
         {
+            AInfo.TickAnalyzeInfo(DButer.floor.SpeedMultiplier);
             if (!InTask && RegionHub.HubTrolleys.Count > 0)
             {
-
                 Goal = "TravelToLP";
                 DButer.TravelToTile(RegionHub.DbOpenSpots());
                 if (DButer.route == null)
@@ -94,6 +94,7 @@ namespace FloorSimulation
 
         public override void RouteCompleted()
         {
+            AInfo.UpdateFreq(Goal);
             if (Goal == "TravelToLP")
                 TravelToLP();
             else if (Goal == "DistributePlants")
@@ -118,7 +119,7 @@ namespace FloorSimulation
             if (Goal == "TravelToLP")
                 DButer.TravelToTile(RegionHub.DbOpenSpots());
             else if (Goal == "TakeRegionHubTrolley")
-                DButer.TravelToTrolley(RegionHub.HubTrolleys[0]);
+                DButer.TravelToTrolley(RegionHub.HubTrolleys[0], true);
             else if (Goal == "TravelToStartTile")
                 DButer.TravelToTile(DButer.WW.GetTile(DButer.SavePoint));
             else if (TargetIsOpenSpotsRegionDb.Contains(Goal))
@@ -315,8 +316,7 @@ namespace FloorSimulation
 
         public override void DistributionCompleted()
         {
-            //TODO: UPDATE AINFO
-            //AInfo.UpdateFreq(Goal, true);
+            AInfo.UpdateFreq(Goal, true);
             if (Goal == "DistributePlants")
             {
                 Trolley = TargetHub.GetRandomTrolley();
@@ -325,6 +325,11 @@ namespace FloorSimulation
                 if (Trolley.TakePlantIn(p))
                 {
                     ShopTrolleyBecameFull();
+                    return;
+                }
+                if (Trolley.NStickers == Trolley.MaxStickers) //Sticker bord became full. Add side activity
+                {
+                    StickerBordBecameFull();
                     return;
                 }
 
@@ -342,6 +347,14 @@ namespace FloorSimulation
                     Travelling = false;
                 }
             }
+        }
+
+        private void StickerBordBecameFull()
+        {
+            DButer.SideActivityMsLeft += Distributer.BordTime;
+            DButer.SideActivity = "Bord";
+            AInfo.UpdateFreq(Goal, true);
+            Trolley.NStickers = 0;
         }
 
         private void ShopTrolleyBecameFull()

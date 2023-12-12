@@ -69,7 +69,7 @@ namespace FloorSimulation.Assignments
                 return;
             }
 
-            TargetHub = DButer.floor.HasFullSmallBufferHub(5);
+            TargetHub = DButer.floor.HasFullSmallBufferHub(6);
             if (TargetHub != null)
             {
                 Goal = "EmptySmallBuffHub";
@@ -259,7 +259,7 @@ namespace FloorSimulation.Assignments
             }
             else
             {
-                if(TargetHub.AmountOfTrolleys() == 2)
+                if(TargetHub.AmountOfTrolleys() == 4)
                 {
                     TargetHub = floor.HasEmptySmallBufferHub(0);
                     if(TargetHub == null)

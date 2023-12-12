@@ -138,6 +138,9 @@ namespace FloorSimulation
 
             if (TickingHeatMap)
                 WWHeatMap.TickHeatMap();
+
+            FinishedD.CheckFinishedDistributionGlobal();
+
             Display.Invalidate();
             Invalidate();
         }

@@ -77,6 +77,19 @@ namespace FloorSimulation
             return true;
         }
 
+        public bool CheckFinishedDistributionGlobal()
+        {
+            if (!floor.StartHubsEmpty())
+                return false;
+            foreach (LowPad LP in floor.LPList)
+                if (LP.trolley != null)
+                    return false;
+
+            DistributionCompleted();
+            return true;
+
+        }
+
         public void WriteHeatMap()
         {
             int[,] intArray = new int[floor.FirstWW.WalkTileList.Count, floor.FirstWW.WalkTileList[0].Count];
@@ -276,7 +289,11 @@ namespace FloorSimulation
                 if(MTask.Travelling)
                     switch (MTask.Goal)
                     {
+                        case "TravelToStartTile":
+                            return ref TransportVerdeelTijd;
                         case "DistributePlants":
+                            return ref TransportVerdeelTijd;
+                        case "TravelToLP":
                             return ref TransportVerdeelTijd;
 
                         case "PushTrolleyAway":
@@ -294,7 +311,12 @@ namespace FloorSimulation
                         case "TakeOldTrolley":
                             return ref NewShopTrolleyTijd;
 
+
+                        case "TakeRegionHubTrolley":
+                            return ref TakeNewFullTrolleyTijd;
                         case "TakeFullTrolley":
+                            return ref TakeNewFullTrolleyTijd;
+                        case "DeliverEmptyTrolley":
                             return ref TakeNewFullTrolleyTijd;
                         case "DeliveringEmptyTrolley":
                             return ref TakeNewFullTrolleyTijd;
@@ -317,7 +339,6 @@ namespace FloorSimulation
                             return ref VerdeelTijd;
                     }
                 }
-
                 return ref OtherTijd;
             }
         }
@@ -342,6 +363,7 @@ namespace FloorSimulation
         public void TickAnalyzeInfo(int TickMultiplier)
         {
             CurrentTask = CurrentTask.Add(TimeSpan.FromMilliseconds(TickMs * TickMultiplier));
+            ;
         }
 
         public void UpdateGeneralTimes()
@@ -356,6 +378,8 @@ namespace FloorSimulation
 
             OldGoal = goal;
             if (goal == "DeliveringEmptyTrolley")
+                NewFullTrolleyFreq++;
+            else if (goal == "DeliverEmptyTrolley")
                 NewFullTrolleyFreq++;
             else if (goal == "DistributePlants")
             {
