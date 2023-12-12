@@ -23,6 +23,7 @@ namespace FloorSimulation
 
         public override void PerformTask()
         {
+            //Get new Full Trolley to distribute
             if (!InTask && Goal == "TakeFullTrolley")
             {
                 TargetHub = floor.GetStartHub(LP);
@@ -41,6 +42,7 @@ namespace FloorSimulation
                     TargetWasSaveTile = true;
                 }
             }
+            // Smart distributers (First signal lowpad away, then distribute plants.)
             else if(ContinueBeforeDistribution && !InTask && Goal == "TravelToLPAccessHub" && LP.trolley.FinishedRegion((LowPadAccessHub)TargetHub))
             {
                 TargetTiles = LP.ClosestRegion(LP.trolley.TargetRegions);
@@ -51,6 +53,7 @@ namespace FloorSimulation
                 InTask = true;
                 Travelling = true;
             }
+            // Dumb distributers (First distribute plants, then signal lowpad away.)
             else if(!InTask && Goal == "TravelToLPAccessHub" && LP.trolley.ContinueDistribution)
             {
                 LP.trolley.ContinueDistribution = false;

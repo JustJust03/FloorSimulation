@@ -33,11 +33,11 @@ namespace FloorSimulation
         public Random rand;
 
         // Real size: 5000 cm x 5000 cm
-        public const float ScaleFactor = 0.20f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
+        public const float ScaleFactor = 0.25f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
         public Layout layout;
 
         public bool TickingHeatMap = false;
-        public const int NDistributers = 32;
+        public const int NDistributers = 21;
         public const int SecondsToFullOperation = 240; //How long to wait before all distributers are running
         public int OperationalInterval; //How long to wait between distributers
 

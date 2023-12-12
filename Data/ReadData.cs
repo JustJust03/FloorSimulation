@@ -185,6 +185,7 @@ namespace FloorSimulation
             int StickerMaximum = StickersPerTrolley.Max();
 
             double Stickersd = Math.Sqrt(VarStickersPerTrolley);
+            ;
         }
             
         public void LoadHeatMap(string FileName, WalkWay WW)

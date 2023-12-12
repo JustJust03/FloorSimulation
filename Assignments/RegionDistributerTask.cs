@@ -11,6 +11,7 @@ namespace FloorSimulation
     {
         private Distributer DButer;
         private FinishedDistribution FinishedD;
+        private LowPadAccessHub[] RegionHubs;
         private LowPadAccessHub RegionHub;
 
         private WalkTile OldWalkTile; //Is only used to save on which spot you picked up a finished trolley.
@@ -23,14 +24,15 @@ namespace FloorSimulation
             "DeliverFullTrolley"
         };
 
-        public RegionDistributerTask(Distributer DButer_, string Goal_, FinishedDistribution FinishedD_, LowPadAccessHub RHub_, DanishTrolley trolley_ = default) :
+        public RegionDistributerTask(Distributer DButer_, string Goal_, FinishedDistribution FinishedD_, LowPadAccessHub[] RHubs_, DanishTrolley trolley_ = default) :
             base(Goal_, trolley_)
         {
             DButer = DButer_;
             FinishedD = FinishedD_;
-            RegionHub = RHub_;
+            RegionHubs = RHubs_;
             AInfo = new AnalyzeInfo(DButer, this, DButer.distributionms_per_tick);
             Waiting = true;
+            RegionHub = RegionHubs[0];
         }
 
         public override void PerformTask()
@@ -49,13 +51,13 @@ namespace FloorSimulation
                 {
                     DButer.TravelToTrolley(RegionHub.HubTrolleys[0]);
                     Goal = "TakeRegionHubTrolley";
-                    if(DButer.route == null)
+                    if (DButer.route == null)
                     {
                         FailRoute();
                         return;
                     }
                 }
-                else if(DButer.route.Count == 0)
+                else if (DButer.route.Count == 0)
                 {
                     DButer.PlantInHand = RegionHub.HubTrolleys[0].GiveFirstPlantInRegion(RegionHub);
                     if (DButer.PlantInHand != null)
@@ -71,9 +73,17 @@ namespace FloorSimulation
                     }
                 }
 
-
                 InTask = true;
                 Travelling = true;
+            }
+            else if (!InTask)
+            {
+                foreach(LowPadAccessHub RHub in RegionHubs)
+                    if (RHub.HubTrolleys.Count > 0)
+                    {
+                        RegionHub = RHub;
+                        break;
+                    }
             }
 
             if (InTask && Travelling)
@@ -164,6 +174,7 @@ namespace FloorSimulation
             }
             else
             {
+                RegionHub.HubTrolleys[0].ContinueDistribution = true;
                 Goal = "TravelToStartTile"; //New goal
                 DButer.TravelToTile(DButer.WW.GetTile(DButer.SavePoint));
                 if(DButer.route == null)
@@ -172,7 +183,6 @@ namespace FloorSimulation
                     return;
                 }
 
-                RegionHub.HubTrolleys[0].ContinueDistribution = true;
                 InTask = true;
                 Travelling = true;
             }

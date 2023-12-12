@@ -11,12 +11,12 @@ namespace FloorSimulation.Assignments
         Floor floor;
         private Distributer DButer;
         private LangeHarry Harry;
+        private int WaitedTicks = 0;
 
         public readonly List<string> InitGoals = new List<string> //Only distributeplants should be in this.
         {
             "EmptySmallBuffHub",
             "FillSmallBuffHub",
-            "LHTakeFinishedTrolley",
             "TravelToStartTile"
         };
 
@@ -35,6 +35,24 @@ namespace FloorSimulation.Assignments
                 GetNewGoal();
             else if (InTask && Travelling)
                 DButer.TickWalk();
+
+            if (Waiting)
+            {
+                if (DButer.route != null)
+                {
+                    WaitedTicks = 0;
+                    Waiting = false;
+                }
+                WaitedTicks++;
+                if (WaitedTicks > 100)
+                {
+                    WaitedTicks = 0;
+                    DButer.TravelToTile(DButer.WW.GetTile(DButer.SavePoint));
+                    Waiting = false;
+                    TargetWasSaveTile = true;
+                }
+                return;
+            }
         }
 
         private void GetNewGoal()
@@ -44,8 +62,10 @@ namespace FloorSimulation.Assignments
 
             if (Harry.TrolleyList.Count > 0 && Harry.TrolleyList[0].PlantList.Count > 0)
             {
-                TargetHub = DButer.floor.HasFullTrolleyHubFull(4);
+                TargetHub = DButer.floor.HasFullTrolleyHubFull(4) ?? TargetHub;
                 DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
+                if (DButer.route == null)
+                    Waiting = true;
                 return;
             }
 
@@ -72,16 +92,14 @@ namespace FloorSimulation.Assignments
                         if(DButer.route != null)
                             return;
                     }
-
-                    InTask = false;
-                    Travelling = false;
-                    return;
                 }
-
-                Goal = "FillSmallBuffHub";
-                DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
-                if(DButer.route != null)
-                    return;
+                else
+                {
+                    Goal = "FillSmallBuffHub";
+                    DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
+                    if(DButer.route != null)
+                        return;
+                }
             }
 
             TargetHub = DButer.floor.HasFullTrolleyHubFull(4);
@@ -131,7 +149,7 @@ namespace FloorSimulation.Assignments
             else if (TargetIsOpenSpots.Contains(Goal))
                 DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
             else if (TargetIsFilledSpots.Contains(Goal))
-                DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
+                DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer)); //This needs to stay in!
 
             if (DButer.route == null)
                 Waiting = true;
