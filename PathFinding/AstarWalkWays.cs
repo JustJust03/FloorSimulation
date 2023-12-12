@@ -50,7 +50,7 @@ namespace FloorSimulation
         /// returns shortest path to a trolley.
         /// Access points are at the top or bottom for vertical trolleys and at the right and left of horizontal trolleys
         /// </summary>
-        public List<WalkTile> RunAlgoDistrToTrolley(DanishTrolley TargetTrolley)
+        public List<WalkTile> RunAlgoDistrToTrolley(DanishTrolley TargetTrolley, bool OnlyUpper)
         {
             if (TargetTrolley == null)
                 return null;
@@ -68,7 +68,7 @@ namespace FloorSimulation
 
                 if (toppoint > 0)
                     TargetTiles.Add(WW.WalkTileList[tx][toppoint]); //top accesspoint to trolley
-                if (botpoint < WW.WalkTileList[0].Count)
+                if (botpoint < WW.WalkTileList[0].Count && !OnlyUpper)
                     TargetTiles.Add(WW.WalkTileList[tx][botpoint]); //bot accesspoint to trolley
             }
             else //Horizontal target trolley

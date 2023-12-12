@@ -117,9 +117,9 @@ namespace FloorSimulation
         /// <summary>
         /// Makes the distributer walk towards the target tile using a shortest path algorithm.
         /// </summary>
-        public virtual void TravelToTrolley(DanishTrolley target_trolley)
+        public virtual void TravelToTrolley(DanishTrolley target_trolley, bool OnlyUpper = false)
         {
-            route = AWW.RunAlgoDistrToTrolley(target_trolley);
+            route = AWW.RunAlgoDistrToTrolley(target_trolley, OnlyUpper);
         }
 
         /// <summary>

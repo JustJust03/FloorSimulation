@@ -319,7 +319,8 @@ namespace FloorSimulation
                 new int[] {27},
                 new int[] {28},
             };
-            ShopsPerRegion[29] = new int[] { 5, 5, 5, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5 };
+            //ShopsPerRegion[29] = new int[] { 5, 5, 5, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5 };
+            ShopsPerRegion[29] = new int[] { 5, 5, 5, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5, 4 };
             AddShopsPerDButer(29, 21);
         }
 

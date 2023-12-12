@@ -30,7 +30,7 @@ namespace FloorSimulation
                 Trolley = TargetHub.PeekFirstTrolley();
                 if (Trolley != null)
                 {
-                    LP.TravelToTrolley(Trolley);
+                    LP.TravelToTrolley(Trolley, false);
                     InTask = true;
                     Travelling = true;
                 }

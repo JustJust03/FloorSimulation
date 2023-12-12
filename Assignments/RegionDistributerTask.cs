@@ -49,7 +49,7 @@ namespace FloorSimulation
                 }
                 else if (RegionHub.HubTrolleys[0].PlantList.Count == 0)
                 {
-                    DButer.TravelToTrolley(RegionHub.HubTrolleys[0]);
+                    DButer.TravelToTrolley(RegionHub.HubTrolleys[0], true);
                     Goal = "TakeRegionHubTrolley";
                     if (DButer.route == null)
                     {
@@ -202,12 +202,6 @@ namespace FloorSimulation
 
             TargetHub = DButer.floor.GetBuffHubOpen(DButer);
             Trolley = DButer.trolley;
-            if (TargetHub.VerticalTrolleys != Trolley.IsVertical)
-            {
-                DButer.WW.unfill_tiles(DButer.RPoint, DButer.GetRSize());
-                DButer.WW.unfill_tiles(Trolley.RPoint, Trolley.GetRSize());
-                DButer.RotateDistributerAndTrolley();
-            }
 
             DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
 
@@ -216,6 +210,8 @@ namespace FloorSimulation
 
         private void DeliverEmptyTrolley()
         {
+            DButer.RotateDistributerAndTrolley();
+
             DButer.WW.unoccupie_by_tiles(DButer.trolley.RPoint, DButer.trolley.GetRSize()); // drop the trolley of from the distributer
             DButer.GiveTrolley();
             if (Trolley.IsVertical)

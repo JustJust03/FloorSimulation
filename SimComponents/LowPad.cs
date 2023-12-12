@@ -103,7 +103,12 @@ namespace FloorSimulation
             RPoint = t.RPoint;
         }
 
-        public override void TravelToTrolley(DanishTrolley t)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="OnlyUpper">Filler Boolean, not used by the lowpad.</param>
+        public override void TravelToTrolley(DanishTrolley t, bool OnlyUpper)
         {
             route = AWW.RunAlgoLowPadToTrolley(t);
         }
