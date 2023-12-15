@@ -17,10 +17,11 @@ namespace FloorSimulation
 
         public LowPadSlayoutBuffhub(Floor floor_, ReadData rData) : base(floor_, rData)
         {
-            NLowpads = 10;
+            NLowpads = 50;
             RC = new RegionConstants();
             if (NRegions == 0)
                 NRegions = NDbuters;
+            ShopStartX = 50;
         }
         public override string ToString()
         {
@@ -121,6 +122,14 @@ namespace FloorSimulation
                 LowPadAccessHub[] LPAHubs = new LowPadAccessHub[Nregions];
                 for (int regioni = 0; regioni < Nregions; regioni++)
                     LPAHubs[regioni] = floor.LPHubs[regionsPerDB[regioni]];
+
+                if (Nregions == 1)
+                    LPAHubs[0].HasLowerAccessPoint = true;
+                else
+                {
+                    LPAHubs[0].HasLowerAccessPoint = true;
+                    LPAHubs[1].HasLowerAccessPoint = true;
+                }
 
                 Distributer db = new Distributer(id, floor, floor.FirstWW, Rpoint_: new Point(DBX, MiddleY), MaxWaitedTicks_: 100 - id, IsVertical_: false, RHubs: LPAHubs);
                 floor.DistrList.Add(db);
@@ -319,8 +328,8 @@ namespace FloorSimulation
                 new int[] {27},
                 new int[] {28},
             };
-            //ShopsPerRegion[29] = new int[] { 5, 5, 5, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5 };
-            ShopsPerRegion[29] = new int[] { 5, 5, 5, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5, 4 };
+            ShopsPerRegion[29] = new int[] { 5, 5, 5, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5 };
+            //ShopsPerRegion[29] = new int[] { 5, 5, 5, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5, 4 };
             AddShopsPerDButer(29, 21);
         }
 

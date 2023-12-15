@@ -19,6 +19,7 @@ namespace FloorSimulation
         public string TotalTrolleysDistributed;
         public string TotalTrolleysExported;
         public string DistributersWorking;
+        public string LowpadsRunning;
         private Floor floor;
         
         private int TotalTrolleysDistr;
@@ -51,6 +52,7 @@ namespace FloorSimulation
             TotalTrolleysDistributed = TotalTrolleysDistr.ToString();
             TotalTrolleysExported = TotalTrolleysExp.ToString();
             DistributersWorking = floor.DistrList.Count.ToString();
+            LowpadsRunning = floor.layout.NLowpads.ToString();
 
             DistributionDate = floor.Display.date;
             Layout = floor.layout.ToString();
@@ -281,6 +283,8 @@ namespace FloorSimulation
         {
             get
             {
+                if (!MTask.InTask && MTask.Goal == "TravelToLP")
+                    return ref WachtTijd;
                 if (!MTask.InTask)
                     return ref FillerTijd;
                 if (MTask.Waiting || MTask.TargetWasSaveTile)

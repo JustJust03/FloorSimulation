@@ -47,7 +47,7 @@ namespace FloorSimulation
             else if(id_ == -8)
                 MainTask = new LHDriverTask(this);
             else
-                MainTask = new RegionDistributerTask(this, "TakeFullTrolley", floor.FinishedD, RegionHubs);
+                MainTask = new RegionDistributerTask(this, "TravelToLP", floor.FinishedD, RegionHubs);
         }
 
         /// <summary>

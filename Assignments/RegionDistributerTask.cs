@@ -14,6 +14,8 @@ namespace FloorSimulation
         private LowPadAccessHub[] RegionHubs;
         private LowPadAccessHub RegionHub;
 
+        public bool HasLowerAccessPoint;
+
         private WalkTile OldWalkTile; //Is only used to save on which spot you picked up a finished trolley.
         private ShopHub OldTargetHub;
 
@@ -316,7 +318,7 @@ namespace FloorSimulation
 
         public override void DistributionCompleted()
         {
-            AInfo.UpdateFreq(Goal, true);
+            //AInfo.UpdateFreq(Goal, true);
             if (Goal == "DistributePlants")
             {
                 Trolley = TargetHub.GetRandomTrolley();

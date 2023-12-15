@@ -19,6 +19,7 @@ namespace FloorSimulation
         private int NtrolleysPerShop = 2;
 
         protected int HalfShopsInRow = 0;
+        protected int ShopStartX = 0;
 
         public SLayout(Floor floor_, ReadData rData) : base(floor_, rData) 
         { 
@@ -36,7 +37,7 @@ namespace FloorSimulation
         {
             UpperY = UpperY_;
             int y = LowerY;
-            int x = 50;
+            int x = ShopStartX;
             int two_per_row = 1; //Keeps track of how many cols are placed without space between them
             int placed_shops_in_a_row = 0;
 
@@ -112,6 +113,8 @@ namespace FloorSimulation
         public override void DistributeTrolleys(List<DanishTrolley> dtList)
         {
             floor.STHubs[0].AddUndistributedTrolleys(dtList);
+            for(int hi = 1; hi < floor.STHubs.Count; hi++)
+                floor.STHubs[hi].AddUndistributedTrolleys(new List<DanishTrolley>());
         }
 
         public override StartHub GetStartHub(Agent agent)
