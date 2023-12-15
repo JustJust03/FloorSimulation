@@ -91,6 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assignments\DistributerTask.cs" />
+    <Compile Include="Assignments\DumbLowPadTask.cs" />
     <Compile Include="Assignments\LHDriverTask.cs" />
     <Compile Include="Assignments\RegionDistributerTask.cs" />
     <Compile Include="Assignments\LowPadTask.cs" />
@@ -109,6 +110,7 @@
     </Compile>
     <Compile Include="PathFinding\AstarWalkWays.cs" />
     <Compile Include="SimComponents\Agent.cs" />
+    <Compile Include="SimComponents\DumbLowPad.cs" />
     <Compile Include="SimComponents\LowPad.cs" />
     <Compile Include="SimComponents\Distributer.cs" />
     <Compile Include="SimComponents\LangeHarry.cs" />

@@ -12,7 +12,6 @@ namespace FloorSimulation
         public List<ShopHub> shops = new List<ShopHub>();
         WalkTile DbAccesspoint;
 
-        public bool HasLowerAccessPoint = false;
         WalkTile LowerAccesspoint;
 
         public LowPadAccessHub(string name_, int id_, Point FPoint_, Floor floor_, Size s, List<ShopHub> shops_) : 
@@ -23,12 +22,11 @@ namespace FloorSimulation
                 DbAccesspoint = WW.GetTile(new Point(RFloorPoint.X + RHubSize.Width + 40, RFloorPoint.Y));
             else
                 DbAccesspoint = WW.GetTile(new Point(RFloorPoint.X - 40, RFloorPoint.Y));
-            LowerAccesspoint = WW.GetTile(new Point(RFloorPoint.X, RFloorPoint.Y + 150));
         }
 
         public override List<WalkTile> OpenSpots(Agent agent)
         {
-            return new List<WalkTile> { WW.GetTile(RFloorPoint), LowerAccesspoint};
+            return new List<WalkTile> {WW.GetTile(RFloorPoint), LowerAccesspoint};
         }
 
         public WalkTile DbOpenSpots()

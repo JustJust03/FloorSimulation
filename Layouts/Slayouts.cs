@@ -11,8 +11,6 @@ namespace FloorSimulation
 
     internal class SLayout : Layout
     {
-        protected int UpperY;
-        protected int LowestY;
         protected List<int> ShopCornersX = new List<int>(); //Keeps track of the upper corners of the shops in the street. Is used to place FullHubs
         protected int StreetWidth = 800;
         protected int ShopHeight = 170;
@@ -150,7 +148,7 @@ namespace FloorSimulation
         /// </summary>
         public override void PlaceStartHubs()
         {
-            int x = 160;
+            int x = 360;
             for (int i = 0; i < RData.days.Count; i++)
             {
                 floor.STHubs.Add(new StartHub("Start hub", i, new Point(x, floor.FirstWW.RSizeWW.Height - 250), floor, vertical_trolleys_: true));

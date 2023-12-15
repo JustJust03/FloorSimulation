@@ -10,14 +10,14 @@ namespace FloorSimulation
     /// <summary>
     /// Start hub. This is where the distributers get their trolleys to distribute them.
     /// </summary>
-    internal class StartHub: Hub
+    internal class StartHub : Hub
     {
         private List<DanishTrolley> UndistributedTrolleys;
         public bool StartHubEmpty;
         public const int MaxStartHubTrolleys = 8;
 
-        public StartHub(string name_, int id_, Point FPoint_, Floor floor_, int initial_trolleys_ = 0, bool vertical_trolleys_ = true) : 
-            base(name_, id_, FPoint_, floor_, new Size(640, 200), initial_trolleys:initial_trolleys_, vertical_trolleys:vertical_trolleys_)
+        public StartHub(string name_, int id_, Point FPoint_, Floor floor_, int initial_trolleys_ = 0, bool vertical_trolleys_ = true) :
+            base(name_, id_, FPoint_, floor_, new Size(640, 200), initial_trolleys: initial_trolleys_, vertical_trolleys: vertical_trolleys_)
         {
             UndistributedTrolleys = new List<DanishTrolley>();
             StartHubEmpty = false;
@@ -39,7 +39,7 @@ namespace FloorSimulation
 
         public override DanishTrolley PeekFirstTrolley()
         {
-            if(HubTrolleys.Count == 0 && UndistributedTrolleys.Count > 0)
+            if (HubTrolleys.Count == 0 && UndistributedTrolleys.Count > 0)
             {
                 int take_amount = Math.Min(MaxStartHubTrolleys, UndistributedTrolleys.Count);
                 HubTrolleys = UndistributedTrolleys.Take(take_amount).ToList();
@@ -68,7 +68,7 @@ namespace FloorSimulation
                 DanishTrolley t = HubTrolleys[i];
                 t.IsVertical = true;
 
-                int trolleyX = LeftX + Rslack; 
+                int trolleyX = LeftX + Rslack;
                 LeftX += t.GetRSize().Width + Rslack;
                 int trolleyY = RFloorPoint.Y + Rslack;
 
@@ -80,6 +80,30 @@ namespace FloorSimulation
         public int TotalUndistributedTrolleys()
         {
             return UndistributedTrolleys.Count + HubTrolleys.Count;
+        }
+
+        public DanishTrolley DumbLowPadPickUp(DumbLowPad dlp)
+        {
+            if (HubTrolleys.Count == 0)
+                return null;
+            DanishTrolley t = HubTrolleys[HubTrolleys.Count - 1];
+            if (WW.GetTile(new Point(t.RPoint.X + t.GetRSize().Width, t.RPoint.Y + 20)) == WW.GetTile(dlp.RPoint) ||
+                WW.GetTile(new Point(t.RPoint.X + t.GetRSize().Width, t.RPoint.Y + 20)).TileRight() == WW.GetTile(dlp.RPoint))
+            {
+                floor.Display.InvalInfo();
+                HubTrolleys.RemoveAt(HubTrolleys.Count - 1);
+
+                if (HubTrolleys.Count == 0 && UndistributedTrolleys.Count > 0)
+                {
+                    HubTrolleys = UndistributedTrolleys.Take(1).ToList();
+                    UndistributedTrolleys.RemoveRange(0, 1);
+                    PlaceTrolleys();
+                }
+
+                return t;
+            }
+
+            return null;
         }
     }
 }

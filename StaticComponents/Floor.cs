@@ -51,8 +51,10 @@ namespace FloorSimulation
         public List<Distributer> DistrList; // A list with all the distributers that are on the floor.
         public Distributer LHDriver;
         public List<LowPad> LPList;
+        public List<DumbLowPad> DLPList;
         public List<Distributer> TotalDistrList;
         public List<LowPad> TotalLPList;
+        public List<DumbLowPad> TotalDLPList;
         public LangeHarry FirstHarry;
         public WalkWay FirstWW;
         public WalkWayHeatMap WWHeatMap;
@@ -101,9 +103,11 @@ namespace FloorSimulation
 
             DistrList = new List<Distributer>();
             LPList = new List<LowPad>();
+            DLPList = new List<DumbLowPad>();
 
             TotalDistrList = new List<Distributer>();
             TotalLPList = new List<LowPad>();
+            TotalDLPList = new List<DumbLowPad>();
 
             layout.PlaceDistributers(NDistributers, new Point(FirstWW.RSizeWW.Width - 1000, 2000));
             if(layout.NLowpads > 0)
@@ -136,6 +140,9 @@ namespace FloorSimulation
             foreach (LowPad lp in LPList)
                 lp.Tick();
 
+            foreach (DumbLowPad dlp in DLPList)
+                dlp.Tick();
+
             if (TickingHeatMap)
                 WWHeatMap.TickHeatMap();
 
@@ -148,7 +155,13 @@ namespace FloorSimulation
         private void AddAgent(int seconds)
         {
             if (layout.NLowpads > 0)
-                AddLowPad(seconds);
+            {
+                if (TotalDLPList.Count > 0)
+                    AddDLowPad(seconds);
+                else
+                    AddLowPad(seconds);
+            }
+
             else
                 AddDistr(seconds);
         }
@@ -170,6 +183,27 @@ namespace FloorSimulation
             {
                 LPList.Add(TotalLPList[0]);
                 TotalLPList.RemoveAt(0);
+                AddLowPad(seconds);
+            }
+        }
+
+        private void AddDLowPad(int seconds)
+        {
+            if(TotalDLPList.Count ==  0) 
+                return;
+            if(OperationalInterval == 0)
+            {
+                DLPList = TotalDLPList.ToList();
+                TotalDLPList.Clear();
+                return;
+            }
+            int TargetAmntLP = seconds / OperationalInterval;
+            if (TargetAmntLP > layout.NLowpads)
+                TargetAmntLP = layout.NLowpads;
+            if(DLPList.Count < TargetAmntLP)
+            {
+                DLPList.Add(TotalDLPList[0]);
+                TotalDLPList.RemoveAt(0);
                 AddLowPad(seconds);
             }
         }
@@ -246,6 +280,8 @@ namespace FloorSimulation
                     d.DrawObject(g);
             foreach (LowPad lp in LPList)
                 lp.DrawObject(g);
+            foreach (DumbLowPad dlp in DLPList)
+                dlp.DrawObject(g);
         }
 
         public void PlaceShops(List<ShopHub> Shops)

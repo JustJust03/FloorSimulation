@@ -14,6 +14,10 @@ namespace FloorSimulation
         public int RealFloorWidth = 5000;
         public int RealFloorHeight = 5000;
         public int NLowpads = 0;
+        public int UpperY;
+        public int LowestY;
+        public LowPadDriveLines LPDriveLines;
+
         public abstract int NTrolleysInShop { get; set; }
 
         public Layout(Floor floor_, ReadData rData)

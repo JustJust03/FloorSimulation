@@ -13,7 +13,6 @@ namespace FloorSimulation
         public const bool ContinueBeforeDistribution = false; //Travel to the next hub as soon as the distributer takes the plant.
         private List<WalkTile> TargetTiles = new List<WalkTile>();
         int WaitedTicks = 0;
-        private bool TravellingToLowerAccessPoint = false;
 
         public LowPadTask(LowPad LP_, Floor floor_, string Goal_, DanishTrolley trolley_ = default): 
             base(Goal_, trolley_)
@@ -48,10 +47,6 @@ namespace FloorSimulation
             {
                 TargetTiles = LP.ClosestRegion(LP.trolley.TargetRegions);
                 LP.TravelToClosestTile(TargetTiles);
-                if (LP.route == null)
-                    SetTargetTilesToLowerAccessPoint();
-                else
-                    TravellingToLowerAccessPoint = false;
 
                 TargetHub.GiveTrolley();
                 TargetHub.Targeted = false;
@@ -65,10 +60,6 @@ namespace FloorSimulation
 
                 TargetTiles = LP.ClosestRegion(LP.trolley.TargetRegions);
                 LP.TravelToClosestTile(TargetTiles);
-                if (LP.route == null)
-                    SetTargetTilesToLowerAccessPoint();
-                else
-                    TravellingToLowerAccessPoint = false;
 
                 TargetHub.GiveTrolley();
                 TargetHub.Targeted = false;
@@ -137,10 +128,6 @@ namespace FloorSimulation
             {
                 TargetTiles = LP.ClosestRegion(LP.trolley.TargetRegions);
                 LP.TravelToClosestTile(TargetTiles);
-                if (LP.route == null)
-                    SetTargetTilesToLowerAccessPoint();
-                else
-                    TravellingToLowerAccessPoint = false;
 
             }
 
@@ -180,10 +167,6 @@ namespace FloorSimulation
 
             TargetTiles = LP.ClosestRegion(LP.trolley.TargetRegions);
             LP.TravelToClosestTile(TargetTiles);
-            if (LP.route == null)
-                SetTargetTilesToLowerAccessPoint();
-            else
-                TravellingToLowerAccessPoint = false;
 
             if(LP.route == null)
             {
@@ -197,12 +180,6 @@ namespace FloorSimulation
 
         private void TravelToLPAccessHub()
         {
-            if (TravellingToLowerAccessPoint)
-            {
-                FailRoute();
-                return;
-            }
-
             TargetHub = floor.AccessPointPerRegion[LP.RPoint];
             TargetHub.TakeVTrolleyIn(LP.trolley);
 
@@ -217,15 +194,6 @@ namespace FloorSimulation
                 InTask = false;
                 Travelling = false;
             }
-        }
-
-        private void SetTargetTilesToLowerAccessPoint()
-        {
-            TargetTiles = LP.ClosestOccupiedRegion(LP.trolley.TargetRegions);
-            TravellingToLowerAccessPoint = true;
-            LP.TravelToClosestTile(TargetTiles);
-            if (LP.route != null && LP.route.Count == 0)
-                LP.route = null;
         }
     }
 }

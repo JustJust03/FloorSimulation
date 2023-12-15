@@ -19,6 +19,8 @@ namespace FloorSimulation
         private int TilesReset = 0;
         bool log;
 
+        private WalkTile w; //Only used by the dumb lowpads.
+        private Size s; //Only used by the dumb lowpads.
 
         public WalkWayClearance(WalkWay WW_, bool log_ = false)
         {
@@ -180,6 +182,48 @@ namespace FloorSimulation
             foreach (List<WalkTile> TileCol in WW.WalkTileList)
                 foreach (WalkTile t in TileCol)
                     t.occupied_by = null;
+        }
+
+        public bool DumbLPClearanceLeft(DumbLowPad Dlp)
+        {
+            w = WW.GetTile(Dlp.RPoint);
+            
+            for (int deltay = 0; deltay < Dlp.TILEWIDTH; deltay++)
+            {
+                if (WW.WalkTileList[w.TileX - 1][w.TileY + deltay].occupied)
+                    return false;
+            }
+            return true;
+        }
+        public bool DumbLPClearanceRight(DumbLowPad Dlp)
+        {
+            w = WW.GetTile(Dlp.RPoint);
+            for (int deltay = 0; deltay < Dlp.TILEHEIGHT; deltay++)
+            {
+                if (WW.WalkTileList[w.TileX + Dlp.TILEWIDTH][w.TileY + deltay].occupied)
+                    return false;
+            }
+            return true;
+        }
+        public bool DumbLPClearanceUp(DumbLowPad Dlp)
+        {
+            w = WW.GetTile(Dlp.RPoint);
+            for (int deltax = 0; deltax < Dlp.TILEWIDTH; deltax++)
+            {
+                if (WW.WalkTileList[w.TileX + deltax][w.TileY - 1].occupied)
+                    return false;
+            }
+            return true;
+        }
+        public bool DumbLPClearanceDown(DumbLowPad Dlp)
+        {
+            w = WW.GetTile(Dlp.RPoint);
+            for (int deltax = 0; deltax < Dlp.TILEWIDTH; deltax++)
+            {
+                if (WW.WalkTileList[w.TileX + deltax][w.TileY + Dlp.TILEHEIGHT].occupied)
+                    return false;
+            }
+            return true;
         }
     }
 }
