@@ -82,6 +82,10 @@ namespace FloorSimulation
             ticktravel += travel_dist_per_tick * floor.SpeedMultiplier;
             while (ticktravel > WalkWay.WALK_TILE_WIDTH)
             {
+                if(RPoint.Y < 860)
+                {
+                    ;
+                }
                 WW.unfill_tiles(RPoint, GetRSize());
                 if (MainTask.LowpadDeltaX == -1)
                 {
@@ -130,6 +134,32 @@ namespace FloorSimulation
 
                 floor.layout.LPDriveLines.HitDriveLine(this);
                 ticktravel -= WalkWay.WALK_TILE_WIDTH;
+            }
+        }
+
+        public void HitAccessHub()
+        {
+            if(LPAHub != default)
+            {
+                if(trolley.TargetRegions.Count == 1)
+                {
+                    LPAHub.TakeVTrolleyIn(GiveTrolley());
+                    MainTask.LowpadDeltaX = LPAHub.HasLeftAccess ? -1 : 1;
+                }
+                else
+                {
+                    LPAHub.TakeVTrolleyIn(trolley);
+                    trolley.ContinueDistribution = false;
+                }
+            }
+        }
+
+        public void FinishedRegion()
+        {
+            if(LPAHub != default)
+            {
+                LPAHub.Targeted = false;
+                LPAHub = default;
             }
         }
     }

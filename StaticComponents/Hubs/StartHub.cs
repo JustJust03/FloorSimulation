@@ -87,8 +87,9 @@ namespace FloorSimulation
             if (HubTrolleys.Count == 0)
                 return null;
             DanishTrolley t = HubTrolleys[HubTrolleys.Count - 1];
-            if (WW.GetTile(new Point(t.RPoint.X + t.GetRSize().Width, t.RPoint.Y + 20)) == WW.GetTile(dlp.RPoint) ||
-                WW.GetTile(new Point(t.RPoint.X + t.GetRSize().Width, t.RPoint.Y + 20)).TileRight() == WW.GetTile(dlp.RPoint))
+            //if (WW.GetTile(new Point(t.RPoint.X + t.GetRSize().Width, t.RPoint.Y + 20)) == WW.GetTile(dlp.RPoint) ||
+            //    WW.GetTile(new Point(t.RPoint.X + t.GetRSize().Width, t.RPoint.Y + 20)).TileRight() == WW.GetTile(dlp.RPoint))
+            if (dlp.RPoint.Y - 20 == t.RPoint.Y && dlp.RPoint.X > t.RPoint.X && dlp.RPoint.X < t.RPoint.X + 67)
             {
                 floor.Display.InvalInfo();
                 HubTrolleys.RemoveAt(HubTrolleys.Count - 1);

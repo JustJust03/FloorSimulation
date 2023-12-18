@@ -115,29 +115,30 @@ namespace FloorSimulation
         {
             LPDriveLines = new LowPadDriveLines();
 
-            LPDriveLines.AddVerticalLine(3520, UpperY - 200, LowestY + 20, 1);
-            LPDriveLines.AddHorizontalLine(4790, 0, RealFloorWidth, -1);
-            LPDriveLines.AddHorizontalLine(4590, 360, 850, -1);
-            LPDriveLines.AddHorizontalLine(4590, 0, 360, 1);
-            LPDriveLines.AddHorizontalLine(4590, 850, 4000, -1, true);
+            LPDriveLines.AddVerticalLine(3520, UpperY - 200, LowestY + 20, 1); //Most right shop line
+            LPDriveLines.AddHorizontalLine(4790, 0, RealFloorWidth, -1); //Lowest line, Used to pick up a new full trolley
+            LPDriveLines.AddHorizontalLine(4590, 360, 850, -1, true); //Normal loop again. Used to push the lp's with the new trolleys to the first vertical shopline
+            LPDriveLines.AddHorizontalLine(4590, 0, 360, 1, true); //Also normal loop. Also Pushed the lp's to the first vertical shopline
+            LPDriveLines.AddHorizontalLine(4590, 850, 4000, -1, true); //If a lp finished the loop, but still carries a trolley, put it on this line.
 
-            LPDriveLines.AddHorizontalLine(UpperY - 180, 0, 3600, 1);
-            LPDriveLines.AddHorizontalLine(LowestY + 10, 430, 3310, 1);
+            LPDriveLines.AddHorizontalLine(UpperY - 190, 0, 3600, 1); //Upper horizontal line above the shops
+            LPDriveLines.AddHorizontalLine(UpperY - 180, 0, 3600, 1); //Backup Line
+            LPDriveLines.AddHorizontalLine(LowestY + 10, 430, 3310, 1, true); //lower horizontal line below the shops.
 
-            LPDriveLines.AddVerticalLine(360, UpperY - 200, 4750, -1);
-            LPDriveLines.AddVerticalLine(650, UpperY - 200, LowestY + 20, 1);
-            LPDriveLines.AddVerticalLine(1320, UpperY - 200, LowestY + 40, -1);
-            LPDriveLines.AddVerticalLine(1600, UpperY - 200, LowestY + 40, 1);
-            LPDriveLines.AddVerticalLine(2280, UpperY - 200, LowestY + 40, -1);
-            LPDriveLines.AddVerticalLine(2560, UpperY - 200, LowestY + 40, 1);
-            LPDriveLines.AddVerticalLine(3240, UpperY - 200, LowestY + 40, -1);
+            LPDriveLines.AddVerticalLine(360, UpperY - 300, 4750, -1); //Shop hub lines...
+            LPDriveLines.AddVerticalLine(650, UpperY - 300, LowestY + 20, 1);
+            LPDriveLines.AddVerticalLine(1320, UpperY - 300, LowestY + 40, -1);
+            LPDriveLines.AddVerticalLine(1600, UpperY - 300, LowestY + 40, 1);
+            LPDriveLines.AddVerticalLine(2280, UpperY - 300, LowestY + 40, -1);
+            LPDriveLines.AddVerticalLine(2560, UpperY - 300, LowestY + 40, 1);
+            LPDriveLines.AddVerticalLine(3240, UpperY - 300, LowestY + 40, -1);
 
             for(int EvenI = 0; EvenI < ShopCornersX.Count - 1; EvenI += 2)
-                LPDriveLines.AddVerticalLine(ShopCornersX[EvenI] + 70, UpperY - 10, LowestY, 0);
+                LPDriveLines.AddVerticalLine(ShopCornersX[EvenI] + 70, UpperY - 10, LowestY, 0, EnterLPAHubWhenHit: true);
             for(int UnevenI = 1; UnevenI < ShopCornersX.Count - 1; UnevenI += 2)
-                LPDriveLines.AddVerticalLine(ShopCornersX[UnevenI] - 130, UpperY - 10, LowestY, 0);
+                LPDriveLines.AddVerticalLine(ShopCornersX[UnevenI] - 130, UpperY - 10, LowestY, 0, EnterLPAHubWhenHit: true);
 
-            LPDriveLines.AddVerticalLine(ShopCornersX[ShopCornersX.Count - 1] - 70, UpperY, floor.LPHubs[floor.LPHubs.Count - 1].RFloorPoint.Y + 50, 0);
+            LPDriveLines.AddVerticalLine(ShopCornersX[ShopCornersX.Count - 1] - 130, UpperY - 10, floor.LPHubs[floor.LPHubs.Count - 1].RFloorPoint.Y + 50, 0, EnterLPAHubWhenHit: true);
 
             foreach(LowPadAccessHub LPAHub in floor.LPHubs)
             {
@@ -318,9 +319,9 @@ namespace FloorSimulation
         List<VerticalLine> VerticalLines = new List<VerticalLine>();
         List<HorizontalLine> HorizontalLines = new List<HorizontalLine>();
 
-        public void AddVerticalLine(int Rx, int LowerRy, int UpperRy, int DeltaY)
+        public void AddVerticalLine(int Rx, int LowerRy, int UpperRy, int DeltaY, bool EnterLPAHubWhenHit = false)
         {
-            VerticalLines.Add(new VerticalLine(Rx, LowerRy, UpperRy, DeltaY));
+            VerticalLines.Add(new VerticalLine(Rx, LowerRy, UpperRy, DeltaY, EnterLPAHubWhenHit));
         }
 
         public void AddHorizontalLine(int Ry, int LeftRx, int RightRx, int DeltaX, bool CarryTrolleyToEnterLine = false, LowPadAccessHub LPA= default)
@@ -344,8 +345,15 @@ namespace FloorSimulation
                     continue;
                 if(line.LowerRY < dlp.RPoint.Y && dlp.RPoint.Y < line.UpperRY)
                 {
+                    if (line.EnterLPAHubWhenHit && dlp.LPAHub == null)
+                        return; //The lp got stuck and couldn't move out of regionhub.
+
                     dlp.MainTask.LowpadDeltaX = 0;
                     dlp.MainTask.LowpadDeltaY = line.DeltaY;
+                    if(line.EnterLPAHubWhenHit)
+                        dlp.HitAccessHub();
+                    else
+                        dlp.FinishedRegion();
                 }
             }
         }
@@ -374,13 +382,16 @@ namespace FloorSimulation
         public int UpperRY;
 
         public int DeltaY;
+        public bool EnterLPAHubWhenHit;
 
-        public VerticalLine(int Rx, int LowerRy, int UpperRy, int Deltay)
+        public VerticalLine(int Rx, int LowerRy, int UpperRy, int Deltay, bool EnterLPAHubWhenHit_)
         {
             RX = Rx;
             LowerRY = LowerRy;  
             UpperRY = UpperRy;
             DeltaY = Deltay;
+
+            EnterLPAHubWhenHit = EnterLPAHubWhenHit_;
         }
     }
 
@@ -412,8 +423,9 @@ namespace FloorSimulation
 
         public bool EnterRegion(DumbLowPad dlp)
         {
-            if (dlp.trolley.TargetRegions.Contains(LPA) && !LPA.Targeted)
+            if (dlp.trolley != null && dlp.trolley.TargetRegions.Contains(LPA) && !LPA.Targeted && LPA.HubTrolleys.Count == 0)
             {
+                dlp.LPAHub = LPA;
                 LPA.Targeted = true;
                 return true;
             }

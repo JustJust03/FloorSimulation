@@ -51,6 +51,7 @@ namespace FloorSimulation
                 }
                 else if (RegionHub.HubTrolleys[0].PlantList.Count == 0)
                 {
+                    DButer.floor.FirstWW.unfill_tiles(new Point(RegionHub.RFloorPoint.X, RegionHub.RFloorPoint.Y - 60), new Size(RegionHub.RHubSize.Width + 10, 60));
                     DButer.TravelToTrolley(RegionHub.HubTrolleys[0], true);
                     Goal = "TakeRegionHubTrolley";
                     if (DButer.route == null)
@@ -121,7 +122,10 @@ namespace FloorSimulation
             if (Goal == "TravelToLP")
                 DButer.TravelToTile(RegionHub.DbOpenSpots());
             else if (Goal == "TakeRegionHubTrolley")
+            {
+                DButer.floor.FirstWW.unfill_tiles(new Point(RegionHub.RFloorPoint.X, RegionHub.RFloorPoint.Y - 60), new Size(RegionHub.RHubSize.Width + 10, 60));
                 DButer.TravelToTrolley(RegionHub.HubTrolleys[0], true);
+            }
             else if (Goal == "TravelToStartTile")
                 DButer.TravelToTile(DButer.WW.GetTile(DButer.SavePoint));
             else if (TargetIsOpenSpotsRegionDb.Contains(Goal))

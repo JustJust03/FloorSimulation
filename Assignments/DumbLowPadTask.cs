@@ -24,6 +24,18 @@ namespace FloorSimulation
         {
             if(LowpadDeltaX != 0 || LowpadDeltaY != 0)
                 LP.TickWalk();
+            else
+            {
+                if(LP.trolley != null && LP.trolley.ContinueDistribution && LP.LPAHub != null)
+                {
+                    LP.LPAHub.GiveTrolley();
+                    LowpadDeltaX = LP.LPAHub.HasLeftAccess ? -1 : 1;
+                }
+                else if(LP.LPAHub == null)
+                {
+                    ;
+                }
+            }
         }
 
         public override void RouteCompleted()
