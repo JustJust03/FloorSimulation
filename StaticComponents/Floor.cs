@@ -33,7 +33,7 @@ namespace FloorSimulation
         public Random rand;
 
         // Real size: 5000 cm x 5000 cm
-        public const float ScaleFactor = 0.25f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
+        public const float ScaleFactor = 0.15f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
         public Layout layout;
 
         public bool TickingHeatMap = false;
@@ -128,6 +128,9 @@ namespace FloorSimulation
         {
             Ticks += SpeedMultiplier;
             ElapsedSimTime = ElapsedSimTime.Add(TimeSpan.FromMilliseconds(MilisecondsPerTick * SpeedMultiplier));
+
+            if(STHubs[0].HubTrolleys.Count == 1)
+                FirstWW.fill_tiles(STHubs[0].HubTrolleys[0].RPoint, STHubs[0].HubTrolleys[0].GetRSize());
 
             if ((int)ElapsedSimTime.TotalSeconds <= SecondsToFullOperation + 2)
                 AddAgent((int)ElapsedSimTime.TotalSeconds);

@@ -19,6 +19,8 @@ namespace FloorSimulation
         public int TILEWIDTH = LPTileWidth;
         public int TILEHEIGHT = LPTileHeight;
 
+        public LowPadAccessHub LPAHub;
+
         public DumbLowPad(int id_, Floor floor_, WalkWay WW_, Point Rpoint_ = default, bool IsVertical_ = true, int MaxWaitedTicks_ = 100) :
             base(id_, floor_, WW_, "LowPad", RIDESPEED, Rpoint_, IsVertical_, MaxWaitedTicks_)
         {

@@ -19,9 +19,15 @@ namespace FloorSimulation
         {
             shops = shops_;
             if (shops[0].HasLeftAccess)
+            {
+                HasLeftAccess = true;
                 DbAccesspoint = WW.GetTile(new Point(RFloorPoint.X + RHubSize.Width + 40, RFloorPoint.Y));
+            }
             else
+            {
+                HasLeftAccess = false;
                 DbAccesspoint = WW.GetTile(new Point(RFloorPoint.X - 40, RFloorPoint.Y));
+            }
         }
 
         public override List<WalkTile> OpenSpots(Agent agent)

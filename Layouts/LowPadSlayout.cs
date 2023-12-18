@@ -20,7 +20,7 @@ namespace FloorSimulation
 
         public LowPadSlayoutBuffhub(Floor floor_, ReadData rData) : base(floor_, rData)
         {
-            NLowpads = 10;
+            NLowpads = 50;
             ShopStartX = 50;
         }
         public override string ToString()
@@ -122,7 +122,7 @@ namespace FloorSimulation
             LPDriveLines.AddHorizontalLine(4590, 850, 4000, -1, true);
 
             LPDriveLines.AddHorizontalLine(UpperY - 180, 0, 3600, 1);
-            LPDriveLines.AddHorizontalLine(LowestY + 20, 430, 3310, 1);
+            LPDriveLines.AddHorizontalLine(LowestY + 10, 430, 3310, 1);
 
             LPDriveLines.AddVerticalLine(360, UpperY - 200, 4750, -1);
             LPDriveLines.AddVerticalLine(650, UpperY - 200, LowestY + 20, 1);
@@ -131,6 +131,21 @@ namespace FloorSimulation
             LPDriveLines.AddVerticalLine(2280, UpperY - 200, LowestY + 40, -1);
             LPDriveLines.AddVerticalLine(2560, UpperY - 200, LowestY + 40, 1);
             LPDriveLines.AddVerticalLine(3240, UpperY - 200, LowestY + 40, -1);
+
+            for(int EvenI = 0; EvenI < ShopCornersX.Count - 1; EvenI += 2)
+                LPDriveLines.AddVerticalLine(ShopCornersX[EvenI] + 70, UpperY - 10, LowestY, 0);
+            for(int UnevenI = 1; UnevenI < ShopCornersX.Count - 1; UnevenI += 2)
+                LPDriveLines.AddVerticalLine(ShopCornersX[UnevenI] - 130, UpperY - 10, LowestY, 0);
+
+            LPDriveLines.AddVerticalLine(ShopCornersX[ShopCornersX.Count - 1] - 70, UpperY, floor.LPHubs[floor.LPHubs.Count - 1].RFloorPoint.Y + 50, 0);
+
+            foreach(LowPadAccessHub LPAHub in floor.LPHubs)
+            {
+                if(LPAHub.HasLeftAccess)
+                    LPDriveLines.AddHorizontalLine(LPAHub.RFloorPoint.Y, LPAHub.RFloorPoint.X - 100, LPAHub.RFloorPoint.X, 1, LPA: LPAHub);
+                else
+                    LPDriveLines.AddHorizontalLine(LPAHub.RFloorPoint.Y, LPAHub.RFloorPoint.X, LPAHub.RFloorPoint.X + 100, -1, LPA: LPAHub);
+            }
         }
 
         public override void PlaceDistributers(int amount, Point StartPoint)
@@ -308,9 +323,9 @@ namespace FloorSimulation
             VerticalLines.Add(new VerticalLine(Rx, LowerRy, UpperRy, DeltaY));
         }
 
-        public void AddHorizontalLine(int Ry, int LeftRx, int RightRx, int DeltaX, bool CarryTrolleyToEnterLine = false)
+        public void AddHorizontalLine(int Ry, int LeftRx, int RightRx, int DeltaX, bool CarryTrolleyToEnterLine = false, LowPadAccessHub LPA= default)
         {
-            HorizontalLines.Add(new HorizontalLine(Ry, LeftRx, RightRx, DeltaX, CarryTrolleyToEnterLine));
+            HorizontalLines.Add(new HorizontalLine(Ry, LeftRx, RightRx, DeltaX, CarryTrolleyToEnterLine, LPA));
         }
 
         public void HitDriveLine(DumbLowPad dlp)
@@ -341,8 +356,9 @@ namespace FloorSimulation
             {
                 if (line.RY != dlp.RPoint.Y)
                     continue;
-                if(line.LeftRX < dlp.RPoint.X && dlp.RPoint.X < line.RightRX &&
-                   (!line.CarryTrolleyToEnterLine || line.MustHaveAtrolley(dlp)))
+                if(line.LeftRX < dlp.RPoint.X && dlp.RPoint.X < line.RightRX &&         //Hit line,
+                   (!line.CarryTrolleyToEnterLine || line.MustHaveAtrolley(dlp)) &&     //Must have a trolley to enter this line (redo the loop).
+                   (line.LPA == default || line.EnterRegion(dlp)))                      //Must have a plant to deliver to this region and it should not be used already.
                 {
                     dlp.MainTask.LowpadDeltaY = 0;
                     dlp.MainTask.LowpadDeltaX = line.DeltaX;
@@ -377,18 +393,31 @@ namespace FloorSimulation
         public int DeltaX;
         public bool CarryTrolleyToEnterLine;
 
-        public HorizontalLine(int Ry, int LeftRx, int RightRx, int Deltax, bool CarryTrolleyToEnterLine_)
+        public LowPadAccessHub LPA;
+
+        public HorizontalLine(int Ry, int LeftRx, int RightRx, int Deltax, bool CarryTrolleyToEnterLine_, LowPadAccessHub LPA_)
         {
             RY = Ry;
             LeftRX = LeftRx;
             RightRX = RightRx;
             DeltaX = Deltax;
             CarryTrolleyToEnterLine = CarryTrolleyToEnterLine_;
+            LPA = LPA_;
         }
 
         public bool MustHaveAtrolley(DumbLowPad dlp) 
         {
             return dlp.trolley != null;
+        }
+
+        public bool EnterRegion(DumbLowPad dlp)
+        {
+            if (dlp.trolley.TargetRegions.Contains(LPA) && !LPA.Targeted)
+            {
+                LPA.Targeted = true;
+                return true;
+            }
+            return false;
         }
     }
 }
