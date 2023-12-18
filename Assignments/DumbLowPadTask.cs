@@ -31,10 +31,6 @@ namespace FloorSimulation
                     LP.LPAHub.GiveTrolley();
                     LowpadDeltaX = LP.LPAHub.HasLeftAccess ? -1 : 1;
                 }
-                else if(LP.LPAHub == null)
-                {
-                    ;
-                }
             }
         }
 

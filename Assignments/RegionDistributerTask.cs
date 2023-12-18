@@ -19,6 +19,8 @@ namespace FloorSimulation
         private WalkTile OldWalkTile; //Is only used to save on which spot you picked up a finished trolley.
         private ShopHub OldTargetHub;
 
+        int WaitedTicks = 0;
+
         private readonly List<string> TargetIsOpenSpotsRegionDb = new List<string>
         {
             "DistributePlants",
@@ -89,6 +91,24 @@ namespace FloorSimulation
                     }
             }
 
+            if (Waiting)
+            {
+                FailRoute();
+                if (DButer.route != null)
+                    WaitedTicks = 0;
+
+                WaitedTicks++;
+
+                if (WaitedTicks > 100)
+                {
+                    WaitedTicks = 0;
+                    DButer.TravelToTile(DButer.WW.GetTile(DButer.SavePoint));
+                    Waiting = false;
+                    TargetWasSaveTile = true;
+                }
+                return;
+            }
+
             if (InTask && Travelling)
                 DButer.TickWalk();
             else if (InTask)
@@ -97,6 +117,13 @@ namespace FloorSimulation
 
         public override void RouteCompleted()
         {
+            if (TargetWasSaveTile)
+            {
+                TargetWasSaveTile = false;
+                FailRoute();
+                return;
+            }
+
             AInfo.UpdateFreq(Goal);
             if (Goal == "TravelToLP")
                 TravelToLP();

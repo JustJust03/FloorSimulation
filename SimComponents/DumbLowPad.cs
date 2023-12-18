@@ -82,10 +82,6 @@ namespace FloorSimulation
             ticktravel += travel_dist_per_tick * floor.SpeedMultiplier;
             while (ticktravel > WalkWay.WALK_TILE_WIDTH)
             {
-                if(RPoint.Y < 860)
-                {
-                    ;
-                }
                 WW.unfill_tiles(RPoint, GetRSize());
                 if (MainTask.LowpadDeltaX == -1)
                 {

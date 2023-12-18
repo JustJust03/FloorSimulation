@@ -46,6 +46,7 @@ namespace FloorSimulation.Assignments
                 WaitedTicks++;
                 if (WaitedTicks > 100)
                 {
+                    DButer.floor.FirstWW.unfill_tiles(DButer.RPoint, DButer.GetRSize());
                     WaitedTicks = 0;
                     DButer.TravelToTile(DButer.WW.GetTile(DButer.SavePoint));
                     Waiting = false;
