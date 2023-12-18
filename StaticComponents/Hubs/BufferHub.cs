@@ -121,11 +121,17 @@ namespace FloorSimulation
                     return LangeHarryOpenSpots(agent);
                 for (int coli = NTrolleysInRow - 1; coli >= 0; coli--)
                     for (int rowi = 0; rowi < NRows; rowi++)
-                        if (Trolleyarr[rowi, coli] == null)
+                    {
+                        if (Trolleyarr[rowi, coli] == null && OpenSpots.Count == 0)
                         {
                             OpenSpots.Add(HubAccessPoints[rowi, coli]);
-                            break;
                         }
+                        else if (OpenSpots.Count > 0 && Trolleyarr[rowi, coli] != null) //Removes any trolleys that were under an open spot.
+                        {
+                            WW.unfill_tiles(Trolleyarr[rowi, coli].RPoint, Trolleyarr[rowi, coli].GetRSize());
+                            Trolleyarr[rowi, coli] = null;
+                        }
+                    }
             }
 
             else

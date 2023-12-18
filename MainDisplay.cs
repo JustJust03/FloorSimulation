@@ -66,7 +66,7 @@ namespace FloorSimulation
             Controls.Add(InfoPanel);
 
             Paint += PaintMainDisplay;
-            SaveFileBase = date + "_" + "HeatMapTesting";
+            SaveFileBase = date + "_" + "21distr-40LowPads";
         }
 
         private void PaintMainDisplay(object sender, PaintEventArgs e)
