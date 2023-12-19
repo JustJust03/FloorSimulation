@@ -21,7 +21,10 @@ namespace FloorSimulation
         public LowPadSlayoutBuffhub(Floor floor_, ReadData rData) : base(floor_, rData)
         {
             NLowpads = 50;
-            ShopStartX = 50;
+            ShopStartX = 70;
+            RealFloorWidth = 5200;
+            StreetWidth += 120;
+            RealFloorHeight = 5200;
         }
 
         public override string ToString()
@@ -108,31 +111,43 @@ namespace FloorSimulation
                     DBX = regions[id][0].RFloorPoint.X + regions[id][0].RHubSize.Width + 10;
 
                 Distributer db = new Distributer(id, floor, floor.FirstWW, Rpoint_: new Point(DBX, MiddleY), MaxWaitedTicks_: 100 - id, IsVertical_: false, RHubs: lowPadAccessHubs[id].ToArray());
+
+                foreach(LowPadAccessHub lpa in lowPadAccessHubs[id])
+                    lpa.dbuter = db;
+
                 floor.DistrList.Add(db);
             }
         }
 
         public void CreateDriveLines()
         {
-            LPDriveLines = new LowPadDriveLines();
+            List<LowPadAccessHub>[] ShopsPLine = new List<LowPadAccessHub>[3];
+            ShopsPLine[0] = floor.LPHubs.GetRange(39, 38);
+            ShopsPLine[1] = floor.LPHubs.GetRange(77, 38);
+            ShopsPLine[2] = floor.LPHubs.GetRange(115, 18);
 
-            LPDriveLines.AddVerticalLine(3520, UpperY - 200, LowestY + 10, 1); //Most right shop line
-            LPDriveLines.AddHorizontalLine(4790, 0, RealFloorWidth, -1); //Lowest line, Used to pick up a new full trolley
-            LPDriveLines.AddHorizontalLine(4590, 360, 850, -1, true); //Normal loop again. Used to push the lp's with the new trolleys to the first vertical shopline
-            LPDriveLines.AddHorizontalLine(4590, 0, 360, 1, true); //Also normal loop. Also Pushed the lp's to the first vertical shopline
-            LPDriveLines.AddHorizontalLine(4590, 850, 4000, -1, true); //If a lp finished the loop, but still carries a trolley, put it on this line.
+            LPDriveLines = new LowPadDriveLines(ShopCornersX[ShopCornersX.Count - 1], UpperY - 300, RealFloorHeight - 160);
 
-            LPDriveLines.AddHorizontalLine(UpperY - 190, 0, 3600, 1); //Upper horizontal line above the shops
-            LPDriveLines.AddHorizontalLine(UpperY - 180, 0, 3600, 1); //Backup Line
-            LPDriveLines.AddHorizontalLine(LowestY + 10, 430, 3310, 1, true); //lower horizontal line below the shops.
+            LPDriveLines.AddHorizontalLine(RealFloorHeight - 210, 0, RealFloorWidth, -1); //Lowest line, Used to pick up a new full trolley
+            LPDriveLines.AddHorizontalLine(RealFloorHeight - 410, 360, 850, -1, true); //Normal loop again. Used to push the lp's with the new trolleys to the first vertical shopline
+            LPDriveLines.AddHorizontalLine(RealFloorHeight - 410, 0, 360, 1, true); //Also normal loop. Also Pushed the lp's to the first vertical shopline
+            LPDriveLines.AddHorizontalLine(RealFloorHeight - 410, 850, RealFloorWidth, -1, true); //If a lp finished the loop, but still carries a trolley, put it on this line.
 
-            LPDriveLines.AddVerticalLine(360, UpperY - 20, 4750, -1); //Shop hub lines...
-            LPDriveLines.AddVerticalLine(650, UpperY - 200, LowestY + 20, 1);
-            LPDriveLines.AddVerticalLine(1320, UpperY - 20, LowestY + 20, -1);
-            LPDriveLines.AddVerticalLine(1600, UpperY - 200, LowestY + 20, 1);
-            LPDriveLines.AddVerticalLine(2280, UpperY - 20, LowestY + 20, -1);
-            LPDriveLines.AddVerticalLine(2560, UpperY - 200, LowestY + 20, 1);
-            LPDriveLines.AddVerticalLine(3240, UpperY - 20, LowestY + 20, -1);
+            LPDriveLines.AddHorizontalLine(UpperY - 180, 0, RealFloorWidth, 1); //Backup Line
+            LPDriveLines.AddHorizontalLine(LowestY + 10, 500, 3310, 1, true); //lower horizontal line below the shops.
+
+            LPDriveLines.AddVerticalLine(ShopCornersX[0] + 200, UpperY - 20, LowestY + 310, -1);
+            int ShopsPLineI = 0;
+            for(int cornerI = 2; cornerI < ShopCornersX.Count; cornerI += 2) //Shop hub lines...
+            {
+                if(ShopsPLineI < 3)
+                    LPDriveLines.AddVerticalLine(ShopCornersX[cornerI] + 200, UpperY - 20, LowestY + 20, -1, ShopsInLine: ShopsPLine[ShopsPLineI]);
+                else
+                    LPDriveLines.AddVerticalLine(ShopCornersX[cornerI] + 200, UpperY - 20, LowestY + 20, -1);
+                ShopsPLineI++;
+            }
+            for(int cornerI = 1; cornerI < ShopCornersX.Count; cornerI += 2)
+                LPDriveLines.AddVerticalLine(ShopCornersX[cornerI] - 260, UpperY - 200, LowestY, 1);
 
             for(int EvenI = 0; EvenI < ShopCornersX.Count - 1; EvenI += 2)
                 LPDriveLines.AddVerticalLine(ShopCornersX[EvenI] + 70, UpperY - 10, LowestY, 0, EnterLPAHubWhenHit: true);
@@ -144,9 +159,9 @@ namespace FloorSimulation
             foreach(LowPadAccessHub LPAHub in floor.LPHubs)
             {
                 if(LPAHub.HasLeftAccess)
-                    LPDriveLines.AddHorizontalLine(LPAHub.RFloorPoint.Y, LPAHub.RFloorPoint.X - 100, LPAHub.RFloorPoint.X, 1, LPA: LPAHub);
+                    LPDriveLines.AddHorizontalLine(LPAHub.RFloorPoint.Y, LPAHub.RFloorPoint.X - 170, LPAHub.RFloorPoint.X, 1, LPA: LPAHub);
                 else
-                    LPDriveLines.AddHorizontalLine(LPAHub.RFloorPoint.Y, LPAHub.RFloorPoint.X, LPAHub.RFloorPoint.X + 100, -1, LPA: LPAHub);
+                    LPDriveLines.AddHorizontalLine(LPAHub.RFloorPoint.Y, LPAHub.RFloorPoint.X, LPAHub.RFloorPoint.X + 170, -1, LPA: LPAHub);
             }
         }
 
@@ -216,7 +231,7 @@ namespace FloorSimulation
                 int deltaX = obj.RFloorPoint.X - agent.RPoint.X;
                 int deltaY = obj.RFloorPoint.Y - agent.RPoint.Y;
                 if (obj.name == "Buffer hub")
-                    deltaX = 0;
+                    deltaX = 999;
                 return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
             })
             .ToList();
@@ -275,7 +290,8 @@ namespace FloorSimulation
 
         private List<List<ShopHub>> AssignDBregions(List<ShopHub> Shops, List<List<ShopHub>> DistributionRegions)
         {
-            int[] NshopsPerDbuter = new int[] { 10, 10, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5 };
+            //int[] NshopsPerDbuter = new int[] { 10, 10, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5 };
+            int[] NshopsPerDbuter = new int[] { 7, 7, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 6, 6, 6 };
             int[] NShopsPerRegion = NshopsPerDbuter.Distinct().OrderBy(x => 9999 - x).ToArray();
 
             for (int Nshopsi = 0; Nshopsi < NShopsPerRegion.Count(); Nshopsi++)
@@ -320,9 +336,20 @@ namespace FloorSimulation
         List<VerticalLine> VerticalLines = new List<VerticalLine>();
         List<HorizontalLine> HorizontalLines = new List<HorizontalLine>();
 
-        public void AddVerticalLine(int Rx, int LowerRy, int UpperRy, int DeltaY, bool EnterLPAHubWhenHit = false)
+        int MostRightX;
+        int UppestY;
+        int LowestY;
+
+        public LowPadDriveLines(int LastCornerX, int HighestY, int LowestY_)
         {
-            VerticalLines.Add(new VerticalLine(Rx, LowerRy, UpperRy, DeltaY, EnterLPAHubWhenHit));
+            MostRightX = LastCornerX + 300;
+            UppestY = HighestY;
+            LowestY = LowestY_;
+        }
+
+        public void AddVerticalLine(int Rx, int LowerRy, int UpperRy, int DeltaY, bool EnterLPAHubWhenHit = false, List<LowPadAccessHub> ShopsInLine = null)
+        {
+            VerticalLines.Add(new VerticalLine(Rx, LowerRy, UpperRy, DeltaY, EnterLPAHubWhenHit, ShopsInLine));
         }
 
         public void AddHorizontalLine(int Ry, int LeftRx, int RightRx, int DeltaX, bool CarryTrolleyToEnterLine = false, LowPadAccessHub LPA= default)
@@ -340,11 +367,25 @@ namespace FloorSimulation
 
         public void HitVerticalDriveLine(DumbLowPad dlp)
         {
+            if(dlp.RPoint.X > MostRightX && dlp.MainTask.LowpadDeltaX == 1)
+            {
+                dlp.MainTask.LowpadDeltaX = 0;
+                dlp.MainTask.LowpadDeltaY = 1;
+                return;
+            }
+            else if(dlp.RPoint.X <= 10 && dlp.MainTask.LowpadDeltaX == -1)
+            {
+                dlp.MainTask.LowpadDeltaX = 0;
+                dlp.MainTask.LowpadDeltaY = -1;
+                return;
+            }
+
             foreach(VerticalLine line in VerticalLines)
             {
                 if (line.RX != dlp.RPoint.X)
                     continue;
-                if(line.LowerRY < dlp.RPoint.Y && dlp.RPoint.Y < line.UpperRY)
+                if (line.LowerRY < dlp.RPoint.Y && dlp.RPoint.Y < line.UpperRY &&
+                   (line.ShopsInLine == null || dlp.trolley == null || LowestY - 420 != dlp.RPoint.Y || line.ShopsInLine.Intersect(dlp.trolley.TargetRegions).Any()))
                 {
                     if (line.EnterLPAHubWhenHit && dlp.LPAHub == null)
                         return; //The lp got stuck and couldn't move out of regionhub.
@@ -356,16 +397,31 @@ namespace FloorSimulation
                     else
                         dlp.FinishedRegion();
                 }
+                ;
             }
+            ;
         }
 
         public void HitHorizontalDriveLine(DumbLowPad dlp)
         {
+            if(dlp.RPoint.Y > LowestY && dlp.MainTask.LowpadDeltaY == 1)
+            {
+                dlp.MainTask.LowpadDeltaX = 0;
+                dlp.MainTask.LowpadDeltaY = -1;
+                return;
+            }
+            else if (dlp.RPoint.Y < UppestY && dlp.MainTask.LowpadDeltaY == -1)
+            {
+                dlp.MainTask.LowpadDeltaX = 1;
+                dlp.MainTask.LowpadDeltaY = 0;
+                return;
+            }
+            
             foreach(HorizontalLine line in HorizontalLines)
             {
                 if (line.RY != dlp.RPoint.Y)
                     continue;
-                if(line.LeftRX < dlp.RPoint.X && dlp.RPoint.X < line.RightRX &&         //Hit line,
+                if (line.LeftRX < dlp.RPoint.X && dlp.RPoint.X < line.RightRX &&         //Hit line,
                    (!line.CarryTrolleyToEnterLine || line.MustHaveAtrolley(dlp)) &&     //Must have a trolley to enter this line (redo the loop).
                    (line.LPA == default || line.EnterRegion(dlp)))                      //Must have a plant to deliver to this region and it should not be used already.
                 {
@@ -384,8 +440,9 @@ namespace FloorSimulation
 
         public int DeltaY;
         public bool EnterLPAHubWhenHit;
+        public List<LowPadAccessHub> ShopsInLine;
 
-        public VerticalLine(int Rx, int LowerRy, int UpperRy, int Deltay, bool EnterLPAHubWhenHit_)
+        public VerticalLine(int Rx, int LowerRy, int UpperRy, int Deltay, bool EnterLPAHubWhenHit_, List<LowPadAccessHub> ShopsInLine_)
         {
             RX = Rx;
             LowerRY = LowerRy;  
@@ -393,6 +450,7 @@ namespace FloorSimulation
             DeltaY = Deltay;
 
             EnterLPAHubWhenHit = EnterLPAHubWhenHit_;
+            ShopsInLine = ShopsInLine_;
         }
     }
 
@@ -426,6 +484,10 @@ namespace FloorSimulation
         {
             if (dlp.trolley != null && dlp.trolley.TargetRegions.Contains(LPA) && !LPA.Targeted && LPA.HubTrolleys.Count == 0)
             {
+                double odds = Math.Min((1.0 / dlp.trolley.TargetRegions.Count) + (1.0 / Math.Pow(2, LPA.dbuter.MainTask.NTrolleysStanding() + 1.0)), 1.0);
+                if (odds < 0.20)
+                    return false;
+                
                 dlp.LPAHub = LPA;
                 LPA.Targeted = true;
                 return true;

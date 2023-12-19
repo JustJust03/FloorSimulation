@@ -135,7 +135,7 @@ namespace FloorSimulation
 
         public void HitAccessHub()
         {
-            if(LPAHub != default)
+            if(LPAHub != default && trolley != null)
             {
                 if(trolley.TargetRegions.Count == 1)
                 {

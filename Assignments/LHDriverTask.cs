@@ -127,6 +127,13 @@ namespace FloorSimulation.Assignments
 
         public override void RouteCompleted()
         {
+            if (TargetWasSaveTile)
+            {
+                TargetWasSaveTile = false;
+                FailRoute();
+                return;
+            }
+
             if (Goal == "EmptySmallBuffHub")
                 EmptySmallBuffHub();
             else if (Goal == "LHDeliverEmptyTrolleys")

@@ -117,8 +117,6 @@ namespace FloorSimulation
 
             if (VerticalTrolleys)
             {
-                if (agent.IsOnHarry)
-                    return LangeHarryOpenSpots(agent);
                 for (int coli = NTrolleysInRow - 1; coli >= 0; coli--)
                     for (int rowi = 0; rowi < NRows; rowi++)
                         if (Trolleyarr[rowi, coli] == null)
@@ -132,12 +130,17 @@ namespace FloorSimulation
             {
                 for (int rowi = 0; rowi < NRows; rowi++)
                     for (int coli = NTrolleysInRow - 1; coli >= 0; coli--)
-                        if (Trolleyarr[rowi, coli] == null)
-                        {
+                    {
+                        if (Trolleyarr[rowi, coli] == null && floor.layout.NLowpads == 0)
                             OpenSpots.Add(HubAccessPoints[rowi, coli]);
-                            if (floor.layout.NLowpads > 0)
-                                return OpenSpots;
+                        if (Trolleyarr[rowi, coli] == null && floor.layout.NLowpads > 0 && OpenSpots.Count == 0)
+                            OpenSpots.Add(HubAccessPoints[rowi, coli]);
+                        else if(Trolleyarr[rowi, coli] != null && OpenSpots.Count == 1)
+                        {
+                            floor.FirstWW.unfill_tiles(Trolleyarr[rowi, coli].RPoint, Trolleyarr[rowi, coli].GetRSize());
+                            Trolleyarr[rowi, coli] = null;
                         }
+                    }
             }
 
             return OpenSpots;
@@ -304,6 +307,8 @@ namespace FloorSimulation
             {
                 ArrIndexx = Array.IndexOf(HubAccessPointsX, AgentRPoint.X + 20);
                 ArrIndexy = Array.IndexOf(HubAccessPointsY, AgentRPoint.Y); //This 20 is because of the extra height when the dbuter is rotated.
+                if(ArrIndexy == 0 && ArrIndexx == 0 && floor.layout.NLowpads > 0)
+                    WW.unfill_tiles(RFloorPoint, RHubSize);
             }
             else
             {
@@ -313,6 +318,10 @@ namespace FloorSimulation
 
             if (ArrIndexx == -1 || ArrIndexy == -1) return null;
             DanishTrolley t = Trolleyarr[ArrIndexy, ArrIndexx];
+            if (t == null)
+                return null;
+
+            WW.unfill_tiles(t.RPoint, t.GetRSize());
             Trolleyarr[ArrIndexy, ArrIndexx] = null;
 
             return t;

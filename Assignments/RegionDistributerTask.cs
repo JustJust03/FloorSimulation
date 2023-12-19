@@ -166,6 +166,8 @@ namespace FloorSimulation
                 if (RegionHub.HubTrolleys.Count > 0)
                     DButer.floor.FirstWW.unfill_tiles(RegionHub.HubTrolleys[0].RPoint, RegionHub.HubTrolleys[0].GetRSize());
                 TargetHub = DButer.floor.GetBuffHubFull(DButer);
+                if (TargetHub == null)
+                    return;
                 DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
             }
             else if (TargetIsOldWalktile.Contains(Goal))
@@ -409,6 +411,11 @@ namespace FloorSimulation
             Goal = "DeliverFullTrolley"; //New goal
             InTask = true;
             Travelling = true;
+        }
+
+        public override int NTrolleysStanding()
+        {
+            return RegionHubs.Count(r => r.Targeted || r.HubTrolleys.Count > 0);
         }
     }
 }

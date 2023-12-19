@@ -85,5 +85,10 @@ namespace FloorSimulation
         public abstract void RouteCompleted();
         public abstract void FailRoute();
         public abstract void DistributionCompleted();
+
+        public virtual int NTrolleysStanding()
+        {
+            return 0;
+        }
     }
 }

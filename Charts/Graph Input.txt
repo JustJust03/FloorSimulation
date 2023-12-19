@@ -46,3 +46,8 @@ Meer buffers: 620, 135, 140, 25, 67, 443, 45, 87
 1Street meer buffers: 446, 118, 99, 22, 49, 339, 59, 58
 2Street meer buffers: 442, 96, 100, 18, 48, 316, 32, 62
 
+Tijden per trolley (2023-07-18, 521 trolleys verdeeld)
+Minuten (/100)
+Verdelers & Lowpads
+// Verdelers && Lowpads
+21 Verdelers, 0 LowPdas: 901, 150, 203, 40, 99, 600, 111, 128

@@ -11,10 +11,11 @@ namespace FloorSimulation
     {
         public List<ShopHub> shops = new List<ShopHub>();
         WalkTile DbAccesspoint;
+        public Distributer dbuter;
 
         WalkTile LowerAccesspoint;
 
-        public LowPadAccessHub(string name_, int id_, Point FPoint_, Floor floor_, Size s, List<ShopHub> shops_) : 
+        public LowPadAccessHub(string name_, int id_, Point FPoint_, Floor floor_, Size s, List<ShopHub> shops_) :
             base(name_, id_, FPoint_, floor_, s, vertical_trolleys: true)
         {
             shops = shops_;
