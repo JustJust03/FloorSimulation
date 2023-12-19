@@ -311,8 +311,6 @@ namespace FloorSimulation
             {
                 ArrIndexx = Array.IndexOf(HubAccessPointsX, AgentRPoint.X + 20);
                 ArrIndexy = Array.IndexOf(HubAccessPointsY, AgentRPoint.Y); //This 20 is because of the extra height when the dbuter is rotated.
-                if(ArrIndexy == 0 && ArrIndexx == 0 && floor.layout.NLowpads > 0)
-                    WW.unfill_tiles(RFloorPoint, RHubSize);
             }
             else
             {
