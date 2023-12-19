@@ -51,10 +51,14 @@ namespace FloorSimulation
                 GenerateHorizontalAccessPoints();
 
             //Creates initial empty trolleys to the bufferhub
-            for (int i = Trolleyarr.Length - initial_trolleys; i < Trolleyarr.Length; i++)
+            for (int i = HubAccessPointsX.Length - initial_trolleys; i < HubAccessPointsX.Length; i++)
             {
+                if (HubAccessPoints[0, i] == null)
+                    i++;
                 Point p = HubAccessPoints[0, i].Rpoint;
-                DanishTrolley t = new DanishTrolley(100 + i, floor, p, true);
+                p.Y += 40;
+                p.X += 10;
+                DanishTrolley t = new DanishTrolley(-i, floor, p, true);
                 WW.fill_tiles(t.RPoint, t.GetRSize());
                 Trolleyarr[0, i] = t;
             }
