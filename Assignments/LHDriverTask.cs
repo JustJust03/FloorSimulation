@@ -183,6 +183,7 @@ namespace FloorSimulation.Assignments
                 FailRoute();
                 return;
             }
+
             Harry.TakeTrolleyIn(Trolley);
 
             if (TargetHub.AmountOfTrolleys() > 0 && Harry.TrolleyList.Count < LangeHarry.MaxTrolleysPerHarry)
@@ -220,6 +221,7 @@ namespace FloorSimulation.Assignments
                 FailRoute();
                 return;
             }
+
             Harry.TakeTrolleyIn(Trolley);
 
             if (TargetHub.AmountOfTrolleys() > 0 && Harry.TrolleyList.Count < LangeHarry.MaxTrolleysPerHarry)

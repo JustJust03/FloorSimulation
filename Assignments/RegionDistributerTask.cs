@@ -105,6 +105,8 @@ namespace FloorSimulation
                     DButer.TravelToTile(DButer.WW.GetTile(DButer.SavePoint));
                     Waiting = false;
                     TargetWasSaveTile = true;
+                    if(DButer.route == null)
+                        DButer.floor.FirstWW.unfill_tiles(DButer.RPoint, DButer.GetRSize());
                 }
                 return;
             }

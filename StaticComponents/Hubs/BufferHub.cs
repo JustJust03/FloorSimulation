@@ -350,7 +350,7 @@ namespace FloorSimulation
             int ArrIndexy = Array.IndexOf(HubAccessPointsY, AgentRPoint.Y - 40);
 
             DanishTrolley t = Trolleyarr[ArrIndexy, ArrIndexx];
-            Trolleyarr[0, ArrIndexx] = null;
+            Trolleyarr[ArrIndexy, ArrIndexx] = null;
             WW.unfill_tiles(t.RPoint, t.GetRSize());
 
             return t;
