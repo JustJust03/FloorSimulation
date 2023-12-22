@@ -134,6 +134,7 @@
     <Compile Include="StaticComponents\WalkWay.cs" />
     <Compile Include="StaticComponents\WalkTile.cs" />
     <Compile Include="StaticComponents\WalkWayClearance.cs" />
+    <Compile Include="StaticComponents\WalkWayHeatMap.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

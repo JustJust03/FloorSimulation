@@ -31,7 +31,11 @@ namespace FloorSimulation
         public ControlInfo ControlPanel;
         private ReadData rd;
         public string SaveFileBase;
-        
+
+        public bool LoadHeatMap = false;
+        public string HeatMapName = "2023-07-18_HeatMapTesting";
+
+
         public MainDisplay()
         {
             //Smoother display
@@ -80,13 +84,16 @@ namespace FloorSimulation
             List<ShopHub> shops = rd.ReadHubData(floor);
 
             //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, length: "top_200");
-            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, DistributeSecondDay: false);
+            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor);
 
             floor.PlaceShops(rd.UsedShopHubs);
             floor.PlaceStartHubs();
             floor.PlaceBuffHubs();
             floor.PlaceFullTrolleyHubs();
             floor.DistributeTrolleys(L);
+
+            if (LoadHeatMap)
+                rd.LoadHeatMap(HeatMapName, floor.FirstWW);
         }
     }
 }

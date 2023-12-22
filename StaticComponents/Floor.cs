@@ -32,7 +32,7 @@ namespace FloorSimulation
         public Random rand;
 
         // Real size: 5000 cm x 5000 cm
-        public const float ScaleFactor = 0.15f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
+        public const float ScaleFactor = 0.25f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
         public Layout layout;
 
         public const int NDistributers = 21;
@@ -49,6 +49,7 @@ namespace FloorSimulation
         public List<Distributer> TotalDistrList;
         public LangeHarry FirstHarry;
         public WalkWay FirstWW;
+        public WalkWayHeatMap WWHeatMap;
 
 
         /// <summary>
@@ -80,6 +81,7 @@ namespace FloorSimulation
             FTHubs = new List<FullTrolleyHub>();
 
             FirstWW = new WalkWay(new Point(0, 0), new Size(layout.RealFloorWidth, layout.RealFloorHeight), this, DevTools_: false);
+            WWHeatMap = new WalkWayHeatMap(FirstWW, this);
 
             FirstHarry = new LangeHarry(0, this, FirstWW, new Point(FirstWW.RSizeWW.Width - 500, 1700));
 
@@ -108,6 +110,7 @@ namespace FloorSimulation
             foreach (Distributer d in DistrList)
                 d.Tick();
 
+            WWHeatMap.TickHeatMap();
             Display.Invalidate();
             Invalidate();
         }
@@ -128,6 +131,11 @@ namespace FloorSimulation
         public void DrawOccupiance(object sender, EventArgs e)
         {
             FirstWW.DevTools = !FirstWW.DevTools;
+        }
+
+        public void DrawHeatMap(object sender, EventArgs e)
+        {
+            FirstWW.DrawHeatMap = !FirstWW.DrawHeatMap;
             Invalidate();
         }
 
