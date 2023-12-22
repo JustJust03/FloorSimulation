@@ -792,7 +792,7 @@ namespace FloorSimulation
         {
             TargetHub.SwapIfOtherTrolley(Trolley);
 
-            OldWalkTile = DButer.WW.GetTile(new Point(DButer.RPoint.X, DButer.RPoint.Y + 40));
+            OldWalkTile = DButer.WW.GetTile(new Point(DButer.RPoint.X, DButer.RPoint.Y + 50));
             DButer.TravelToTile(OldWalkTile);
 
             Goal = "PushTrolleyAway";

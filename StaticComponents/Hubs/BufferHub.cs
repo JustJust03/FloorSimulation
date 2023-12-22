@@ -281,7 +281,7 @@ namespace FloorSimulation
         public void SpawnEmptyTrolleys(int amnt = 5)
         {
             amnt = Math.Min(amnt, HubAccessPointsX.Length);
-            for (int i = HubAccessPointsX.Length; i > 0; i--)
+            for (int i = HubAccessPointsX.Length - 1; i > 0; i--)
             {
                 Point p;
                 if(floor.layout.NLowpads > 0)

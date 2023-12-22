@@ -147,8 +147,11 @@ namespace FloorSimulation
             {
                 if (RPoint.X < trolley.RPoint.X)
                     TrolleyOnTopLeft = true;
-                else 
+                else
+                {
                     SwitchDistributerTrolley();
+                    return;
+                }
             }
 
             trolley.IsInTransport = true;
@@ -248,7 +251,7 @@ namespace FloorSimulation
             IsVertical = !IsVertical;
 
             SimAgentSize = floor.ConvertToSimSize(GetRSize(OnlyAgentSize: true));
-            WW.fill_tiles(RPoint, GetRSize(), this);
+            WW.fill_tiles(RPoint, GetRSize(OnlyAgentSize: true), this);
         }
 
         public void RotateDistributerAndTrolley()
