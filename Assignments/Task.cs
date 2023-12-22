@@ -262,7 +262,7 @@ namespace FloorSimulation
                     }
                     if (DButer.route != null)
                         MovingToClose = true;
-                    else if (Floor.NDistributers > 30) //Let distributers walk to save tile when the target hub is not reachable in busy street
+                    else if (Floor.NDistributers > 20) //Let distributers walk to save tile when the target hub is not reachable in busy street
                     {
                         if(DButer.WW.GetTile(p) != DButer.WW.GetTile(DButer.RDPoint))
                         {

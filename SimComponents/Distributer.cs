@@ -31,11 +31,11 @@ namespace FloorSimulation
         public const float OddsOfHer = 0.28f;
         public const int BordTime = 34000; //ms
         public const int LaagTime = 30000; //ms
-        public const int HerTime = 20000; //ms
+        public const int HerTime = 16000; //ms
         public int MaxWaitedTicks;
 
         public List<WalkTile> route;
-        public const float WALKSPEED = 85f; // cm/s
+        public const float WALKSPEED = 122f; // cm/s
         private float TravelSpeed = WALKSPEED;
         private float travel_dist_per_tick;
         public int distributionms_per_tick; // plant distribution per tick in ms

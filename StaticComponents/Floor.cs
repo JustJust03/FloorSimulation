@@ -35,7 +35,7 @@ namespace FloorSimulation
         public const float ScaleFactor = 0.15f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
         public Layout layout;
 
-        public const int NDistributers = 34;
+        public const int NDistributers = 21;
         public const int SecondsToFullOperation = 180; //How long to wait before all distributers are running
         public int OperationalInterval; //How long to wait between distributers
 
