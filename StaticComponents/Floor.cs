@@ -33,7 +33,7 @@ namespace FloorSimulation
         public Random rand;
 
         // Real size: 5000 cm x 5000 cm
-        public const float ScaleFactor = 0.15f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
+        public const float ScaleFactor = 0.25f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
         public Layout layout;
 
         public bool TickingHeatMap = false;
@@ -110,7 +110,7 @@ namespace FloorSimulation
             TotalDLPList = new List<DumbLowPad>();
 
             layout.PlaceDistributers(NDistributers, new Point(FirstWW.RSizeWW.Width - 1000, 2000));
-            if(layout.NLowpads > 0)
+            if (layout.NLowpads > 0)
                 OperationalInterval = SecondsToFullOperation / layout.NLowpads;
             else
                 OperationalInterval = SecondsToFullOperation / NDistributers;
@@ -124,10 +124,25 @@ namespace FloorSimulation
             this.Invalidate();
         }
 
+        public void RemoveZeroPlants()
+        {
+            foreach(DumbLowPad dlp in DLPList)
+            {
+                if (dlp.trolley != null && dlp.trolley.PlantList.Count == 0)
+                {
+                    ;
+                    //FirstWW.unfill_tiles(dlp.trolley.RPoint, dlp.trolley.GetRSize());
+                    //dlp.trolley = null;
+                }
+            }
+        }
+
         public void TickButton(object sender, EventArgs e)
         {
             Ticks += SpeedMultiplier;
             ElapsedSimTime = ElapsedSimTime.Add(TimeSpan.FromMilliseconds(MilisecondsPerTick * SpeedMultiplier));
+
+            RemoveZeroPlants();
 
             if(STHubs[0].HubTrolleys.Count == 1)
                 FirstWW.fill_tiles(STHubs[0].HubTrolleys[0].RPoint, STHubs[0].HubTrolleys[0].GetRSize());

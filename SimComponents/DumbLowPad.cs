@@ -137,10 +137,14 @@ namespace FloorSimulation
         {
             if(LPAHub != default && trolley != null)
             {
-                if(trolley.TargetRegions.Count == 1)
+                if(trolley.TargetRegions.Count == 1 && trolley.TargetRegions[0] == LPAHub)
                 {
                     LPAHub.TakeVTrolleyIn(GiveTrolley());
                     MainTask.LowpadDeltaX = LPAHub.HasLeftAccess ? -1 : 1;
+                }
+                else if(trolley.TargetRegions.Count == 1)
+                {
+                    ;
                 }
                 else
                 {

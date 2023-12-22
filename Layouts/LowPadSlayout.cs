@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity.Core.Common;
-using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
-using System.Threading.Tasks;
+using Gurobi;
 
 namespace FloorSimulation
 {
@@ -289,6 +285,11 @@ namespace FloorSimulation
         }
 
         private List<List<ShopHub>> AssignDBregions(List<ShopHub> Shops, List<List<ShopHub>> DistributionRegions)
+        {
+            return DistributionRegions;
+        }
+
+        private List<List<ShopHub>> OldAssignDBregions(List<ShopHub> Shops, List<List<ShopHub>> DistributionRegions)
         {
             //int[] NshopsPerDbuter = new int[] { 10, 10, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5 };
             int[] NshopsPerDbuter = new int[] { 7, 7, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 6, 6, 6 };

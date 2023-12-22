@@ -48,6 +48,9 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="gurobi110.netstandard20, Version=11.0.0.0, Culture=neutral, PublicKeyToken=21e2c4b1860157bc, processorArchitecture=MSIL">
+      <HintPath>packages\Gurobi.Optimizer.11.0.0\lib\netstandard2.0\gurobi110.netstandard20.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Bcl.AsyncInterfaces.1.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
@@ -168,6 +171,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="logo-final.png" />
     <Content Include="SimImages\Distributer.png" />
   </ItemGroup>
   <ItemGroup>
@@ -181,6 +185,8 @@
     </PropertyGroup>
     <Error Condition="!Exists('packages\EntityFramework.6.4.4\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\EntityFramework.6.4.4\build\EntityFramework.props'))" />
     <Error Condition="!Exists('packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
+    <Error Condition="!Exists('packages\Gurobi.Optimizer.11.0.0\build\Gurobi.Optimizer.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Gurobi.Optimizer.11.0.0\build\Gurobi.Optimizer.targets'))" />
   </Target>
   <Import Project="packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
+  <Import Project="packages\Gurobi.Optimizer.11.0.0\build\Gurobi.Optimizer.targets" Condition="Exists('packages\Gurobi.Optimizer.11.0.0\build\Gurobi.Optimizer.targets')" />
 </Project>
