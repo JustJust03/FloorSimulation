@@ -33,7 +33,7 @@ namespace FloorSimulation
         public string SaveFileBase;
 
         public bool LoadHeatMap = false;
-        public string HeatMapName = "2023-07-18_HeatMapTesting";
+        public string HeatMapName = "2023-07-18_2ndvalues";
 
 
         public MainDisplay()
@@ -66,7 +66,7 @@ namespace FloorSimulation
             Controls.Add(InfoPanel);
 
             Paint += PaintMainDisplay;
-            SaveFileBase = date + "_" + "21Distr_nieuweTijden";
+            SaveFileBase = date + "_" + "21Distr_nieuweTijden2";
         }
 
         private void PaintMainDisplay(object sender, PaintEventArgs e)
@@ -84,7 +84,7 @@ namespace FloorSimulation
             List<ShopHub> shops = rd.ReadHubData(floor);
 
             //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, length: "top_200");
-            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor);
+            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, DistributeSecondDay: false);
 
             floor.PlaceShops(rd.UsedShopHubs);
             floor.PlaceStartHubs();
