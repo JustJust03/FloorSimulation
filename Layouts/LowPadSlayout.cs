@@ -286,6 +286,65 @@ namespace FloorSimulation
 
         private List<List<ShopHub>> AssignDBregions(List<ShopHub> Shops, List<List<ShopHub>> DistributionRegions)
         {
+            int[] NshopsPerDbuter = new int[] { 7, 7, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 6, 6, 6 };
+
+            GRBEnv env = new GRBEnv();
+            env.Start();
+            GRBModel model = new GRBModel(env);
+
+            GRBVar[] ShopsPerDistributer = new GRBVar[Shops.Count * NDbuters];
+            for (int i = 0; i < Shops.Count * NDbuters; i++)
+                ShopsPerDistributer[i] = model.AddVar(0.0, 1.0, 0.0, GRB.BINARY, $"Shop_{i}_Shops");
+
+
+            // Ensure each shop is assigned to exactly 1 distributor
+            for (int s = 0; s < Shops.Count; s++)
+            {
+                GRBLinExpr distributorCountExpr = new GRBLinExpr();
+
+                for (int d = 0; d < NDbuters; d++)
+                    distributorCountExpr += ShopsPerDistributer[d * Shops.Count + s];
+
+                model.AddConstr(distributorCountExpr == 1, $"Shop_{s}_DistributorCount");
+            }
+
+            GRBLinExpr[] ShopsPerDbuterExpr = new GRBLinExpr[NDbuters];
+            GRBLinExpr[] StickersPerDbuterExpr = new GRBLinExpr[NDbuters];
+
+            GRBVar MaxVar = model.AddVar(0, GRB.INFINITY, 0, GRB.INTEGER, "Maximum var");
+            GRBVar MinVar = model.AddVar(0, GRB.INFINITY, 0, GRB.INTEGER, "Minimum var");
+
+            //every dbuter distributes to 6 or 7 shops.
+            //calculate the stickers per distributer and minimize the difference.
+            for (int dbi = 0; dbi < DistributionRegions.Count; dbi++)
+            {
+                ShopsPerDbuterExpr[dbi] = new GRBLinExpr();
+                StickersPerDbuterExpr[dbi] = new GRBLinExpr();
+
+                for (int shopi = 0; shopi < Shops.Count; shopi++)
+                {
+                    ShopsPerDbuterExpr[dbi] += ShopsPerDistributer[dbi * Shops.Count + shopi];
+                    StickersPerDbuterExpr[dbi] += Shops[shopi].StickersToReceive * ShopsPerDistributer[dbi * Shops.Count + shopi];
+                }
+
+                model.AddConstr(ShopsPerDbuterExpr[dbi] == NshopsPerDbuter[dbi], $"Distributor_{dbi}");
+
+                model.AddConstr(MaxVar >= StickersPerDbuterExpr[dbi], $"maxVarConstraint{dbi}");
+                model.AddConstr(MinVar <= StickersPerDbuterExpr[dbi], $"minVarConstraint{dbi}");
+            }
+
+
+
+            model.SetObjective(MaxVar - MinVar, GRB.MINIMIZE);
+            model.Optimize();
+
+            //Assign the regions.
+            for(int shopi = 0; shopi < Shops.Count; shopi++)
+                for(int dbi = 0; dbi < NDbuters; dbi++)
+                    if (ShopsPerDistributer[dbi * Shops.Count + shopi].X == 1)
+                        DistributionRegions[dbi].Add(Shops[shopi]);
+
+
             return DistributionRegions;
         }
 
