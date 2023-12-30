@@ -16,7 +16,7 @@ namespace FloorSimulation
         public int id = 0; //TODO: create a function to assign unique id's just like the trolleys
         public string name;//Assign plant names here 
         public ShopHub DestinationHub;
-        public const int ReorderTime = 30000; //ms
+        public const int ReorderTime = 24000; //ms
         //public const int ReorderTime = 3; //ms
         public int units;
 

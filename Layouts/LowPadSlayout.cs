@@ -16,7 +16,7 @@ namespace FloorSimulation
 
         public LowPadSlayoutBuffhub(Floor floor_, ReadData rData) : base(floor_, rData)
         {
-            NLowpads = 50;
+            NLowpads = 30;
             ShopStartX = 70;
             RealFloorWidth = 5200;
             StreetWidth += 120;
@@ -230,6 +230,7 @@ namespace FloorSimulation
                     deltaX = 999;
                 return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
             })
+            .Where(obj => obj.name != "Buffer hub")
             .ToList();
 
             foreach(BufferHub buffhub in sortedList) 

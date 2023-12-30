@@ -180,6 +180,10 @@ namespace FloorSimulation.Assignments
             Trolley = TargetHub.GiveTrolleyToHarry(DButer.RPoint);
             if (Trolley == null)
             {
+                if(Harry.TrolleyList.Count != 0)
+                {
+                    ;
+                }
                 FailRoute();
                 return;
             }

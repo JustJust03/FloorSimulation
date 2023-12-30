@@ -100,7 +100,7 @@ namespace FloorSimulation
                     UndistributedTrolleys.RemoveRange(0, 1);
                     PlaceTrolleys();
                 }
-                else
+                else if(HubTrolleys.Count == 0 && UndistributedTrolleys.Count == 0)
                     StartHubEmpty = true;
 
                 return t;
