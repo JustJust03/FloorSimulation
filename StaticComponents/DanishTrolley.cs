@@ -37,7 +37,7 @@ namespace FloorSimulation
         public int TotalStickers = 2;
         public const int MaxTotalStickers = 22 ; //22
 
-        public const float TrolleyTravelSpeed = 50f; //cm/s
+        public const float TrolleyTravelSpeed = 67f; //cm/s
 
         public List<plant> PlantList;
         public List<LowPadAccessHub> TargetRegions;

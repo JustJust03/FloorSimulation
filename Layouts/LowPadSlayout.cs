@@ -16,7 +16,7 @@ namespace FloorSimulation
 
         public LowPadSlayoutBuffhub(Floor floor_, ReadData rData) : base(floor_, rData)
         {
-            NLowpads = 30;
+            NLowpads = 50;
             ShopStartX = 70;
             RealFloorWidth = 5200;
             StreetWidth += 120;
