@@ -33,7 +33,7 @@ namespace FloorSimulation
         public Random rand;
 
         // Real size: 5000 cm x 5000 cm
-        public const float ScaleFactor = 0.15f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
+        public const float ScaleFactor = 0.25f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
         public Layout layout;
 
         public bool TickingHeatMap = false;
@@ -128,7 +128,7 @@ namespace FloorSimulation
         {
             foreach(DumbLowPad dlp in DLPList)
             {
-                if (dlp.trolley != null && dlp.trolley.PlantList.Count == 0)
+                if (dlp != null && dlp.trolley != null && dlp.trolley.PlantList.Count == 0)
                 {
                     ;
                     //FirstWW.unfill_tiles(dlp.trolley.RPoint, dlp.trolley.GetRSize());
@@ -158,8 +158,8 @@ namespace FloorSimulation
             foreach (LowPad lp in LPList)
                 lp.Tick();
 
-            foreach (DumbLowPad dlp in DLPList)
-                dlp.Tick();
+            for (int i = 0; i < DLPList.Count; i++)
+                DLPList[i]?.Tick();
 
             if (TickingHeatMap)
                 WWHeatMap.TickHeatMap();
@@ -299,7 +299,7 @@ namespace FloorSimulation
             foreach (LowPad lp in LPList)
                 lp.DrawObject(g);
             foreach (DumbLowPad dlp in DLPList)
-                dlp.DrawObject(g);
+                dlp?.DrawObject(g);
         }
 
         public void PlaceShops(List<ShopHub> Shops)

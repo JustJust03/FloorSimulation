@@ -80,7 +80,7 @@ namespace FloorSimulation
         public override void TickWalk()
         {
             ticktravel += travel_dist_per_tick * floor.SpeedMultiplier;
-            while (ticktravel > WalkWay.WALK_TILE_WIDTH)
+            while (ticktravel > WalkWay.WALK_TILE_WIDTH && floor.DLPList[id] != null)
             {
                 WW.unfill_tiles(RPoint, GetRSize());
                 if (MainTask.LowpadDeltaX == -1)

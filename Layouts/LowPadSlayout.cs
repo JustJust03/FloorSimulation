@@ -271,11 +271,20 @@ namespace FloorSimulation
             List<List<ShopHub>> DistributionRegions = new List<List<ShopHub>>();
             for(int i = 0; i < NDbuters; i++)
                 DistributionRegions.Add(new List<ShopHub>());
+            try
+            {
+                AssignDBregions(Shops, DistributionRegions);
+                Console.WriteLine("Used the NEW assign regions");
+            }
+            catch (GRBException)
+            {
+                OldAssignDBregions(Shops, DistributionRegions);
+                Console.WriteLine("Used the OLD assign regions");
+            }
 
-            AssignDBregions(Shops, DistributionRegions);
 
             //Sort the shops within the regions again.
-            for(int regioni = 0; regioni < DistributionRegions.Count; regioni++)
+            for (int regioni = 0; regioni < DistributionRegions.Count; regioni++)
             {
                 DistributionRegions[regioni] = DistributionRegions[regioni]
                     .OrderBy(shop => shop.day)
@@ -434,8 +443,14 @@ namespace FloorSimulation
                 dlp.MainTask.LowpadDeltaY = 1;
                 return;
             }
-            else if(dlp.RPoint.X <= 10 && dlp.MainTask.LowpadDeltaX == -1)
+            else if(dlp.RPoint.X <= 10 && dlp.MainTask.LowpadDeltaX == -1) //Hit the left wall delete self if no more trolleys left.
             {
+                if(dlp.trolley == null && dlp.floor.STHubs[0].HubTrolleys.Count == 0)
+                {
+                    dlp.floor.FirstWW.unfill_tiles(dlp.RPoint, dlp.GetRSize());
+                    dlp.floor.DLPList[dlp.floor.DLPList.IndexOf(dlp)] = null;
+                    return;
+                }
                 dlp.MainTask.LowpadDeltaX = 0;
                 dlp.MainTask.LowpadDeltaY = -1;
                 return;
