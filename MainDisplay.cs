@@ -22,10 +22,10 @@ namespace FloorSimulation
         public Font BiggerSFont;
         public Brush StandardWhiteBrush;
         public bool isSimulating = false;
-        public string date = "2023-07-18";
+        public string date = "2023-04-14";
         //public string date = "2023-05-16";
-        public List<string> days = new List<string> { "DI", "WO" };
-        //public List<string> days = new List<string> { "VR"};
+        //public List<string> days = new List<string> { "DI", "WO" };
+        public List<string> days = new List<string> { "VR"};
 
         public MetaInfo InfoPanel;
         public ControlInfo ControlPanel;
