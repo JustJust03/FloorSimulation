@@ -293,6 +293,7 @@ namespace FloorSimulation
                     deltaX = 0;
                 return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
             })
+            .Where(obj => obj.name != "Buffer hub")
             .ToList();
 
             foreach(BufferHub buffhub in sortedList) 

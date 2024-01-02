@@ -33,7 +33,7 @@ namespace FloorSimulation
         public string SaveFileBase;
 
         public bool LoadHeatMap = false;
-        public string HeatMapName = "2023-07-18_21distr";
+        public string HeatMapName = "2023-07-18_21distr-BuffSlayout";
 
 
         public MainDisplay()
@@ -66,7 +66,7 @@ namespace FloorSimulation
             Controls.Add(InfoPanel);
 
             Paint += PaintMainDisplay;
-            SaveFileBase = date + "_" + "21distr-Slayout";
+            SaveFileBase = date + "_" + "21distr-BuffSlayout";
         }
 
         private void PaintMainDisplay(object sender, PaintEventArgs e)

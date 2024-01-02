@@ -126,7 +126,7 @@ namespace FloorSimulation
                         {
                             OpenSpots.Add(HubAccessPoints[rowi, coli]);
                         }
-                        else if (OpenSpots.Count > 0 && Trolleyarr[rowi, coli] != null) //Removes any trolleys that were under an open spot.
+                        else if (floor.BuffHubs.Count > 1 && OpenSpots.Count > 0 && Trolleyarr[rowi, coli] != null) //Removes any trolleys that were under an open spot.
                         {
                             WW.unfill_tiles(Trolleyarr[rowi, coli].RPoint, Trolleyarr[rowi, coli].GetRSize());
                             Trolleyarr[rowi, coli] = null;
