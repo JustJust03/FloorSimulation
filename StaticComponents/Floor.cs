@@ -69,8 +69,8 @@ namespace FloorSimulation
         {
             Display = di;
 
-            //layout = new SLayoutDayId(this, rd);
-            layout = new SLayoutDayIdBuffhub(this, rd);
+            layout = new SLayoutDayId(this, rd);
+            //layout = new SLayoutDayIdBuffhub(this, rd);
             //layout = new SLayoutDayIdBuffhub2Streets(this, rd);
             //layout = new SLayoutDayId2Streets(this, rd);
 
@@ -111,7 +111,7 @@ namespace FloorSimulation
             else
                 OperationalInterval = SecondsToFullOperation / NDistributers;
 
-            TrHub = new TruckHub("Truck Hub", 6, new Point(FirstWW.RSizeWW.Width - 770, 700), this);
+            TrHub = new TruckHub("Truck Hub", 6, new Point(FirstWW.RSizeWW.Width - 770, 900), this);
             HubList.Add(TrHub);
 
             BuffHubs = new List<BufferHub>();
@@ -138,8 +138,6 @@ namespace FloorSimulation
 
             if (TickingHeatMap)
                 WWHeatMap.TickHeatMap();
-
-            FinishedD.CheckFinishedDistributionGlobal();
 
             Display.Invalidate();
             Invalidate();

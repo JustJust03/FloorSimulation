@@ -122,7 +122,7 @@ namespace FloorSimulation
                 for (int coli = NTrolleysInRow - 1; coli >= 0; coli--)
                     for (int rowi = 0; rowi < NRows; rowi++)
                     {
-                        if (Trolleyarr[rowi, coli] == null && OpenSpots.Count == 0)
+                        if (Trolleyarr[rowi, coli] == null && OpenSpots.Count == 0 && HubAccessPoints[rowi, coli] != null)
                         {
                             OpenSpots.Add(HubAccessPoints[rowi, coli]);
                         }
@@ -217,7 +217,7 @@ namespace FloorSimulation
 
             for (int rowi = NRows - 1; rowi >= 0; rowi--)
                 for (int coli = NTrolleysInRow - 1; coli >= 0; coli--)
-                    if (Trolleyarr[rowi, coli] != null)
+                    if (Trolleyarr[rowi, coli] != null && HubAccessPoints[rowi, coli] != null)
                     {
                         Point p = HubAccessPoints[rowi, coli].Rpoint;
                         if (VerticalTrolleys)
@@ -281,7 +281,7 @@ namespace FloorSimulation
         public void SpawnEmptyTrolleys(int amnt = 5)
         {
             amnt = Math.Min(amnt, HubAccessPointsX.Length);
-            for (int i = HubAccessPointsX.Length - 1; i > 0; i--)
+            for (int i = amnt; i > 0; i--)
             {
                 Point p;
                 if(floor.layout.NLowpads > 0)

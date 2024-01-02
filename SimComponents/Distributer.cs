@@ -20,7 +20,7 @@ namespace FloorSimulation
         public const int LaagTime = 30000; //ms
         public const int HerTime = 16000; //ms
 
-        public const float WALKSPEED = 102f; // cm/s
+        public const float WALKSPEED = 122f; // cm/s
         public int distributionms_per_tick; // plant distribution per tick in ms
         public int SideActivityMsLeft; // Amount of ticks left of performing the side activity
         private int distributionms = 0; // How many ms have you been distributing

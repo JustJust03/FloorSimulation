@@ -17,7 +17,7 @@ namespace FloorSimulation
 
         public LowPadSlayoutBuffhub(Floor floor_, ReadData rData) : base(floor_, rData)
         {
-            NLowpads = 40;
+            NLowpads = 0;
             RC = new RegionConstants();
             if (NRegions == 0)
                 NRegions = NDbuters;

@@ -200,7 +200,7 @@ namespace FloorSimulation
                     }
                     if (DButer.route != null)
                         MovingToClose = true;
-                    else if (Floor.NDistributers > 30) //Let distributers walk to save tile when the target hub is not reachable in busy street
+                    else if (Floor.NDistributers > 20) //Let distributers walk to save tile when the target hub is not reachable in busy street
                     {
                         if (DButer.WW.GetTile(p) != DButer.WW.GetTile(DButer.RPoint))
                         {
@@ -437,6 +437,8 @@ namespace FloorSimulation
             OldWalkTile = DButer.WW.GetTile(Trolley.RPoint);
             DButer.TakeTrolleyIn(TargetHub.GiveTrolley());
             WasOnTopLeft = DButer.TrolleyOnTopLeft;
+            if (WasOnTopLeft)
+                OldWalkTile = DButer.WW.GetTile(new Point(DButer.RPoint.X + 30, DButer.RPoint.Y));
             Trolley = DButer.trolley;
             TargetHub = DButer.floor.ClosestFTHub(DButer);
             DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
@@ -703,8 +705,6 @@ namespace FloorSimulation
             {
                 if (TargetHub.VerticalTrolleys != Trolley.IsVertical)
                     DButer.RotateDistributerAndTrolley(); //Rotate the distributer and the trolley to fit into the shop.
-                if (WasOnTopLeft)
-                    OldWalkTile = DButer.WW.GetTile(new Point(OldWalkTile.Rpoint.X - DButer.GetRSize().Width + 10, OldWalkTile.Rpoint.Y)); //Because dbuter is on the left of the trolley.
                 DButer.TravelToTile(OldWalkTile);
                 TargetHub = OldTargetHub;
 
@@ -717,8 +717,6 @@ namespace FloorSimulation
         private void MoveEmptyTrolleyDown()
         {
             DButer.RotateDistributerAndTrolley(); //Rotate the distributer and the trolley to fit into the shop.
-            if (WasOnTopLeft)
-                OldWalkTile = DButer.WW.GetTile(new Point(OldWalkTile.Rpoint.X - DButer.GetRSize().Width + 10, OldWalkTile.Rpoint.Y)); //Because dbuter is on the left of the trolley.
             DButer.TravelToTile(OldWalkTile);
             TargetHub = OldTargetHub;
 
