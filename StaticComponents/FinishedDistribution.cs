@@ -87,7 +87,7 @@ namespace FloorSimulation
                 if (LP.trolley != null)
                     return false;
             foreach (DumbLowPad DLP in floor.DLPList)
-                if (DLP.trolley != null)
+                if (DLP != null && DLP.trolley != null)
                     return false;
 
             DistributionCompleted();
