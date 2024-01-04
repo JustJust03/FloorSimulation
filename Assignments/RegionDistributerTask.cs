@@ -99,14 +99,20 @@ namespace FloorSimulation
 
                 WaitedTicks++;
 
-                if (WaitedTicks > 100)
+                if (WaitedTicks > DButer.MaxWaitedTicks)
                 {
                     WaitedTicks = 0;
                     DButer.TravelToTile(DButer.WW.GetTile(DButer.SavePoint));
                     Waiting = false;
                     TargetWasSaveTile = true;
                     if(DButer.route == null)
-                        DButer.floor.FirstWW.unfill_tiles(DButer.RPoint, DButer.GetRSize());
+                    {
+                        Point p = new Point(DButer.RPoint.X - 20, DButer.RPoint.Y);
+                        Size s = DButer.GetRSize();
+                        s.Width += 40;
+                        DButer.floor.FirstWW.unfill_tiles(p, s);
+                        DButer.TravelToTile(DButer.WW.GetTile(DButer.SavePoint));
+                    }
                 }
                 return;
             }

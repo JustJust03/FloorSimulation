@@ -92,7 +92,6 @@ namespace FloorSimulation
 
             DistributionCompleted();
             return true;
-
         }
 
         public void WriteHeatMap()

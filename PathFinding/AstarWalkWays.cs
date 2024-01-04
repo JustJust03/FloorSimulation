@@ -254,7 +254,6 @@ namespace FloorSimulation
                 //Add neighbours to priority queue
                 for (int i = 0; i < neighbours.Length; i++)
                 {
-
                     WalkTile neighbour = neighbours[i];
                     if (neighbour == null)
                         continue;

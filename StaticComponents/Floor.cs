@@ -139,6 +139,11 @@ namespace FloorSimulation
 
         public void TickButton(object sender, EventArgs e)
         {
+            if(STHubs[0].TotalUndistributedTrolleys() == 0)
+            {
+                ;
+                //FinishedD.DistributionCompleted();
+            }
             Ticks += SpeedMultiplier;
             ElapsedSimTime = ElapsedSimTime.Add(TimeSpan.FromMilliseconds(MilisecondsPerTick * SpeedMultiplier));
 
