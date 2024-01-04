@@ -66,7 +66,7 @@ namespace FloorSimulation
             Controls.Add(InfoPanel);
 
             Paint += PaintMainDisplay;
-            SaveFileBase = date + "_" + "RealisticPahting_50LP_21Distr";
+            SaveFileBase = date + "_" + "RealisticPahting_70LP_21Distr";
         }
 
         private void PaintMainDisplay(object sender, PaintEventArgs e)
@@ -87,8 +87,6 @@ namespace FloorSimulation
             //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor);
             List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, DistributeSecondDay: false);
             //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, length: "for_30", DistributeSecondDay: false);
-
-            L.RemoveRange(50, L.Count - 50);
 
             floor.PlaceShops(rd.UsedShopHubs);
             floor.PlaceStartHubs();

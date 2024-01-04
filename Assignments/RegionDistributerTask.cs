@@ -246,10 +246,12 @@ namespace FloorSimulation
 
             TargetHub = DButer.floor.GetBuffHubOpen(DButer);
             Trolley = DButer.trolley;
-
-            DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
-
             Goal = "DeliverEmptyTrolley"; //New goal
+
+            if (TargetHub != null)
+                DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
+            else
+                FailRoute();
         }
 
         private void DeliverEmptyTrolley()
