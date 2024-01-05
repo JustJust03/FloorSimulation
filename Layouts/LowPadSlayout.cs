@@ -13,7 +13,8 @@ namespace FloorSimulation
         int[] ShopsPerCol = new int[] {20, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 5};
 
         readonly bool UseDumbLowPads = true;
-        readonly bool UseDumbRegions = true;
+        readonly bool UseDumbRegions = false;
+        readonly bool UseSemiDumbRegions = true;
 
         public LowPadSlayoutBuffhub(Floor floor_, ReadData rData) : base(floor_, rData)
         {
@@ -279,6 +280,11 @@ namespace FloorSimulation
                 AssignDumbDBregions(Shops, DistributionRegions);
                 return DistributionRegions;
             }    
+            else if (UseSemiDumbRegions)
+            {
+                AssignDBregionsFixedOrder(Shops, DistributionRegions);
+                return DistributionRegions;
+            }
 
             Shops = Shops.OrderBy(obj => obj.StickersToReceive).ToList();
 
@@ -427,9 +433,11 @@ namespace FloorSimulation
                 for (int shopi = 0; shopi < Shops.Count; shopi++)
                 {
                     GRBLinExpr expr = new GRBLinExpr();
+                    expr.AddConstant(1.0);
 
                     // Condition: ShopsPerDistributer[dbi * Shops.Count + shopi] == 0
-                    expr.AddTerm(1.0, ShopsPerDistributer[dbi * Shops.Count + shopi]);
+                    if(dbi > 0 || shopi > 0)
+                        expr.AddTerm(-1.0, ShopsPerDistributer[dbi * Shops.Count + shopi]);
 
                     // Condition: ShopsPerDistributer[dbi * Shops.Count + shopi - 1] == 1 (if shopi > 0)
                     if (shopi > 0)
@@ -439,7 +447,7 @@ namespace FloorSimulation
                     if (dbi > 0 && shopi > 0)
                         expr.AddTerm(1.0, ShopsPerDistributer[(dbi - 1) * Shops.Count + shopi - 1]);
 
-                    model.AddConstr(expr, GRB.EQUAL, 1, "CombinedConstraint");
+                    model.AddConstr(expr, GRB.GREATER_EQUAL, 1, "CombinedConstraint");
 
                     StickersPerDbuterExpr[dbi] += Shops[shopi].StickersToReceive * ShopsPerDistributer[dbi * Shops.Count + shopi];
                 }
@@ -450,6 +458,7 @@ namespace FloorSimulation
 
 
             model.SetObjective(MaxVar - MinVar, GRB.MINIMIZE);
+            model.Set("TimeLimit", "100.0");
             model.Optimize();
 
             //Assign the regions.
@@ -458,6 +467,8 @@ namespace FloorSimulation
                     if (ShopsPerDistributer[dbi * Shops.Count + shopi].X == 1)
                         DistributionRegions[dbi].Add(Shops[shopi]);
 
+            WriteSolution WS = new WriteSolution(floor);
+            WS.Write(DistributionRegions);
 
             return DistributionRegions;
         }
