@@ -13,10 +13,11 @@ namespace FloorSimulation
         int[] ShopsPerCol = new int[] {20, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 5};
 
         readonly bool UseDumbLowPads = true;
+        readonly bool UseDumbRegions = true;
 
         public LowPadSlayoutBuffhub(Floor floor_, ReadData rData) : base(floor_, rData)
         {
-            NLowpads = 70;
+            NLowpads = 40;
             ShopStartX = 70;
             RealFloorWidth = 5200;
             StreetWidth += 120;
@@ -266,11 +267,17 @@ namespace FloorSimulation
 
         private List<List<ShopHub>> CreateDistributionRegions(List<ShopHub> Shops)
         {
-            Shops = Shops.OrderBy(obj => obj.StickersToReceive).ToList();
-
             List<List<ShopHub>> DistributionRegions = new List<List<ShopHub>>();
             for(int i = 0; i < NDbuters; i++)
                 DistributionRegions.Add(new List<ShopHub>());
+            if(UseDumbRegions)
+            {
+                AssignDumbDBregions(Shops, DistributionRegions);
+                return DistributionRegions;
+            }    
+
+            Shops = Shops.OrderBy(obj => obj.StickersToReceive).ToList();
+
             try
             {
                 AssignDBregions(Shops, DistributionRegions);
@@ -290,6 +297,27 @@ namespace FloorSimulation
                     .OrderBy(shop => shop.day)
                     .ThenBy(shop => shop.id).ToList();
             }
+
+            return DistributionRegions;
+        }
+        private List<List<ShopHub>> AssignDumbDBregions(List<ShopHub> Shops, List<List<ShopHub>> DistributionRegions)
+        {
+            int[] NshopsPerDbuter = new int[] { 7, 7, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 6, 6, 6 };
+
+            int shopindex = 0;
+            for(int regioni = 0; regioni < NshopsPerDbuter.Length; regioni++)
+            {
+                int shopi = 0;
+                while(shopi < NshopsPerDbuter[regioni])
+                {
+                    DistributionRegions[regioni].Add(Shops[shopindex + shopi]);
+                    shopi++;
+                }
+                shopindex += shopi;
+            }
+
+            int[] StickersPerDButer = RegionConstants.StickerPerDButerNew(DistributionRegions);
+
 
             return DistributionRegions;
         }
@@ -343,8 +371,6 @@ namespace FloorSimulation
                 model.AddConstr(MinVar <= StickersPerDbuterExpr[dbi], $"minVarConstraint{dbi}");
             }
 
-
-
             model.SetObjective(MaxVar - MinVar, GRB.MINIMIZE);
             model.Optimize();
 
@@ -354,6 +380,7 @@ namespace FloorSimulation
                     if (ShopsPerDistributer[dbi * Shops.Count + shopi].X == 1)
                         DistributionRegions[dbi].Add(Shops[shopi]);
 
+            int[] StickersPerDButer = RegionConstants.StickerPerDButerNew(DistributionRegions);
 
             return DistributionRegions;
         }
@@ -560,7 +587,7 @@ namespace FloorSimulation
         {
             if (dlp.trolley != null && dlp.trolley.TargetRegions.Contains(LPA) && !LPA.Targeted && LPA.HubTrolleys.Count == 0)
             {
-                double odds = Math.Min((1.0 / dlp.trolley.TargetRegions.Count) + (1.0 / Math.Pow(1.5, LPA.dbuter.MainTask.NTrolleysStanding() + 1.0)), 1.0);
+                double odds = Math.Min((1.0 / dlp.trolley.TargetRegions.Count) + (1.0 / Math.Pow(2, LPA.dbuter.MainTask.NTrolleysStanding() + 1.0)), 1.0);
                 if (odds < 0.20)
                     return false;
                 
