@@ -125,9 +125,9 @@ namespace FloorSimulation
             LPDriveLines = new LowPadDriveLines(ShopCornersX[ShopCornersX.Count - 1], UpperY - 300, RealFloorHeight - 160);
 
             LPDriveLines.AddHorizontalLine(RealFloorHeight - 210, 0, RealFloorWidth, -1); //Lowest line, Used to pick up a new full trolley
-            LPDriveLines.AddHorizontalLine(LowestY - 180, 360, 850, -1, true); //Normal loop again. Used to push the lp's with the new trolleys to the first vertical shopline
-            LPDriveLines.AddHorizontalLine(LowestY - 180, 0, 360, 1, true); //Also normal loop. Also Pushed the lp's to the first vertical shopline
-            LPDriveLines.AddHorizontalLine(LowestY - 180, 850, RealFloorWidth, -1, true); //If a lp finished the loop, but still carries a trolley, put it on this line.
+            LPDriveLines.AddHorizontalLine(LowestY + 180, 360, 850, -1, true); //Normal loop again. Used to push the lp's with the new trolleys to the first vertical shopline
+            LPDriveLines.AddHorizontalLine(LowestY + 180, 0, 360, 1, true); //Also normal loop. Also Pushed the lp's to the first vertical shopline
+            LPDriveLines.AddHorizontalLine(LowestY + 180, 850, RealFloorWidth, -1, true); //If a lp finished the loop, but still carries a trolley, put it on this line.
 
             LPDriveLines.AddHorizontalLine(UpperY - 180, 0, RealFloorWidth, 1); //Backup Line
             LPDriveLines.AddHorizontalLine(LowestY + 10, 500, 3310, 1, true); //lower horizontal line below the shops.
@@ -147,7 +147,7 @@ namespace FloorSimulation
             LPDriveLines.AddVerticalLine(ShopCornersX[ShopCornersX.Count - 1] + 400, UpperY - 200, LowestY, 1);
 
 
-            for (int EvenI = 0; EvenI < ShopCornersX.Count - 1; EvenI += 2)
+            for (int EvenI = 0; EvenI < ShopCornersX.Count; EvenI += 2)
                 LPDriveLines.AddVerticalLine(ShopCornersX[EvenI] + 70, UpperY - 10, LowestY, 0, EnterLPAHubWhenHit: true);
             for(int UnevenI = 1; UnevenI < ShopCornersX.Count - 1; UnevenI += 2)
                 LPDriveLines.AddVerticalLine(ShopCornersX[UnevenI] - 130, UpperY - 10, LowestY, 0, EnterLPAHubWhenHit: true);
