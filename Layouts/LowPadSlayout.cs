@@ -14,7 +14,7 @@ namespace FloorSimulation
 
         readonly bool UseDumbLowPads = true;
         readonly bool UseDumbRegions = false;
-        readonly bool UseSemiDumbRegions = true;
+        readonly bool UseSemiDumbRegions = false;
 
         public LowPadSlayoutBuffhub(Floor floor_, ReadData rData) : base(floor_, rData)
         {
@@ -120,7 +120,7 @@ namespace FloorSimulation
         public void CreateDriveLines()
         {
             List<LowPadAccessHub>[] ShopsPLine = new List<LowPadAccessHub>[4];
-            ShopsPLine[0] = floor.LPHubs.GetRange(0, 38);
+            ShopsPLine[0] = floor.LPHubs.GetRange(0, 39);
             ShopsPLine[1] = floor.LPHubs.GetRange(39, 38);
             ShopsPLine[2] = floor.LPHubs.GetRange(77, 38);
             ShopsPLine[3] = floor.LPHubs.GetRange(115, 18);
