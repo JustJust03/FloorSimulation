@@ -34,7 +34,7 @@ namespace FloorSimulation
         public int NStickers = 2;
         public readonly int MaxStickers = 20;
         public int TotalStickers = 2;
-        public const int MaxTotalStickers = 15; //22
+        public const int MaxTotalStickers = 22; //22
 
         public const float TrolleyTravelSpeed = 67f; //cm/s
 
