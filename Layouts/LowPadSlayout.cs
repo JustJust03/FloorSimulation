@@ -118,26 +118,30 @@ namespace FloorSimulation
 
         public void CreateDriveLines()
         {
-            List<LowPadAccessHub>[] ShopsPLine = new List<LowPadAccessHub>[3];
-            ShopsPLine[0] = floor.LPHubs.GetRange(39, 38);
-            ShopsPLine[1] = floor.LPHubs.GetRange(77, 38);
-            ShopsPLine[2] = floor.LPHubs.GetRange(115, 18);
+            List<LowPadAccessHub>[] ShopsPLine = new List<LowPadAccessHub>[4];
+            ShopsPLine[0] = floor.LPHubs.GetRange(0, 38);
+            ShopsPLine[1] = floor.LPHubs.GetRange(39, 38);
+            ShopsPLine[2] = floor.LPHubs.GetRange(77, 38);
+            ShopsPLine[3] = floor.LPHubs.GetRange(115, 18);
 
             LPDriveLines = new LowPadDriveLines(ShopCornersX[ShopCornersX.Count - 1], UpperY - 300, RealFloorHeight - 160);
 
             LPDriveLines.AddHorizontalLine(RealFloorHeight - 210, 0, RealFloorWidth, -1); //Lowest line, Used to pick up a new full trolley
             LPDriveLines.AddHorizontalLine(RealFloorHeight - 410, 360, 850, -1, true); //Normal loop again. Used to push the lp's with the new trolleys to the first vertical shopline
-            LPDriveLines.AddHorizontalLine(RealFloorHeight - 410, 0, 360, 1, true); //Also normal loop. Also Pushed the lp's to the first vertical shopline
+            LPDriveLines.AddHorizontalLine(LowestY + 10, 0, 360, 1, true); //Also normal loop. Also Pushed the lp's to the first vertical shopline
             LPDriveLines.AddHorizontalLine(RealFloorHeight - 410, 850, RealFloorWidth, -1, true); //If a lp finished the loop, but still carries a trolley, put it on this line.
 
             LPDriveLines.AddHorizontalLine(UpperY - 180, 0, RealFloorWidth, 1); //Backup Line
             LPDriveLines.AddHorizontalLine(LowestY + 10, 500, 3310, 1, true); //lower horizontal line below the shops.
 
-            LPDriveLines.AddVerticalLine(ShopCornersX[0] + 200, UpperY - 20, LowestY + 310, -1);
-            int ShopsPLineI = 0;
+            LPDriveLines.AddVerticalLine(ShopCornersX[0] + 100, LowestY, LowestY + 310, -1); //If the first loop is skipped, up to the normal move right height
+
+
+            LPDriveLines.AddVerticalLine(ShopCornersX[0] + 200, UpperY - 20, LowestY + 310, -1, ShopsInLine: ShopsPLine[0]);
+            int ShopsPLineI = 1;
             for(int cornerI = 2; cornerI < ShopCornersX.Count; cornerI += 2) //Shop hub lines...
             {
-                if(ShopsPLineI < 3)
+                if(ShopsPLineI < 4)
                     LPDriveLines.AddVerticalLine(ShopCornersX[cornerI] + 200, UpperY - 20, LowestY + 20, -1, ShopsInLine: ShopsPLine[ShopsPLineI]);
                 else
                     LPDriveLines.AddVerticalLine(ShopCornersX[cornerI] + 200, UpperY - 20, LowestY + 20, -1);
@@ -385,6 +389,79 @@ namespace FloorSimulation
             return DistributionRegions;
         }
 
+        private List<List<ShopHub>> AssignDBregionsFixedOrder(List<ShopHub> Shops, List<List<ShopHub>> DistributionRegions)
+        {
+            GRBEnv env = new GRBEnv();
+            env.Start();
+            GRBModel model = new GRBModel(env);
+
+            GRBVar[] ShopsPerDistributer = new GRBVar[Shops.Count * NDbuters];
+            for (int i = 0; i < Shops.Count * NDbuters; i++)
+                ShopsPerDistributer[i] = model.AddVar(0.0, 1.0, 0.0, GRB.BINARY, $"Shop_{i}_Shops");
+
+
+            // Ensure each shop is assigned to exactly 1 distributor
+            for (int s = 0; s < Shops.Count; s++)
+            {
+                GRBLinExpr distributorCountExpr = new GRBLinExpr();
+
+                for (int d = 0; d < NDbuters; d++)
+                    distributorCountExpr += ShopsPerDistributer[d * Shops.Count + s];
+
+                model.AddConstr(distributorCountExpr == 1, $"Shop_{s}_DistributorCount");
+            }
+
+            GRBLinExpr[] ShopsPerDbuterExpr = new GRBLinExpr[NDbuters];
+            GRBLinExpr[] StickersPerDbuterExpr = new GRBLinExpr[NDbuters];
+
+            GRBVar MaxVar = model.AddVar(0, GRB.INFINITY, 0, GRB.INTEGER, "Maximum var");
+            GRBVar MinVar = model.AddVar(0, GRB.INFINITY, 0, GRB.INTEGER, "Minimum var");
+
+            //every dbuter distributes to 6 or 7 shops.
+            //calculate the stickers per distributer and minimize the difference.
+            for (int dbi = 0; dbi < DistributionRegions.Count; dbi++)
+            {
+                ShopsPerDbuterExpr[dbi] = new GRBLinExpr();
+                StickersPerDbuterExpr[dbi] = new GRBLinExpr();
+
+                for (int shopi = 0; shopi < Shops.Count; shopi++)
+                {
+                    GRBLinExpr expr = new GRBLinExpr();
+
+                    // Condition: ShopsPerDistributer[dbi * Shops.Count + shopi] == 0
+                    expr.AddTerm(1.0, ShopsPerDistributer[dbi * Shops.Count + shopi]);
+
+                    // Condition: ShopsPerDistributer[dbi * Shops.Count + shopi - 1] == 1 (if shopi > 0)
+                    if (shopi > 0)
+                        expr.AddTerm(1.0, ShopsPerDistributer[dbi * Shops.Count + shopi - 1]);
+
+                    // Condition: ShopsPerDistributer[(dbi - 1) * Shops.Count + shopi - 1] == 1 (if dbi > 0 and shopi > 0)
+                    if (dbi > 0 && shopi > 0)
+                        expr.AddTerm(1.0, ShopsPerDistributer[(dbi - 1) * Shops.Count + shopi - 1]);
+
+                    model.AddConstr(expr, GRB.EQUAL, 1, "CombinedConstraint");
+
+                    StickersPerDbuterExpr[dbi] += Shops[shopi].StickersToReceive * ShopsPerDistributer[dbi * Shops.Count + shopi];
+                }
+                model.AddConstr(MaxVar >= StickersPerDbuterExpr[dbi], $"maxVarConstraint{dbi}");
+                model.AddConstr(MinVar <= StickersPerDbuterExpr[dbi], $"minVarConstraint{dbi}");
+            }
+
+
+
+            model.SetObjective(MaxVar - MinVar, GRB.MINIMIZE);
+            model.Optimize();
+
+            //Assign the regions.
+            for (int shopi = 0; shopi < Shops.Count; shopi++)
+                for (int dbi = 0; dbi < NDbuters; dbi++)
+                    if (ShopsPerDistributer[dbi * Shops.Count + shopi].X == 1)
+                        DistributionRegions[dbi].Add(Shops[shopi]);
+
+
+            return DistributionRegions;
+        }
+
         private List<List<ShopHub>> OldAssignDBregions(List<ShopHub> Shops, List<List<ShopHub>> DistributionRegions)
         {
             //int[] NshopsPerDbuter = new int[] { 10, 10, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5 };
@@ -488,10 +565,14 @@ namespace FloorSimulation
                 if (line.RX != dlp.RPoint.X)
                     continue;
                 if (line.LowerRY < dlp.RPoint.Y && dlp.RPoint.Y < line.UpperRY &&
-                   (line.ShopsInLine == null || dlp.trolley == null || LowestY - 420 != dlp.RPoint.Y || line.ShopsInLine.Intersect(dlp.trolley.TargetRegions).Any()))
+                   (line.ShopsInLine == null || dlp.trolley == null || dlp.RPoint.Y < LowestY - 420 || line.ShopsInLine.Intersect(dlp.trolley.TargetRegions).Any()))
                 {
                     if (line.EnterLPAHubWhenHit && dlp.LPAHub == null)
                         return; //The lp got stuck and couldn't move out of regionhub.
+                    if(line.ShopsInLine != null && line.ShopsInLine.Count == 0)
+                    {
+                        ;
+                    }
 
                     dlp.MainTask.LowpadDeltaX = 0;
                     dlp.MainTask.LowpadDeltaY = line.DeltaY;
