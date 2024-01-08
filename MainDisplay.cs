@@ -66,7 +66,7 @@ namespace FloorSimulation
             Controls.Add(InfoPanel);
 
             Paint += PaintMainDisplay;
-            SaveFileBase = date + "_" + "RealisticPahting_70LP_21Distr";
+            SaveFileBase = date + "_" + "SmartOrder_50LP_21Distr";
         }
 
         private void PaintMainDisplay(object sender, PaintEventArgs e)
