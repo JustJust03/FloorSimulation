@@ -37,8 +37,9 @@ namespace FloorSimulation
         public Layout layout;
 
         public bool TickingHeatMap = false;
-        public const int NDistributers = 21;
-        public const int SecondsToFullOperation = 480; //How long to wait before all distributers are running
+        public const int NDistributers = 14;
+        public const int SecondsToFullOperation = 240; //How long to wait before all distributers are running
+
         public int OperationalInterval; //How long to wait between distributers
 
         public List<DanishTrolley> TrolleyList; // A list with all the trolleys that are on the floor.

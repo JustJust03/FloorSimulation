@@ -150,8 +150,10 @@ namespace FloorSimulation
             }
             for(int cornerI = 1; cornerI < ShopCornersX.Count; cornerI += 2)
                 LPDriveLines.AddVerticalLine(ShopCornersX[cornerI] - 260, UpperY - 200, LowestY, 1);
+            LPDriveLines.AddVerticalLine(ShopCornersX[ShopCornersX.Count - 1] + 400, UpperY - 200, LowestY, 1);
 
-            for(int EvenI = 0; EvenI < ShopCornersX.Count - 1; EvenI += 2)
+
+            for (int EvenI = 0; EvenI < ShopCornersX.Count; EvenI += 2)
                 LPDriveLines.AddVerticalLine(ShopCornersX[EvenI] + 70, UpperY - 10, LowestY, 0, EnterLPAHubWhenHit: true);
             for(int UnevenI = 1; UnevenI < ShopCornersX.Count - 1; UnevenI += 2)
                 LPDriveLines.AddVerticalLine(ShopCornersX[UnevenI] - 130, UpperY - 10, LowestY, 0, EnterLPAHubWhenHit: true);
@@ -476,7 +478,8 @@ namespace FloorSimulation
         private List<List<ShopHub>> OldAssignDBregions(List<ShopHub> Shops, List<List<ShopHub>> DistributionRegions)
         {
             //int[] NshopsPerDbuter = new int[] { 10, 10, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5 };
-            int[] NshopsPerDbuter = new int[] { 7, 7, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 6, 6, 6 };
+            //int[] NshopsPerDbuter = new int[] { 7, 7, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 6, 6, 6 };
+            int[] NshopsPerDbuter = new int[] {10, 10, 9, 10, 10, 9, 9, 10, 10, 9, 9, 10, 9, 9 };
             int[] NShopsPerRegion = NshopsPerDbuter.Distinct().OrderBy(x => 9999 - x).ToArray();
 
             for (int Nshopsi = 0; Nshopsi < NShopsPerRegion.Count(); Nshopsi++)
