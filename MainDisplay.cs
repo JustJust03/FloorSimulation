@@ -67,7 +67,7 @@ namespace FloorSimulation
             Controls.Add(InfoPanel);
 
             Paint += PaintMainDisplay;
-            SaveFileBase = date + "_" + "SmartOrder_40LP_14Distr";
+            SaveFileBase = date + "_" + "SmartOrder_50LP_21Distr";
         }
 
         private void PaintMainDisplay(object sender, PaintEventArgs e)
@@ -88,8 +88,6 @@ namespace FloorSimulation
             //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor);
             List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, DistributeSecondDay: false);
             //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, length: "for_30", DistributeSecondDay: false);
-
-            L = L.Take(350).ToList();
 
             floor.PlaceShops(rd.UsedShopHubs);
             floor.PlaceStartHubs();

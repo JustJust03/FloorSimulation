@@ -54,6 +54,8 @@ namespace FloorSimulation
                         ShopCornersX.Add(Shop.RFloorPoint.X);
                     else
                         ShopCornersX.Add(Shop.RFloorPoint.X + Shop.RHubSize.Width);
+                    if (i == Shops.Count - 1)
+                        ShopCornersX.Add(Shop.RFloorPoint.X + StreetWidth);
                 }
 
                 placed_shops_in_a_row++;
@@ -84,7 +86,7 @@ namespace FloorSimulation
                     }
 
                     if (!FirstColFinished)
-                        HalfShopsInRow = (placed_shops_in_a_row - 1) / 2;
+                        HalfShopsInRow = (placed_shops_in_a_row - 1) / 3;
                     FirstColFinished = true;
                     placed_shops_in_a_row = 0;
                     two_per_row++;
@@ -96,12 +98,8 @@ namespace FloorSimulation
                     else
                     {
                         LowestY = y + ShopHeight;
-                        floor.HubList.Add(Shop);
-                        i++;
-                        Shop = Shops[i];
                         if (two_per_row == 3)
                             Shop.HasLeftAccess = true;
-                        Shop.TeleportHub(new Point(x, y));
                         x += 160;
                         two_per_row = 1;
                         placed_shops_in_a_row--;
