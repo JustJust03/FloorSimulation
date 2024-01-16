@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace FloorSimulation
 {
@@ -14,13 +15,15 @@ namespace FloorSimulation
     {
         private List<DanishTrolley> UndistributedTrolleys;
         public bool StartHubEmpty;
-        public const int MaxStartHubTrolleys = 8;
+        public int MaxStartHubTrolleys = 8;
 
-        public StartHub(string name_, int id_, Point FPoint_, Floor floor_, int initial_trolleys_ = 0, bool vertical_trolleys_ = true) : 
-            base(name_, id_, FPoint_, floor_, new Size(640, 200), initial_trolleys:initial_trolleys_, vertical_trolleys:vertical_trolleys_)
+        public StartHub(string name_, int id_, Point FPoint_, Size s_, Floor floor_, int initial_trolleys_ = 0, bool vertical_trolleys_ = true) : 
+            base(name_, id_, FPoint_, floor_, s_, initial_trolleys:initial_trolleys_, vertical_trolleys:vertical_trolleys_)
         {
             UndistributedTrolleys = new List<DanishTrolley>();
             StartHubEmpty = false;
+            if (!vertical_trolleys_)
+                MaxStartHubTrolleys = 6;
         }
 
         public void AddUndistributedTrolleys(List<DanishTrolley> UT)
@@ -62,15 +65,21 @@ namespace FloorSimulation
         private void PlaceTrolleys()
         {
             int LeftX = RFloorPoint.X; //Start from the left of the hub, and keep track of where to place the trolley.
+            int UpperY = RFloorPoint.Y;
             int Rslack = 20; //The real slack in all dimensions.
             for (int i = 0; i < HubTrolleys.Count; i++)
             {
                 DanishTrolley t = HubTrolleys[i];
-                t.IsVertical = true;
+                t.IsVertical = VerticalTrolleys;
 
                 int trolleyX = LeftX + Rslack; 
-                LeftX += t.GetRSize().Width + Rslack;
-                int trolleyY = RFloorPoint.Y + Rslack;
+                int trolleyY = UpperY + Rslack;
+
+                if(VerticalTrolleys)
+                    LeftX += t.GetRSize().Width + Rslack;
+                else
+                    UpperY += t.GetRSize().Height + Rslack;
+
 
                 t.TeleportTrolley(new Point(trolleyX, trolleyY));
                 WW.fill_tiles(t.RPoint, t.GetRSize());

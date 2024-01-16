@@ -155,12 +155,12 @@ namespace FloorSimulation
                 if (ntrolleys == 1) 
                 {
                     HubSize = new Size(160, 80);
-                    s = new ShopHub(d.Search_Name, d.Zoeknaam2, default, floor, HubSize, initial_trolleys: ntrolleys, ColliPlusDay_: d.ColliPlusDay);
+                    s = new ShopHub(d.Search_Name, d.Zoeknaam2, default, floor, HubSize, initial_trolleys: ntrolleys, ColliPlusDay_: d.ColliPlusDay, HorizontalTrolleys_: floor.layout.HorizontalShops );
                 }
                 else
                 {
-                    HubSize = new Size(160, 160);
-                    s = new ShopHub(d.Search_Name, d.Zoeknaam2, default, floor, HubSize, initial_trolleys: ntrolleys, d.ColliPlusDay);
+                    HubSize = new Size(floor.layout.ForcedShopWidth, 160);
+                    s = new ShopHub(d.Search_Name, d.Zoeknaam2, default, floor, HubSize, initial_trolleys: ntrolleys, d.ColliPlusDay, HorizontalTrolleys_: floor.layout.HorizontalShops);
                 }
 
                 shops.Add(s);

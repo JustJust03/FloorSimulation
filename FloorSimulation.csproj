@@ -101,6 +101,7 @@
     <Compile Include="Data\BoxActivity.cs" />
     <Compile Include="Data\HubData.cs" />
     <Compile Include="Data\ReadData.cs" />
+    <Compile Include="Layouts\KortereVerdeelstraatSlayout.cs" />
     <Compile Include="Layouts\Layout.cs" />
     <Compile Include="Layouts\LowPadSlayout.cs" />
     <Compile Include="Layouts\Slayouts.cs" />

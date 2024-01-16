@@ -153,7 +153,7 @@ namespace FloorSimulation
             int x = 160;
             for (int i = 0; i < RData.days.Count; i++)
             {
-                floor.STHubs.Add(new StartHub("Start hub", i, new Point(x, floor.FirstWW.RSizeWW.Height - 250), floor, vertical_trolleys_: true));
+                floor.STHubs.Add(new StartHub("Start hub", i, new Point(x, floor.FirstWW.RSizeWW.Height - 250), new Size(640, 200), floor, vertical_trolleys_: true));
                 x += 960;
             }
 
@@ -356,7 +356,7 @@ namespace FloorSimulation
             int x = 2080;
             for (int i = 0; i < RData.days.Count; i++)
             {
-                floor.STHubs.Add(new StartHub("Start hub", i + RData.days.Count, new Point(x, floor.FirstWW.RSizeWW.Height - 250), floor, vertical_trolleys_: true));
+                floor.STHubs.Add(new StartHub("Start hub", i + RData.days.Count, new Point(x, floor.FirstWW.RSizeWW.Height - 250), new Size(640, 200), floor, vertical_trolleys_: true));
                 x += 960;
             }
             base.PlaceStartHubs();

@@ -27,8 +27,8 @@ namespace FloorSimulation
         /// Shop hub has a standard size: (200cm x 200cm)
         /// Usually horizontal trolleys
         /// </summary>
-        public ShopHub(string name_, int id_, Point FPoint_, Floor floor_, Size s, int initial_trolleys = 0, string ColliPlusDay_ = null) : 
-            base(name_, id_, FPoint_, floor_, s, initial_trolleys: initial_trolleys)
+        public ShopHub(string name_, int id_, Point FPoint_, Floor floor_, Size s, int initial_trolleys = 0, string ColliPlusDay_ = null, bool HorizontalTrolleys_ = true) : 
+            base(name_, id_, FPoint_, floor_, s, initial_trolleys: initial_trolleys, vertical_trolleys: !HorizontalTrolleys_)
         {
             ColliPlusDay = ColliPlusDay_;
             int nstrips = ColliPlusDay.Split('-').Length;
@@ -76,7 +76,12 @@ namespace FloorSimulation
         {
             //Update Accesspoints
             if (VerticalTrolleys)
-                throw new NotImplementedException("Implement access points for shop hubs first!");
+            {
+                if(HasLeftAccess) //Lower access
+                    Accesspoint[0] = WW.GetTile(new Point(NewRPoint.X + 10, NewRPoint.Y + RHubSize.Height));
+                else //Upper access
+                    Accesspoint[0] = WW.GetTile(new Point(NewRPoint.X + 10, NewRPoint.Y));
+            }
             else
             {
                 if (HasLeftAccess)

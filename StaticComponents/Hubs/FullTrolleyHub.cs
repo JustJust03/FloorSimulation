@@ -36,26 +36,34 @@ namespace FloorSimulation
 
 
             HubAccessPoints = new WalkTile[Trolleyarr.Length];
-            HubAccessPointsY = new int[Trolleyarr.Length];
-            int trolleyX = RFloorPoint.X + RHubSize.Width / 2  - (DummyTrolley.GetRSize().Width / 2 + DummyDistributer.GetRSize().Width - 10); //Place the trolley exactly in the middle
 
-            for (int i = 0; i < Trolleyarr.Length; i++)
+            if (!vertical_trolleys_)
             {
-                int trolleyY = RFloorPoint.Y + Rslack + i * (Rslack + DummyTrolley.GetRSize().Height);
+                HubAccessPointsY = new int[Trolleyarr.Length];
+                int trolleyX = RFloorPoint.X + RHubSize.Width / 2  - (DummyTrolley.GetRSize().Width / 2 + DummyDistributer.GetRSize().Width - 10); //Place the trolley exactly in the middle
 
-                HubAccessPoints[i] = WW.GetTile(new Point(trolleyX, trolleyY));
-                HubAccessPointsY[i] = HubAccessPoints[i].Rpoint.Y;
+                for (int i = 0; i < Trolleyarr.Length; i++)
+                {
+                    int trolleyY = RFloorPoint.Y + Rslack + i * (Rslack + DummyTrolley.GetRSize().Height);
+
+                    HubAccessPoints[i] = WW.GetTile(new Point(trolleyX, trolleyY));
+                    HubAccessPointsY[i] = HubAccessPoints[i].Rpoint.Y;
+                }
+
+                HarryHubAccessPoints = new WalkTile[Trolleyarr.Length];
+                HarryHubAccessPointsY = new int[Trolleyarr.Length];
+                trolleyX = RFloorPoint.X + RHubSize.Width / 2  - (DummyTrolley.GetRSize().Width / 2); //Place the trolley exactly in the middle
+                for (int i = 0; i < Trolleyarr.Length; i++)
+                {
+                    int trolleyY = RFloorPoint.Y + (i + 1) * (Rslack + DummyTrolley.GetRSize().Height) + 10;
+
+                    HarryHubAccessPoints[i] = WW.GetTile(new Point(trolleyX, trolleyY));
+                    HarryHubAccessPointsY[i] = HarryHubAccessPoints[i].Rpoint.Y;
+                }
             }
-
-            HarryHubAccessPoints = new WalkTile[Trolleyarr.Length];
-            HarryHubAccessPointsY = new int[Trolleyarr.Length];
-            trolleyX = RFloorPoint.X + RHubSize.Width / 2  - (DummyTrolley.GetRSize().Width / 2); //Place the trolley exactly in the middle
-            for (int i = 0; i < Trolleyarr.Length; i++)
+            else
             {
-                int trolleyY = RFloorPoint.Y + (i + 1) * (Rslack + DummyTrolley.GetRSize().Height) + 10;
-
-                HarryHubAccessPoints[i] = WW.GetTile(new Point(trolleyX, trolleyY));
-                HarryHubAccessPointsY[i] = HarryHubAccessPoints[i].Rpoint.Y;
+                ;//TODO: Implement access points for full trolley hub.
             }
         }
 

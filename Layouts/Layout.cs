@@ -14,6 +14,9 @@ namespace FloorSimulation
         public int RealFloorWidth = 5000;
         public int RealFloorHeight = 5000;
         public int NLowpads = 0;
+        public bool HorizontalShops = true;
+        public int ForcedShopWidth = 160;
+
         public abstract int NTrolleysInShop { get; set; }
 
         public Layout(Floor floor_, ReadData rData)
