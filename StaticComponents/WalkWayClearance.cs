@@ -112,6 +112,42 @@ namespace FloorSimulation
                 Console.WriteLine("Tiles Reset: " + TilesReset + " Tiles Checked: " + TilesChecked
                                 + " Tiles Changed: " + TilesChanged);
         }
+
+        public bool IsBlockedInDirection(Agent agent, WalkTile targettile)
+        {
+            int[] indices = WW.TileListIndices(agent.RPoint, agent.GetRSize());
+            int dwidth = indices[2]; int dheight = indices[3];
+
+            if (agent.RPoint.Y - targettile.Rpoint.Y < -8)//Moving Down
+            {
+                int y = targettile.TileY + dheight - 1;
+                for (int x = targettile.TileX; x < targettile.TileX + dwidth; x += 4)
+                    if (WW.WalkTileList[x][y].occupied)
+                        return true;
+            }
+            else if (agent.RPoint.Y - targettile.Rpoint.Y > 8) //Moving Up
+            {
+                int y = targettile.TileY;
+                for (int x = targettile.TileX; x < targettile.TileX + dwidth; x += 4)
+                    if (WW.WalkTileList[x][y].occupied)
+                        return true;
+            }
+            else if (agent.RPoint.X - targettile.Rpoint.X > 8) // Moving Left
+            {
+                int x = targettile.TileX;
+                for (int y = targettile.TileY; y < targettile.TileY + dheight; y += 4)
+                    if (WW.WalkTileList[x][y].occupied)
+                        return true;
+            }
+            else if (agent.RPoint.X - targettile.Rpoint.X < -8) // Moving Right
+            {
+                int x = targettile.TileX + dwidth - 1;
+                for (int y = targettile.TileY; y < targettile.TileY + dheight; y += 4)
+                    if (WW.WalkTileList[x][y].occupied)
+                        return true;
+            }
+            return false;
+        }
         
         /// <summary>
         /// Updates the accessibility of a tile based on the object size that needs to traverse the walkway

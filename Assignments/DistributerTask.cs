@@ -179,6 +179,10 @@ namespace FloorSimulation
 
         public override void FailRoute()
         {
+            if(DButer.id == 16)
+            {
+                ;
+            }
             TargetWasSaveTile = false;
             if (TargetIsHubGoals.Contains(Goal)) //If the shophub is blocked by something, try to walk 10 tiles to the right and down of this.
             {
@@ -186,18 +190,9 @@ namespace FloorSimulation
                 if (DButer.route == null)
                 {
                     Point targetp = TargetHub.OpenSpots(DButer)[0].Rpoint;
-                    Point p;
-                    if (TargetHub.HasLeftAccess)
-                    {
-                        p = new Point(Math.Max(targetp.X - 180, 0), targetp.Y);
-                        DButer.TravelToTile(DButer.WW.GetTile(p));
-                    }
-                    else
-                    {
-                        int maxwidth = DButer.floor.FirstWW.RSizeWW.Width;
-                        p = new Point(Math.Min(targetp.X + 180, maxwidth), targetp.Y);
-                        DButer.TravelToTile(DButer.WW.GetTile(p));
-                    }
+
+                    Point p = TravelToClose(targetp);
+
                     if (DButer.route != null)
                         MovingToClose = true;
                     else if (Floor.NDistributers > 20) //Let distributers walk to save tile when the target hub is not reachable in busy street
@@ -417,13 +412,13 @@ namespace FloorSimulation
             OldTrolley = DButer.GiveTrolley();
             OldTargetHub = TargetHub;
             DButer.TravelToTrolley(TargetHub.PeekFirstTrolley());
+
+            Goal = "TakeFinishedTrolley"; //New goal
             if (DButer.route == null) //Route was not possible at this point. Try again later.
             {
                 FailRoute();
                 return;
             }
-
-            Goal = "TakeFinishedTrolley"; //New goal
             InTask = true;
             Travelling = true;
         }
@@ -437,7 +432,9 @@ namespace FloorSimulation
             OldWalkTile = DButer.WW.GetTile(Trolley.RPoint);
             DButer.TakeTrolleyIn(TargetHub.GiveTrolley());
             WasOnTopLeft = DButer.TrolleyOnTopLeft;
-            if (WasOnTopLeft)
+            if (WasOnTopLeft && Trolley.IsVertical)
+                OldWalkTile = DButer.WW.GetTile(new Point(DButer.RPoint.X, DButer.RPoint.Y + 20));
+            else if(WasOnTopLeft)
                 OldWalkTile = DButer.WW.GetTile(new Point(DButer.RPoint.X + 30, DButer.RPoint.Y));
             Trolley = DButer.trolley;
             TargetHub = DButer.floor.ClosestFTHub(DButer);
@@ -457,7 +454,10 @@ namespace FloorSimulation
         /// </summary>
         private void DeliverFullTrolley()
         {
-            TargetHub.TakeHTrolleyIn(Trolley, DButer.RPoint);
+            if(Trolley.IsVertical)
+                TargetHub.TakeVTrolleyIn(Trolley, DButer.RPoint);
+            else
+                TargetHub.TakeHTrolleyIn(Trolley, DButer.RPoint);
             DButer.WW.unoccupie_by_tiles(DButer.trolley.RPoint, DButer.trolley.GetRSize()); // drop the trolley of from the distributer
             DButer.GiveTrolley();
 
@@ -716,7 +716,8 @@ namespace FloorSimulation
 
         private void MoveEmptyTrolleyDown()
         {
-            DButer.RotateDistributerAndTrolley(); //Rotate the distributer and the trolley to fit into the shop.
+            if(!Trolley.IsVertical)
+                DButer.RotateDistributerAndTrolley(); //Rotate the distributer and the trolley to fit into the shop.
             DButer.TravelToTile(OldWalkTile);
             TargetHub = OldTargetHub;
 
@@ -790,7 +791,10 @@ namespace FloorSimulation
         {
             TargetHub.SwapIfOtherTrolley(Trolley);
 
-            OldWalkTile = DButer.WW.GetTile(new Point(DButer.RPoint.X, DButer.RPoint.Y + 50));
+            if(Trolley.IsVertical)
+                OldWalkTile = DButer.WW.GetTile(new Point(DButer.RPoint.X + 50, DButer.RPoint.Y));
+            else
+                OldWalkTile = DButer.WW.GetTile(new Point(DButer.RPoint.X, DButer.RPoint.Y + 50));
             DButer.TravelToTile(OldWalkTile);
 
             Goal = "PushTrolleyAway";
@@ -841,6 +845,40 @@ namespace FloorSimulation
                 FailRoute();
                 return;
             }
+        }
+
+        private Point TravelToClose(Point targetp)
+        {
+            Point p;
+            if (TargetHub.VerticalTrolleys)
+            {
+                if (TargetHub.HasLeftAccess)
+                {
+                    p = new Point(targetp.X, targetp.Y + 240);
+                    DButer.TravelToTile(DButer.WW.GetTile(p));
+                }
+                else
+                {
+                    p = new Point(targetp.X, targetp.Y - 240);
+                    DButer.TravelToTile(DButer.WW.GetTile(p));
+                }
+            }
+            else
+            {
+                if (TargetHub.HasLeftAccess)
+                {
+                    p = new Point(Math.Max(targetp.X - 180, 0), targetp.Y);
+                    DButer.TravelToTile(DButer.WW.GetTile(p));
+                }
+                else
+                {
+                    int maxwidth = DButer.floor.FirstWW.RSizeWW.Width;
+                    p = new Point(Math.Min(targetp.X + 180, maxwidth), targetp.Y);
+                    DButer.TravelToTile(DButer.WW.GetTile(p));
+                }
+            }
+
+            return p;
         }
     }
 }

@@ -112,42 +112,44 @@ namespace FloorSimulation
             InitShopCorners();
         }
 
+        public override void PlaceDistributers(int amount, Point StartPoint)
+        {
+            floor.LHDriver = new Distributer(-8, floor, floor.FirstWW, Rpoint_: floor.FirstHarry.RPoint);
+            base.PlaceDistributers(amount, StartPoint);
+        }
+
 
         public override void PlaceFullTrolleyHubs()
         {
             int FullTrolleyHubHeight = 200;
 
-            Point FirstPoint = new Point(LeftX + BuffhubWidth + 300, ShopCornersY[0] + 300);
-            Point SecondPoint = new Point(ShopCornersX[1] - Shoplength[1] * ShopWidth, ShopCornersY[0] + 300);
-            floor.FTHubs.Add(new FullTrolleyHub("Full Trolley Hub", 0, FirstPoint, floor, new Size(ShopCornersX[1] - Shoplength[1] * ShopWidth - 200 - FirstPoint.X, FullTrolleyHubHeight), vertical_trolleys_: true));
-            floor.FTHubs.Add(new FullTrolleyHub("Full Trolley Hub", 0, SecondPoint, floor, new Size(Shoplength[1] * ShopWidth - 300 - BuffhubWidth, FullTrolleyHubHeight), vertical_trolleys_: true));
+            Point FirstPoint = new Point(LeftX + BuffhubWidth + 300 + 300, ShopCornersY[0] + 350);
+            floor.FTHubs.Add(new FullTrolleyHub("Full Trolley Hub", 0, FirstPoint, floor, new Size(ShopCornersX[1] - BuffhubWidth - 300 - FirstPoint.X, FullTrolleyHubHeight), vertical_trolleys_: true));
 
             for (int i = 1; i < ShopCornersY.Count - 1; i += 2)
             {
                 int y = ((ShopCornersY[i] + ShopCornersY[i + 1]) / 2) - (FullTrolleyHubHeight / 2);
 
-                FirstPoint = new Point(LeftX + BuffhubWidth + 300, y);
-                SecondPoint = new Point(ShopCornersX[1] - Shoplength[1] * ShopWidth, y);
+                FirstPoint = new Point(LeftX + BuffhubWidth + 300 + 300, y);
 
-                floor.FTHubs.Add(new FullTrolleyHub("Full Trolley Hub", 0, FirstPoint, floor, new Size(Shoplength[0] * ShopWidth - BuffhubWidth - 300, FullTrolleyHubHeight), vertical_trolleys_: true));
-                floor.FTHubs.Add(new FullTrolleyHub("Full Trolley Hub", 0, SecondPoint, floor, new Size(Shoplength[1] * ShopWidth - 300 - BuffhubWidth, FullTrolleyHubHeight), vertical_trolleys_: true));
+                floor.FTHubs.Add(new FullTrolleyHub("Full Trolley Hub", 0, FirstPoint, floor, new Size(ShopCornersX[1] - BuffhubWidth - 300 - FirstPoint.X, FullTrolleyHubHeight), vertical_trolleys_: true));
             }
 
-            base.PlaceFullTrolleyHubs();
+            floor.HubList = floor.HubList.Concat(floor.FTHubs).ToList();
         }
 
         public override void PlaceBuffHubs()
         {
             int BuffHubHeight = 200;
 
-            floor.BuffHubs.Add(new BufferHub("Small buffer hub", 0, new Point(ShopCornersX[0], ShopCornersY[0] + 300),new Size(BuffhubWidth, BuffHubHeight), floor, vertical_trolleys_: true));
+            floor.BuffHubs.Add(new BufferHub("Small buffer hub", 0, new Point(ShopCornersX[0] + 300, ShopCornersY[0] + 350),new Size(BuffhubWidth, BuffHubHeight), floor, vertical_trolleys_: true));
             floor.BuffHubs.Add(new BufferHub("Small buffer hub", 0, new Point(ShopCornersX[1] - BuffhubWidth, ShopCornersY[0] + 300),new Size(BuffhubWidth, BuffHubHeight), floor, vertical_trolleys_: true));
 
             for (int i = 1; i < ShopCornersY.Count - 1; i += 2)
             {
                 int y = ((ShopCornersY[i] + ShopCornersY[i + 1]) / 2) - (BuffHubHeight / 2);
 
-                floor.BuffHubs.Add(new BufferHub("Small buffer hub", 1 + i, new Point(ShopCornersX[0], y),new Size(BuffhubWidth, BuffHubHeight), floor, vertical_trolleys_: true));
+                floor.BuffHubs.Add(new BufferHub("Small buffer hub", 1 + i, new Point(ShopCornersX[0] + 300, y),new Size(BuffhubWidth, BuffHubHeight), floor, vertical_trolleys_: true));
                 floor.BuffHubs.Add(new BufferHub("Small buffer hub", 1 + i, new Point(ShopCornersX[1] - BuffhubWidth, y),new Size(BuffhubWidth, BuffHubHeight), floor, vertical_trolleys_: true));
             }
 
@@ -161,26 +163,100 @@ namespace FloorSimulation
             int y = ShopCornersY[0] + 100;
             int x = LeftX - 200;
 
-            for (int i = 0; i < Shoplength.Length; i++)
+            for (int i = 0; i < Shoplength.Length - 2; i += 2)
             {
                 floor.STHubs.Add(new StartHub("Start hub", i, new Point(x, y), new Size(200, 470), floor, vertical_trolleys_: false));
                 if(i % 4 == 0 && i < Shoplength.Length - 1) //Left of the first col
-                    x += Shoplength[0] * ShopWidth + TussenWidth;
-                else if(i % 4 == 1 && i < Shoplength.Length - 1) //Left of the second col (In the middle path)
                 {
-                    x += Shoplength[1] * ShopWidth + 200;
+                    x += Shoplength[0] * ShopWidth + TussenWidth + Shoplength[1] * ShopWidth + 200;
                     y = ShopCornersY[++CornersYDone] - 570;
                 }
                 else if(i % 4 == 2 && i < Shoplength.Length - 1) //Right of the second col
-                    x -= Shoplength[1] * ShopWidth + TussenWidth;
-                else if(i % 4 == 3 && i < Shoplength.Length - 1) //Right of the first col (in the middle path)
                 {
-                    x = LeftX - 200;
+                    x -= Shoplength[0] * ShopWidth + Shoplength[1] * ShopWidth + TussenWidth + 200;
                     y = ShopCornersY[++CornersYDone] + 100;
+
                 }
             }
+            floor.STHubs.Add(new StartHub("Start hub", 8, new Point(x, y), new Size(200, 470), floor, vertical_trolleys_: false));
 
             floor.HubList = floor.HubList.Concat(floor.STHubs).ToList();
+        }
+
+        public override void SortPlantLists(List<DanishTrolley> dtList)
+        {
+            foreach(DanishTrolley dt in dtList)
+            {
+                dt.PlantList = dt.PlantList
+                    .OrderBy(obj => obj.DestinationHub.day)
+                    .ThenBy(obj => obj.DestinationHub.id)
+                    .ToList();
+            }
+        }
+
+        public override BufferHub GetBuffHubOpen(Agent agent)
+        {
+            List<BufferHub> sortedList = floor.BuffHubs
+            .OrderBy(obj =>
+            {
+                int deltaX = obj.RFloorPoint.X - agent.RPoint.X;
+                int deltaY = obj.RFloorPoint.Y - agent.RPoint.Y;
+                if (obj.name == "Buffer hub")
+                    deltaX = 0;
+                return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
+            })
+            .Where(obj => obj.name != "Buffer hub")
+            .ToList();
+
+            foreach(BufferHub buffhub in sortedList) 
+            {
+                if (buffhub.OpenSpots(agent).Count > 0)
+                    return buffhub;
+            }
+
+            return base.GetBuffHubOpen(agent);
+        }
+
+        public override BufferHub GetBuffHubFull(Agent agent)
+        {
+            List<BufferHub> sortedList = floor.BuffHubs.OrderBy(obj =>
+            {
+                int deltaX = obj.RFloorPoint.X - agent.RPoint.X;
+                int deltaY = obj.RFloorPoint.Y - agent.RPoint.Y;
+                if (obj.name == "Buffer hub")
+                    deltaX = 9999;
+                return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
+            })
+            .ToList();
+
+            foreach(BufferHub buffhub in sortedList) 
+            {
+                if (buffhub.FilledSpots(agent).Count > 0)
+                    return buffhub;
+            }
+
+            return base.GetBuffHubFull(agent);
+        }
+
+        public override void DistributeTrolleys(List<DanishTrolley> dtList)
+        {
+            for(int i = 0; i < floor.)
+
+            List<List<DanishTrolley>> TrolleysPerStartHub = new List<List<DanishTrolley>> ();
+            for (int i = 0; i < floor.STHubs.Count; i++)
+                TrolleysPerStartHub.Add(new List<DanishTrolley>());
+
+            foreach(DanishTrolley d in dtList)
+            {
+
+                int i = 0;
+                ;
+                TrolleysPerStartHub[i].Add(d);
+            }
+
+            for (int i = 0; i <  floor.STHubs.Count; i++)
+                floor.STHubs[i].AddUndistributedTrolleys(TrolleysPerStartHub[i]);
+            ;
         }
     }
 }

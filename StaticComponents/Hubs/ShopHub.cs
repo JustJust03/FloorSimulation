@@ -80,14 +80,14 @@ namespace FloorSimulation
                 if(HasLeftAccess) //Lower access
                     Accesspoint[0] = WW.GetTile(new Point(NewRPoint.X + 10, NewRPoint.Y + RHubSize.Height));
                 else //Upper access
-                    Accesspoint[0] = WW.GetTile(new Point(NewRPoint.X + 10, NewRPoint.Y));
+                    Accesspoint[0] = WW.GetTile(new Point(NewRPoint.X + 10, NewRPoint.Y - 40));
             }
             else
             {
                 if (HasLeftAccess)
                     Accesspoint[0] = WW.GetTile(new Point(NewRPoint.X - 40, NewRPoint.Y + 10));
                 else
-                    Accesspoint[0] = WW.GetTile(new Point(NewRPoint.X + RHubSize.Width, NewRPoint.Y + 10));
+                    Accesspoint[0] = WW.GetTile(new Point(NewRPoint.X + RHubSize.Width, NewRPoint.Y - 10));
             }
             base.TeleportHub(NewRPoint);
         }

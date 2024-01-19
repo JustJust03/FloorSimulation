@@ -42,7 +42,7 @@ namespace FloorSimulation
             distributionms_per_tick = (int)(1000f / Program.TICKS_PER_SECOND);
             RegionHubs = RHubs;
 
-            if (floor.layout.NLowpads == 0)
+            if (floor.layout.NLowpads == 0 && id != -8)
                 MainTask = new DistributerTask(this, "TakeFullTrolley", floor.FinishedD);
             else if(id_ == -8)
                 MainTask = new LHDriverTask(this);
@@ -135,7 +135,9 @@ namespace FloorSimulation
             if (IsVertical != trolley.IsVertical)
             {
                 RotateAgentOnly();
-                if (RPoint.X < trolley.RPoint.X)
+                if(trolley.IsVertical && RPoint.Y < trolley.RPoint.Y)
+                    TrolleyOnTopLeft = true;
+                else if (!trolley.IsVertical && RPoint.X < trolley.RPoint.X)
                     TrolleyOnTopLeft = true;
                 else //Switches the trolley and the distributer
                 {
@@ -169,6 +171,8 @@ namespace FloorSimulation
                 SwitchDistrToLeftOfTrolley();
             else if(RPoint.Y - trolley.RPoint.Y > 10) //Distributer is on the bottom of the trolley
                 SwitchDistrToTopOfTrolley();
+            else if(trolley.RPoint.Y - RPoint.Y > 10)
+                SwitchDistrToBotOfTrolley();
         }
 
         private void SwitchDistrToLeftOfTrolley()
@@ -210,6 +214,21 @@ namespace FloorSimulation
             RPoint = trolley.RPoint;
             
             trolley.RPoint.Y = RPoint.Y + 10;
+            SimPoint = floor.ConvertToSimPoint(RPoint);
+            trolley.SimPoint = floor.ConvertToSimPoint(trolley.RPoint);
+
+            WW.fill_tiles(RPoint, GetRSize());
+        }
+
+        private void SwitchDistrToBotOfTrolley()
+        {
+            WW.unfill_tiles(trolley.RPoint, trolley.GetRSize());
+            WW.unfill_tiles(RPoint, GetRSize());
+
+            TrolleyOnTopLeft = true;
+            trolley.RPoint = RPoint;
+            
+            RPoint.Y = trolley.RPoint.Y + trolley.GetRSize().Height + 10;
             SimPoint = floor.ConvertToSimPoint(RPoint);
             trolley.SimPoint = floor.ConvertToSimPoint(trolley.RPoint);
 

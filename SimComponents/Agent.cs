@@ -154,9 +154,18 @@ namespace FloorSimulation
                 {
                     WalkTile destination = route[0];
 
-                    WW.WWC.UpdateLocalClearances(this, GetTileSize(), destination);
+                    //WW.WWC.UpdateLocalClearances(this, GetTileSize(), destination);
 
+                    /*
                     if (!AWW.IsTileAccessible(destination)) //Route failed, there was something occupying the calculated route
+                    {
+                        route = null;
+                        ticktravel = 0;
+                        MainTask.FailRoute();
+                        return;
+                    */
+
+                    if(WW.WWC.IsBlockedInDirection(this, destination))
                     {
                         route = null;
                         ticktravel = 0;
