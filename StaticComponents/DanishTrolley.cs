@@ -35,7 +35,7 @@ namespace FloorSimulation
         public int NStickers = 2;
         public readonly int MaxStickers = 20;
         public int TotalStickers = 2;
-        public const int MaxTotalStickers = 22 ; //22
+        public const int MaxTotalStickers = 17 ; //22
 
         public const float TrolleyTravelSpeed = 67f; //cm/s
 
@@ -43,6 +43,8 @@ namespace FloorSimulation
         public List<LowPadAccessHub> TargetRegions;
 
         public bool ContinueDistribution = false; //The distributer can flip this bool, to tell the lowpad to continue travelling.
+        public int MaxUnitsPerTrolley;
+        public int SingleUnits;
 
         /// <summary>
         /// Constructer initializing the variables
@@ -112,6 +114,7 @@ namespace FloorSimulation
             NStickers++;
             TotalStickers++;
             Units += p.units;
+            SingleUnits += p.SingleUnits;
             PlantList.Add(p);
             return IsFull();
         }

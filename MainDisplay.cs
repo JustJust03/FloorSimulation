@@ -23,8 +23,9 @@ namespace FloorSimulation
         public Brush StandardWhiteBrush;
         public bool isSimulating = false;
         //public string date = "2023-04-14";
-        public string date = "2023-04-14";
-        public List<string> days = new List<string> { "VR", "ZO" };
+        public string date = "2023-07-18";
+        //public List<string> days = new List<string> { "VR", "ZO" };
+        public List<string> days = new List<string> { "DI", "WO" };
         //public List<string> days = new List<string> { "VR"};
 
         public MetaInfo InfoPanel;
@@ -85,7 +86,7 @@ namespace FloorSimulation
 
             //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, length: "top_200");
             //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor);
-            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, DistributeSecondDay: true);
+            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, DistributeSecondDay: false);
             //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, length: "for_30", DistributeSecondDay: false);
 
             floor.PlaceShops(rd.UsedShopHubs);

@@ -276,7 +276,7 @@ namespace FloorSimulation
 
         public override StartHub GetStartHub(Agent agent)
         {
-            if (agent.RPoint == agent.SavePoint || agent.id % 2 == 0)
+            if (agent.id % 2 == 0)
                 return floor.STHubs[0];
 
             List<StartHub> sortedList = floor.STHubs.OrderBy(obj =>

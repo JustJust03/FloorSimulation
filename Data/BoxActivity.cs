@@ -20,6 +20,7 @@ namespace FloorSimulation
         public string Transactieid { get; set; }
         public string Opmerking5 {  get; set; }
         public int Entry {  get; set; }
+        public int Lgstk_aantal_fust_op_sticker { get; set; }
         public DateTime Date { get; set; }
         public ShopHub Destination { get; set; }
 
@@ -43,6 +44,11 @@ namespace FloorSimulation
         {
             return int.Parse(Beladings_aantallen.Split('x')[1]) * int.Parse(Beladings_aantallen.Split('x')[0]);
         }
+        public int GetSingleUnits()
+        {
+            return int.Parse(Beladings_aantallen.Split('x')[0]);
+        }
+
     }
 
     internal class BoxActivityMap : ClassMap<BoxActivity>
@@ -59,6 +65,7 @@ namespace FloorSimulation
             Map(m => m.Transactieid).Index(7);
             Map(m => m.Opmerking5).Index(8);
             Map(m => m.Entry).Index(9);
+            Map(m => m.Lgstk_aantal_fust_op_sticker).Index(10);
         }
     }
 

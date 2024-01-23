@@ -77,15 +77,6 @@ namespace FloorSimulation
                 BestemmingToPlants[p.Bestemmingscode].Add(p);
             }
 
-            List<NPlants> NonLagerTrolleys = new List<NPlants>();
-            foreach(List<NPlants> pslist in BestemmingToPlants.Values)
-            {
-                if (pslist.Select(p => alist[int.Parse(p.BoxActiviteitEntry)].Transactieid).Distinct().ToList().Count <= 1)
-                {
-                    ;
-                }
-            }
-
             Dictionary<string, int> BestemmingToNumberOfPlants = new Dictionary<string, int>();
             foreach(string key in BestemmingToPlants.Keys)
             {

@@ -20,6 +20,8 @@ namespace FloorSimulation
         public List<ShopHub> UsedShopHubs;
         public List<string> days;
 
+        int SplitTrolleyI = 0;
+
         public ReadData(List<string> days_)
         {
             days = days_;
@@ -96,14 +98,27 @@ namespace FloorSimulation
 
         public void AddToTrolley(BoxActivity b, Floor floor)
         {
-            if (!TransactieIdToTrolley.Keys.Contains(b.Transactieid))
-                TransactieIdToTrolley[b.Transactieid] = new DanishTrolley(-1, floor, transactieId_: b.Transactieid);
+            if (!TransactieIdToTrolley.Keys.Contains(b.Transactieid + SplitTrolleyI))
+            {
+                SplitTrolleyI = 0;
+                TransactieIdToTrolley[b.Transactieid + SplitTrolleyI] = new DanishTrolley(-1, floor, transactieId_: b.Transactieid + SplitTrolleyI);
+                TransactieIdToTrolley[b.Transactieid + SplitTrolleyI].MaxUnitsPerTrolley = b.Lgstk_aantal_fust_op_sticker;
+            }
 
-            DanishTrolley t = TransactieIdToTrolley[b.Transactieid];
+            DanishTrolley t = TransactieIdToTrolley[b.Transactieid + SplitTrolleyI];
             if(days.Contains(b.Destination.day))
             {
                 b.Destination.StickersToReceive++;
-                plant p = new plant(b.Destination, b.GetUnits(), name_: b.Product_omschrijving_1);
+                plant p = new plant(b.Destination, b.GetUnits(), b.GetSingleUnits(), name_: b.Product_omschrijving_1);
+                if(t.SingleUnits + p.SingleUnits > t.MaxUnitsPerTrolley) 
+                {
+                    if (t.SingleUnits == 0)
+                        ;
+                    SplitTrolleyI++;
+                    TransactieIdToTrolley[b.Transactieid + SplitTrolleyI] = new DanishTrolley(-1, floor, transactieId_: b.Transactieid + SplitTrolleyI);
+                    TransactieIdToTrolley[b.Transactieid + SplitTrolleyI].MaxUnitsPerTrolley = b.Lgstk_aantal_fust_op_sticker;
+                    t = TransactieIdToTrolley[b.Transactieid + SplitTrolleyI];
+                }
                 t.TakePlantIn(p);
             }
         }
