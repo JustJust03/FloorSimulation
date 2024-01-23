@@ -21,10 +21,11 @@ namespace FloorSimulation
             base(name_, id_, FPoint_, floor_, s_, initial_trolleys:initial_trolleys_, vertical_trolleys:vertical_trolleys_)
         {
             UndistributedTrolleys = new List<DanishTrolley>();
-            StartHubEmpty = false;
+            StartHubEmpty = true;
             if (!vertical_trolleys_)
                 MaxStartHubTrolleys = 6;
         }
+
 
         public void AddUndistributedTrolleys(List<DanishTrolley> UT)
         {
@@ -38,6 +39,18 @@ namespace FloorSimulation
             UndistributedTrolleys.RemoveRange(0, take_amount);
 
             PlaceTrolleys();
+        }
+
+        public void AddUndistributedTrolleys(DanishTrolley UT)
+        {
+            StartHubEmpty = false;
+            if (HubTrolleys.Count < MaxStartHubTrolleys)
+            {
+                HubTrolleys.Add(UT);
+                PlaceTrolleys();
+            }
+            else
+                UndistributedTrolleys.Add(UT);
         }
 
         public override DanishTrolley PeekFirstTrolley()
