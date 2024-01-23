@@ -193,7 +193,7 @@ namespace FloorSimulation
                             wt = HubAccessPoints[rowi, coli];
 
                         if (wt == null)
-                            wt = HubAccessPoints[rowi, coli - 1];
+                            wt = HubAccessPoints[rowi, coli - 2];
                         WalkTile DownTile;
 
                         DownTile = WW.GetTile(new Point(wt.Rpoint.X - 290, wt.Rpoint.Y + 30));
@@ -358,7 +358,7 @@ namespace FloorSimulation
             DanishTrolley t = Trolleyarr[ArrIndexy, ArrIndexx];
             if (t == null)
                 return t;
-            Trolleyarr[0, ArrIndexx] = null;
+            Trolleyarr[ArrIndexy, ArrIndexx] = null;
             WW.unfill_tiles(t.RPoint, t.GetRSize());
 
             return t;

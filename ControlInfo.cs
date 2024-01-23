@@ -24,7 +24,7 @@ namespace FloorSimulation
             floor = floor_;
 
             this.Location = PanelLocation;
-            this.Size = new Size((int)(2000 * Floor.ScaleFactor), (int)(2000 * Floor.ScaleFactor));
+            this.Size = new Size((int)(2000 * Floor.ScaleFactor * 2), (int)(2000 * Floor.ScaleFactor * 2));
 
             //Tick Button
             tick_button = new Button();

@@ -179,10 +179,6 @@ namespace FloorSimulation
 
         public override void FailRoute()
         {
-            if(DButer.id == 16)
-            {
-                ;
-            }
             TargetWasSaveTile = false;
             if (TargetIsHubGoals.Contains(Goal)) //If the shophub is blocked by something, try to walk 10 tiles to the right and down of this.
             {
@@ -695,7 +691,7 @@ namespace FloorSimulation
             DButer.TakeTrolleyIn(t);
 
 
-            if (Trolley.IsVertical)
+            if (Trolley.IsVertical && DButer.RPoint.Y < 800)
             {
                 TilesDownTile = DButer.WW.GetTile(new Point(DButer.RPoint.X, TargetHub.RFloorPoint.Y + TargetHub.RHubSize.Height));
                 DButer.TravelToTile(TilesDownTile);
@@ -792,7 +788,7 @@ namespace FloorSimulation
             TargetHub.SwapIfOtherTrolley(Trolley);
 
             if(Trolley.IsVertical)
-                OldWalkTile = DButer.WW.GetTile(new Point(DButer.RPoint.X + 50, DButer.RPoint.Y));
+                OldWalkTile = DButer.WW.GetTile(new Point(DButer.RPoint.X + 60, DButer.RPoint.Y));
             else
                 OldWalkTile = DButer.WW.GetTile(new Point(DButer.RPoint.X, DButer.RPoint.Y + 50));
             DButer.TravelToTile(OldWalkTile);
@@ -859,7 +855,7 @@ namespace FloorSimulation
                 }
                 else
                 {
-                    p = new Point(targetp.X, targetp.Y - 240);
+                    p = new Point(targetp.X, targetp.Y - 260);
                     DButer.TravelToTile(DButer.WW.GetTile(p));
                 }
             }

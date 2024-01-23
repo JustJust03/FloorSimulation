@@ -238,6 +238,7 @@ namespace FloorSimulation
             return base.GetBuffHubFull(agent);
         }
 
+        /*
         public override void DistributeTrolleys(List<DanishTrolley> dtList)
         {
             for(int i = 0; i < floor.)
@@ -258,5 +259,6 @@ namespace FloorSimulation
                 floor.STHubs[i].AddUndistributedTrolleys(TrolleysPerStartHub[i]);
             ;
         }
+        */
     }
 }

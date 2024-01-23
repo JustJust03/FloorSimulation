@@ -33,7 +33,7 @@ namespace FloorSimulation
         public Random rand;
 
         // Real size: 5000 cm x 5000 cm
-        public const float ScaleFactor = 0.12f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
+        public const float ScaleFactor = 0.10f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
         public Layout layout;
 
         public bool TickingHeatMap = false;
@@ -285,7 +285,9 @@ namespace FloorSimulation
         {
             FullTrolleyHub ClosestHub = FTHubs[0];
             foreach (FullTrolleyHub FThub in FTHubs)
-                if (Math.Abs(db.RPoint.X - FThub.RFloorPoint.X) < Math.Abs(db.RPoint.X - ClosestHub.RFloorPoint.X))
+                if (!FTHubs[0].VerticalTrolleys && Math.Abs(db.RPoint.X - FThub.RFloorPoint.X) < Math.Abs(db.RPoint.X - ClosestHub.RFloorPoint.X))
+                    ClosestHub = FThub;
+                else if (FTHubs[0].VerticalTrolleys && Math.Abs(db.RPoint.Y - FThub.RFloorPoint.Y) < Math.Abs(db.RPoint.Y - ClosestHub.RFloorPoint.Y))
                     ClosestHub = FThub;
 
             return ClosestHub;

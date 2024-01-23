@@ -126,6 +126,11 @@ namespace FloorSimulation.Assignments
 
         public override void RouteCompleted()
         {
+            if (DButer.RPoint == DButer.SavePoint && Goal != "TravelToStartTile")
+            {
+                FailRoute();
+                return;
+            }
             if (Goal == "EmptySmallBuffHub")
                 EmptySmallBuffHub();
             else if (Goal == "LHDeliverEmptyTrolleys")

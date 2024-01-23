@@ -62,11 +62,11 @@ namespace FloorSimulation
             InitData();
 
             //MetaInfo
-            InfoPanel = new MetaInfo(new Point(floor.Width, (int)(2000 * Floor.ScaleFactor)), this, floor);
+            InfoPanel = new MetaInfo(new Point(floor.Width, (int)(2000 * Floor.ScaleFactor * 2)), this, floor);
             Controls.Add(InfoPanel);
 
             Paint += PaintMainDisplay;
-            SaveFileBase = date + "_" + "21distr-BuffSlayout";
+            SaveFileBase = date + "_" + "KortereVerdeelStraat_Singel_StartHub";
         }
 
         private void PaintMainDisplay(object sender, PaintEventArgs e)
