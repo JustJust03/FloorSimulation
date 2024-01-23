@@ -125,6 +125,7 @@ namespace FloorSimulation
 
         public override void PlaceDistributers(int amount, Point StartPoint)
         {
+            StartPoint = new Point(floor.FirstWW.RSizeWW.Width - 800, 4000);
             floor.LHDriver = new Distributer(-8, floor, floor.FirstWW, Rpoint_: floor.FirstHarry.RPoint);
             base.PlaceDistributers(amount, StartPoint);
         }
