@@ -20,12 +20,14 @@ namespace FloorSimulation
         //public const int ReorderTime = 3; //ms
         public int units;
         public int SingleUnits;
+        public int MaxSingleUnits;
 
-        public plant(ShopHub desthub, int units_, int SingleUnits_, string name_ = "Plant_Name_Here") 
+        public plant(ShopHub desthub, int units_, int SingleUnits_, int MaxSingleUnits_, string name_ = "Plant_Name_Here") 
         { 
             DestinationHub = desthub;
             units = units_;
             SingleUnits = SingleUnits_;
+            MaxSingleUnits = MaxSingleUnits_;
             name = name_;
         }
 

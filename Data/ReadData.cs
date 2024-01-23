@@ -109,7 +109,7 @@ namespace FloorSimulation
             if(days.Contains(b.Destination.day))
             {
                 b.Destination.StickersToReceive++;
-                plant p = new plant(b.Destination, b.GetUnits(), b.GetSingleUnits(), name_: b.Product_omschrijving_1);
+                plant p = new plant(b.Destination, b.GetUnits(), b.GetSingleUnits(), b.Lgstk_aantal_fust_op_sticker, name_: b.Product_omschrijving_1);
                 if(t.SingleUnits + p.SingleUnits > t.MaxUnitsPerTrolley) 
                 {
                     if (t.SingleUnits == 0)
