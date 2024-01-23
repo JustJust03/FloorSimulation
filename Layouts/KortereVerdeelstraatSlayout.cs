@@ -9,7 +9,14 @@ namespace FloorSimulation
 {
     internal class KortereVerdeelstraatSlayout : SLayout
     {
-        int[] Shoplength = { 7, 8, 8, 7, 7, 8, 8, 7, 7, 8, 8, 7, 7, 8, 7, 7, 7, 7 };
+        int Nshops;
+        int[] Shoplength;
+        Dictionary<int, int[]> ShopsToShopLength = new Dictionary<int, int[]>
+        {
+            {133, new int[]  { 7, 8, 8, 7, 7, 8, 8, 7, 7, 8, 8, 7, 7, 8, 7, 7, 7, 7 }},
+            {141, new int[]  { 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 7, 8, 8, 7 }},
+        };
+
         protected Dictionary<ShopHub, StartHub> ShopToStartHub;
         int LeftX = 600;
         int LowerY = 6300;
@@ -56,6 +63,9 @@ namespace FloorSimulation
 
         public override void PlaceShops(List<ShopHub> Shops, int _, int __)
         {
+            Nshops = Shops.Count;
+            Shoplength = ShopsToShopLength[Nshops];
+
             int RowsPlaced = 0;
             int PlacedShopsInARow = 0;
             bool LowerAccess = true;
@@ -85,7 +95,7 @@ namespace FloorSimulation
                     }
                     else if (RowsPlaced % 4 == 2)// right to left, halfway
                     {
-                        if (Shoplength[RowsPlaced] == 7)
+                        if (Nshops == 133 && Shoplength[RowsPlaced] == 7)
                             x -= ShopWidth; //this row was 1 shorter then normal.
 
                         x -= TussenWidth;
