@@ -378,7 +378,7 @@ namespace FloorSimulation
             dt.Units = 0;
             dt.NStickers = 2;
             dt.TotalStickers = 2;
-            dt.PercentageFull = 0.0f;
+            dt.PercentageFull = 0;
             dt.IsVertical = true;
             if (MainBufferFull()) //Remove the first row
             {
@@ -400,7 +400,7 @@ namespace FloorSimulation
             dt.Units = 0;
             dt.NStickers = 2;
             dt.TotalStickers = 2;
-            dt.PercentageFull = 0.0f;
+            dt.PercentageFull = 0;
             dt.IsVertical = true;
             if (name == "Buffer hub" && (MainBufferFull() || ArrIndexy == HubAccessPointsY.Length - 1)) //Remove the first row
             {
@@ -421,7 +421,7 @@ namespace FloorSimulation
             dt.Units = 0;
             dt.NStickers = 2;
             dt.TotalStickers = 2;
-            dt.PercentageFull = 0.0f;
+            dt.PercentageFull = 0;
             dt.IsVertical = false;
         }
 
@@ -438,7 +438,7 @@ namespace FloorSimulation
             dt.Units = 0;
             dt.NStickers = 2;
             dt.TotalStickers = 2;
-            dt.PercentageFull = 0.0f;
+            dt.PercentageFull = 0;
             dt.IsVertical = false;
         }
 

@@ -19,7 +19,7 @@ namespace FloorSimulation.StaticComponents.Hubs
         private int YSlack = 20;
 
         public int TrolleysExported = 0;
-        public float PercentageExported = 0.0f;
+        public double PercentageExported = 0.0;
 
         public TruckHub(string name_, int id_, Point FPoint_, Floor floor_, int initial_trolleys_ = 0) :
             base(name_, id_, FPoint_, floor_, new Size(700, 350), initial_trolleys: initial_trolleys_, vertical_trolleys:true)
