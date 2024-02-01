@@ -37,6 +37,7 @@ namespace FloorSimulation
         public int TotalStickers = 2;
         public const int MaxTotalStickers = 17 ; //22
         public float PercentageFull = 0.0f;
+        public float FullAt = 1.0f;
 
         public const float TrolleyTravelSpeed = 67f; //cm/s
 
@@ -155,7 +156,7 @@ namespace FloorSimulation
         public bool IsFull()
         {
             if (!floor.layout.UseStickersForFull)
-                return PercentageFull > 1.0;
+                return PercentageFull > FullAt;
             if (TotalStickers >= MaxTotalStickers)
                 return true;
             return false;
@@ -191,7 +192,7 @@ namespace FloorSimulation
         /// </summary>
         public bool DoesPlantFit(plant p)
         {
-            return PercentageFull + (float)p.SingleUnits / p.MaxSingleUnits <= 1.0;
+            return PercentageFull + (float)p.SingleUnits / p.MaxSingleUnits <= FullAt;
         }
     }
 }

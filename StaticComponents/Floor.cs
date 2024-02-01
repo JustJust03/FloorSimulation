@@ -33,7 +33,7 @@ namespace FloorSimulation
         public Random rand;
 
         // Real size: 5000 cm x 5000 cm
-        public const float ScaleFactor = 0.10f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
+        public const float ScaleFactor = 0.17f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
         public Layout layout;
 
         public bool TickingHeatMap = false;
