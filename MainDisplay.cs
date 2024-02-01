@@ -67,7 +67,7 @@ namespace FloorSimulation
             Controls.Add(InfoPanel);
 
             Paint += PaintMainDisplay;
-            SaveFileBase = date + "_" + "KortereVerdeelStraat_Singel_StartHub";
+            SaveFileBase = date + "_" + "KortereVerdeelStraat_Multiple_StartHub_SplitCC";
         }
 
         private void PaintMainDisplay(object sender, PaintEventArgs e)
