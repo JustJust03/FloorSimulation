@@ -33,6 +33,7 @@ namespace FloorSimulation
             RealFloorWidth = 5500;
             StreetWidth = 950;
             ForcedShopWidth = 200;
+            UseStickersForFull = false;
         }
 
         public void InitShopCorners()

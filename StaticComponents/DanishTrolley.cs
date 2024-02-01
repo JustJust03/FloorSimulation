@@ -116,6 +116,8 @@ namespace FloorSimulation
             TotalStickers++;
             Units += p.units;
             SingleUnits += p.SingleUnits;
+            if (!floor.layout.UseStickersForFull)
+                PercentageFull += (float)p.SingleUnits / p.MaxSingleUnits;
 
             PlantList.Add(p);
             return IsFull();
@@ -152,6 +154,8 @@ namespace FloorSimulation
 
         public bool IsFull()
         {
+            if (!floor.layout.UseStickersForFull)
+                return PercentageFull > 1.0;
             if (TotalStickers >= MaxTotalStickers)
                 return true;
             return false;
@@ -181,6 +185,13 @@ namespace FloorSimulation
                 return false;
             return true;
         }
-        // TODO: Create a function that assigns every new trolley an unique id.
+
+        /// <summary>
+        /// Uses the percentage full to determine if the plant would fit on this trolley
+        /// </summary>
+        public bool DoesPlantFit(plant p)
+        {
+            return PercentageFull + (float)p.SingleUnits / p.MaxSingleUnits <= 1.0;
+        }
     }
 }

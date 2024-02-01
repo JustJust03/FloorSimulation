@@ -273,7 +273,24 @@ namespace FloorSimulation
             AInfo.UpdateFreq(Goal, true);
             if (Goal == "DistributePlants")
             {
-                Trolley = TargetHub.GetRandomTrolley();
+                //Stickers for full
+                if(DButer.floor.layout.UseStickersForFull)
+                    Trolley = TargetHub.GetRandomTrolley();
+                //Percentage full for full
+                else
+                {
+                    if (TargetHub.HubTrolleys[0].DoesPlantFit(DButer.trolley.PeekFirstPlant()))
+                        Trolley = TargetHub.HubTrolleys[0];
+                    else if (TargetHub.HubTrolleys[1].DoesPlantFit(DButer.trolley.PeekFirstPlant())) 
+                        Trolley = TargetHub.HubTrolleys[1];
+                    else
+                    {
+                        Trolley = TargetHub.HubTrolleys.OrderByDescending(obj => obj.PercentageFull).FirstOrDefault();
+                        ShopTrolleyBecameFull();
+                        return;
+                    }
+                }
+
                 if (Trolley == null) //If someone took the trolley, wait for a new one to return.
                     return;
                 if (DButer.trolley.PeekFirstPlant() == null) //Distributer trolley is empty. So move this trolley to the Empty trolley Hub.
@@ -775,6 +792,15 @@ namespace FloorSimulation
             }
             TargetHub = DButer.trolley.PeekFirstPlant().DestinationHub;
             Trolley = TargetHub.PeekFirstTrolley();
+            if (!DButer.floor.layout.UseStickersForFull)
+            {
+                Goal = "DistributePlants"; //New goal
+                InTask = true;
+                Travelling = true;
+                DistributionCompleted();
+                return;
+            }
+
             DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
 
             Goal = "DistributePlants"; //New goal

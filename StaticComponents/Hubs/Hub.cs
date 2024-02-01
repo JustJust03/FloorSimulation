@@ -158,7 +158,7 @@ namespace FloorSimulation
         public virtual DanishTrolley PeekFirstTrolley()
         {
             if (HubTrolleys.Count == 0) return null;
-                return HubTrolleys[0];
+            return HubTrolleys[0];
         }
 
         public virtual DanishTrolley GetRandomTrolley()
