@@ -121,6 +121,8 @@ namespace FloorSimulation
             if (agent.RPoint.Y - targettile.Rpoint.Y < -8)//Moving Down
             {
                 int y = targettile.TileY + dheight - 1;
+                if (y >= WW.WalkTileListHeight)
+                    return false;
                 for (int x = targettile.TileX; x < targettile.TileX + dwidth; x += 4)
                     if (WW.WalkTileList[x][y].occupied)
                         return true;
@@ -142,6 +144,8 @@ namespace FloorSimulation
             else if (agent.RPoint.X - targettile.Rpoint.X < -8) // Moving Right
             {
                 int x = targettile.TileX + dwidth - 1;
+                if (x >= WW.WalkTileListWidth)
+                    return false;
                 for (int y = targettile.TileY; y < targettile.TileY + dheight; y += 4)
                     if (WW.WalkTileList[x][y].occupied)
                         return true;

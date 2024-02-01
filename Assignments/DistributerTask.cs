@@ -753,7 +753,7 @@ namespace FloorSimulation
 
         private void MoveEmptyTrolleyDown()
         {
-            if(!Trolley.IsVertical)
+            if(Trolley.IsVertical != OldTargetHub.VerticalTrolleys)
                 DButer.RotateDistributerAndTrolley(); //Rotate the distributer and the trolley to fit into the shop.
             DButer.TravelToTile(OldWalkTile);
             TargetHub = OldTargetHub;

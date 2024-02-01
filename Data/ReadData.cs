@@ -209,6 +209,8 @@ namespace FloorSimulation
             double Stickersd = Math.Sqrt(VarStickersPerTrolley);
             double Fullsd = Math.Sqrt(VarPercentageFullPerTrolley);
 
+            int Lower10 = PercentageFullPerTrolley.Count(obj => obj < 0.10);
+
             ;
         }
             
