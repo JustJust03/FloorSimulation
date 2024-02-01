@@ -35,7 +35,7 @@ namespace FloorSimulation
 
         public override void PerformTask()
         {
-            if(DButer.id == 13)
+            if(DButer.id == 1)
             {
                 ;
             }
@@ -187,7 +187,12 @@ namespace FloorSimulation
             TargetWasSaveTile = false;
             if (TargetIsHubGoals.Contains(Goal)) //If the shophub is blocked by something, try to walk 10 tiles to the right and down of this.
             {
-                DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
+                if (TargetHub.HubTrolleys[0] != null)
+                    DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
+                if(DButer.id == 1)
+                {
+                    ;
+                }
                 if (DButer.route == null)
                 {
                     Point targetp = TargetHub.OpenSpots(DButer)[0].Rpoint;
@@ -274,10 +279,6 @@ namespace FloorSimulation
 
         public override void DistributionCompleted()
         {
-            if(DButer.id == 13)
-            {
-                ;
-            }
             AInfo.UpdateFreq(Goal, true);
             if (Goal == "DistributePlants")
             {
@@ -378,9 +379,13 @@ namespace FloorSimulation
         /// </summary>
         private void DistributePlants()
         {
-            //TODO: Check if these plants would fit on either trolley.
             if (TargetHub.PeekFirstTrolley() == null)
             {
+                Point targetp = TargetHub.OpenSpots(DButer)[0].Rpoint;
+                Point p = TravelToClose(targetp);
+                if (DButer.route != null)
+                    MovingToClose = true;
+                
                 return;
             }
             Travelling = false;

@@ -66,9 +66,8 @@ namespace FloorSimulation
             if(HasLeftAccess)
                 t.RPoint = new Point(RFloorPoint.X + Rslack, RFloorPoint.Y + Rslack);
             else
-            {
                 t.RPoint = new Point(RFloorPoint.X + Rslack, RFloorPoint.Y + Rslack);
-            }
+            t.SimPoint = floor.ConvertToSimPoint(t.RPoint);
             WW.fill_tiles(t.RPoint, t.GetRSize());
         }
 
