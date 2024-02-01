@@ -25,7 +25,7 @@ namespace FloorSimulation
         
         private int TotalTrolleysDistr;
         private int TotalTrolleysExp;
-        private float AveragePercentageFull;
+        private double AveragePercentageFull;
 
         public FinishedDistribution(Floor Floor)
         {

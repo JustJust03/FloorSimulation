@@ -118,6 +118,10 @@ namespace FloorSimulation
                     t = TransactieIdToTrolley[b.Transactieid + SplitTrolleyI];
                 }
                 t.TakePlantIn(p);
+                if(t.PercentageFull > t.FullAt && t.PlantList.Count > 1)
+                {
+                    ;
+                }
             }
         }
 
@@ -190,7 +194,7 @@ namespace FloorSimulation
                 .Where(count => count > 1)
                 .ToList();
 
-            List<float> PercentageFullPerTrolley = dtList
+            List<int> PercentageFullPerTrolley = dtList
                 .Select(dt => dt.PercentageFull)
                 .ToList();
 
@@ -203,8 +207,8 @@ namespace FloorSimulation
             int StickerMinimum = StickersPerTrolley.Min();
             int StickerMaximum = StickersPerTrolley.Max();
 
-            float FullMinimum = PercentageFullPerTrolley.Min();
-            float FullMaximum = PercentageFullPerTrolley.Max();
+            double FullMinimum = PercentageFullPerTrolley.Min();
+            double FullMaximum = PercentageFullPerTrolley.Max();
 
             double Stickersd = Math.Sqrt(VarStickersPerTrolley);
             double Fullsd = Math.Sqrt(VarPercentageFullPerTrolley);
