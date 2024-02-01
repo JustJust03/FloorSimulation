@@ -112,8 +112,6 @@ namespace FloorSimulation
                 plant p = new plant(b.Destination, b.GetUnits(), b.GetSingleUnits(), b.Lgstk_aantal_fust_op_sticker, name_: b.Product_omschrijving_1);
                 if(t.SingleUnits + p.SingleUnits > t.MaxUnitsPerTrolley) 
                 {
-                    if (t.SingleUnits == 0)
-                        ;
                     SplitTrolleyI++;
                     TransactieIdToTrolley[b.Transactieid + SplitTrolleyI] = new DanishTrolley(-1, floor, transactieId_: b.Transactieid + SplitTrolleyI);
                     TransactieIdToTrolley[b.Transactieid + SplitTrolleyI].MaxUnitsPerTrolley = b.Lgstk_aantal_fust_op_sticker;
@@ -192,14 +190,25 @@ namespace FloorSimulation
                 .Where(count => count > 1)
                 .ToList();
 
+            List<float> PercentageFullPerTrolley = dtList
+                .Select(dt => dt.PercentageFull)
+                .ToList();
+
             double MeanStickersPerTrolley = StickersPerTrolley.Average();
+            double MeanPercentageFullPerTrolley = PercentageFullPerTrolley.Average();
 
             double VarStickersPerTrolley = StickersPerTrolley.Select(x => Math.Pow(x - MeanStickersPerTrolley, 2)).Average();
+            double VarPercentageFullPerTrolley = PercentageFullPerTrolley.Select(x => Math.Pow(x - MeanPercentageFullPerTrolley, 2)).Average();
 
             int StickerMinimum = StickersPerTrolley.Min();
             int StickerMaximum = StickersPerTrolley.Max();
 
+            float FullMinimum = PercentageFullPerTrolley.Min();
+            float FullMaximum = PercentageFullPerTrolley.Max();
+
             double Stickersd = Math.Sqrt(VarStickersPerTrolley);
+            double Fullsd = Math.Sqrt(VarPercentageFullPerTrolley);
+
             ;
         }
             

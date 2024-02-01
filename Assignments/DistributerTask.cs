@@ -35,6 +35,10 @@ namespace FloorSimulation
 
         public override void PerformTask()
         {
+            if(DButer.id == 13)
+            {
+                ;
+            }
             if (Goal == "PushTrolleyAway" && DButer.trolley == null)
             {
                 DButer.trolley = OldTrolley;
@@ -270,6 +274,10 @@ namespace FloorSimulation
 
         public override void DistributionCompleted()
         {
+            if(DButer.id == 13)
+            {
+                ;
+            }
             AInfo.UpdateFreq(Goal, true);
             if (Goal == "DistributePlants")
             {
@@ -279,6 +287,11 @@ namespace FloorSimulation
                 //Percentage full for full
                 else
                 {
+                    if (DButer.trolley.PeekFirstPlant() == null) //Distributer trolley is empty. So move this trolley to the Empty trolley Hub.
+                    {
+                        DistributerTrolleyBecameEmpty();
+                        return;
+                    }
                     if (TargetHub.HubTrolleys[0].DoesPlantFit(DButer.trolley.PeekFirstPlant()))
                         Trolley = TargetHub.HubTrolleys[0];
                     else if (TargetHub.HubTrolleys[1].DoesPlantFit(DButer.trolley.PeekFirstPlant())) 
@@ -291,12 +304,16 @@ namespace FloorSimulation
                     }
                 }
 
-                if (Trolley == null) //If someone took the trolley, wait for a new one to return.
-                    return;
-                if (DButer.trolley.PeekFirstPlant() == null) //Distributer trolley is empty. So move this trolley to the Empty trolley Hub.
+                //If you don't use the stickers, you already checked for these.
+                if (DButer.floor.layout.UseStickersForFull)
                 {
-                    DistributerTrolleyBecameEmpty();
-                    return;
+                    if (Trolley == null) //If someone took the trolley, wait for a new one to return.
+                        return;
+                    if (DButer.trolley.PeekFirstPlant() == null) //Distributer trolley is empty. So move this trolley to the Empty trolley Hub.
+                    {
+                        DistributerTrolleyBecameEmpty();
+                        return;
+                    }
                 }
 
                 plant p = DButer.trolley.GiveFirstPlant();

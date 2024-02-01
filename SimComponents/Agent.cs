@@ -111,6 +111,8 @@ namespace FloorSimulation
         /// <param name="target_tile"></param>
         public void TravelToClosestTile(List<WalkTile> target_tiles)
         {
+            if (RPoint == target_tiles[0].Rpoint)
+                return;
             route = AWW.RunAlgoTiles(WW.GetTile(RPoint), target_tiles);
         }
 

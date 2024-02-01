@@ -75,6 +75,8 @@ namespace FloorSimulation.StaticComponents.Hubs
             int ArrIndexX = Array.IndexOf(HubAccessPointsX, AgentRPoint.X);
             int ArrIndexY = Array.IndexOf(HubAccessPointsY, AgentRPoint.Y);
             Trolleyarr[ArrIndexY, ArrIndexX] = dt;
+            PercentageExported += dt.PercentageFull;
+            TrolleysExported++;
             if (ArrIndexX == 0) //Export trolleys away
             {
                 Point p = dt.RPoint;
@@ -84,8 +86,6 @@ namespace FloorSimulation.StaticComponents.Hubs
                 {
                     Trolleyarr[ArrIndexY, i] = null;
                 }
-                TrolleysExported += NTrolleysInRow;
-                PercentageExported += dt.PercentageFull;
             }
         }
 
