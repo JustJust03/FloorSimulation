@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace FloorSimulation
 {
@@ -343,6 +344,7 @@ namespace FloorSimulation
         /// </summary>
         private void DistributePlants()
         {
+            //TODO: Check if these plants would fit on either trolley.
             if (TargetHub.PeekFirstTrolley() == null)
             {
                 return;

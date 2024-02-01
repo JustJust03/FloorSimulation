@@ -36,6 +36,7 @@ namespace FloorSimulation
         public readonly int MaxStickers = 20;
         public int TotalStickers = 2;
         public const int MaxTotalStickers = 17 ; //22
+        public float PercentageFull = 0.0f;
 
         public const float TrolleyTravelSpeed = 67f; //cm/s
 
@@ -115,6 +116,7 @@ namespace FloorSimulation
             TotalStickers++;
             Units += p.units;
             SingleUnits += p.SingleUnits;
+
             PlantList.Add(p);
             return IsFull();
         }
