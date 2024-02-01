@@ -16,6 +16,7 @@ namespace FloorSimulation
         public int NLowpads = 0;
         public bool HorizontalShops = true;
         public int ForcedShopWidth = 160;
+        public int ForcedShopHeight = 160;
         public bool UseStickersForFull = true;
 
         public abstract int NTrolleysInShop { get; set; }

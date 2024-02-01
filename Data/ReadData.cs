@@ -172,7 +172,7 @@ namespace FloorSimulation
                 }
                 else
                 {
-                    HubSize = new Size(floor.layout.ForcedShopWidth, 160);
+                    HubSize = new Size(floor.layout.ForcedShopWidth, floor.layout.ForcedShopHeight);
                     s = new ShopHub(d.Search_Name, d.Zoeknaam2, default, floor, HubSize, initial_trolleys: ntrolleys, d.ColliPlusDay, HorizontalTrolleys_: floor.layout.HorizontalShops);
                 }
 
