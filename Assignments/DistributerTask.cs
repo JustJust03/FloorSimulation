@@ -35,7 +35,7 @@ namespace FloorSimulation
 
         public override void PerformTask()
         {
-            if(DButer.id == 1)
+            if(DButer.id == 3)
             {
                 ;
             }
@@ -840,8 +840,15 @@ namespace FloorSimulation
             if(Trolley.IsVertical)
                 OldWalkTile = DButer.WW.GetTile(new Point(DButer.RPoint.X + 60, DButer.RPoint.Y));
             else
-                OldWalkTile = DButer.WW.GetTile(new Point(DButer.RPoint.X, DButer.RPoint.Y + 50));
+                OldWalkTile = DButer.WW.GetTile(new Point(DButer.RPoint.X, DButer.RPoint.Y + 60));
             DButer.TravelToTile(OldWalkTile);
+
+            //Prevents a bug where the distributer isn't in front of the right shophub.
+            if(OldWalkTile.Rpoint.Y < TargetHub.RFloorPoint.Y)
+            {
+                ;
+                OldWalkTile = DButer.WW.GetTile(new Point(DButer.RPoint.X, DButer.RPoint.Y + 60 + TargetHub.RHubSize.Height));
+            }
 
             Goal = "PushTrolleyAway";
             InTask = true;
