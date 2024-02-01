@@ -104,6 +104,7 @@
     <Compile Include="Layouts\KortereVerdeelstraatSlayout.cs" />
     <Compile Include="Layouts\Layout.cs" />
     <Compile Include="Layouts\LowPadSlayout.cs" />
+    <Compile Include="Layouts\NewSlayout.cs" />
     <Compile Include="Layouts\Slayouts.cs" />
     <Compile Include="MetaInfo.cs">
       <SubType>Component</SubType>
