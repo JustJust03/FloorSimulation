@@ -19,6 +19,8 @@ namespace FloorSimulation
         private WalkTile OldWalkTile; //Is only used to save on which spot you picked up a finished trolley.
         private ShopHub OldTargetHub;
 
+        int WaitedTicks = 0;
+
         private readonly List<string> TargetIsOpenSpotsRegionDb = new List<string>
         {
             "DistributePlants",
@@ -51,6 +53,7 @@ namespace FloorSimulation
                 }
                 else if (RegionHub.HubTrolleys[0].PlantList.Count == 0)
                 {
+                    DButer.floor.FirstWW.unfill_tiles(new Point(RegionHub.RFloorPoint.X, RegionHub.RFloorPoint.Y - 60), new Size(RegionHub.RHubSize.Width + 10, 60));
                     DButer.TravelToTrolley(RegionHub.HubTrolleys[0], true);
                     Goal = "TakeRegionHubTrolley";
                     if (DButer.route == null)
@@ -88,6 +91,32 @@ namespace FloorSimulation
                     }
             }
 
+            if (Waiting)
+            {
+                FailRoute();
+                if (DButer.route != null)
+                    WaitedTicks = 0;
+
+                WaitedTicks++;
+
+                if (WaitedTicks > DButer.MaxWaitedTicks)
+                {
+                    WaitedTicks = 0;
+                    DButer.TravelToTile(DButer.WW.GetTile(DButer.SavePoint));
+                    Waiting = false;
+                    TargetWasSaveTile = true;
+                    if(DButer.route == null)
+                    {
+                        Point p = new Point(DButer.RPoint.X - 20, DButer.RPoint.Y);
+                        Size s = DButer.GetRSize();
+                        s.Width += 40;
+                        DButer.floor.FirstWW.unfill_tiles(p, s);
+                        DButer.TravelToTile(DButer.WW.GetTile(DButer.SavePoint));
+                    }
+                }
+                return;
+            }
+
             if (InTask && Travelling)
                 DButer.TickWalk();
             else if (InTask)
@@ -96,6 +125,13 @@ namespace FloorSimulation
 
         public override void RouteCompleted()
         {
+            if (TargetWasSaveTile)
+            {
+                TargetWasSaveTile = false;
+                FailRoute();
+                return;
+            }
+
             AInfo.UpdateFreq(Goal);
             if (Goal == "TravelToLP")
                 TravelToLP();
@@ -121,7 +157,10 @@ namespace FloorSimulation
             if (Goal == "TravelToLP")
                 DButer.TravelToTile(RegionHub.DbOpenSpots());
             else if (Goal == "TakeRegionHubTrolley")
+            {
+                DButer.floor.FirstWW.unfill_tiles(new Point(RegionHub.RFloorPoint.X, RegionHub.RFloorPoint.Y - 60), new Size(RegionHub.RHubSize.Width + 10, 60));
                 DButer.TravelToTrolley(RegionHub.HubTrolleys[0], true);
+            }
             else if (Goal == "TravelToStartTile")
                 DButer.TravelToTile(DButer.WW.GetTile(DButer.SavePoint));
             else if (TargetIsOpenSpotsRegionDb.Contains(Goal))
@@ -135,6 +174,8 @@ namespace FloorSimulation
                 if (RegionHub.HubTrolleys.Count > 0)
                     DButer.floor.FirstWW.unfill_tiles(RegionHub.HubTrolleys[0].RPoint, RegionHub.HubTrolleys[0].GetRSize());
                 TargetHub = DButer.floor.GetBuffHubFull(DButer);
+                if (TargetHub == null)
+                    return;
                 DButer.TravelToClosestTile(TargetHub.FilledSpots(DButer));
             }
             else if (TargetIsOldWalktile.Contains(Goal))
@@ -205,10 +246,12 @@ namespace FloorSimulation
 
             TargetHub = DButer.floor.GetBuffHubOpen(DButer);
             Trolley = DButer.trolley;
-
-            DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
-
             Goal = "DeliverEmptyTrolley"; //New goal
+
+            if (TargetHub != null)
+                DButer.TravelToClosestTile(TargetHub.OpenSpots(DButer));
+            else
+                FailRoute();
         }
 
         private void DeliverEmptyTrolley()
@@ -378,6 +421,11 @@ namespace FloorSimulation
             Goal = "DeliverFullTrolley"; //New goal
             InTask = true;
             Travelling = true;
+        }
+
+        public override int NTrolleysStanding()
+        {
+            return RegionHubs.Count(r => r.Targeted || r.HubTrolleys.Count > 0);
         }
     }
 }

@@ -253,6 +253,10 @@ namespace FloorSimulation
                 DanishTrolley dtToSwap = HubTrolleys[i];
                 HubTrolleys[i] = HubTrolleys[0];
                 HubTrolleys[0] = dtToSwap;
+                if (HubTrolleys[i] == null)
+                {
+                    ;
+                }
 
                 Point dtpToSwap = HubTrolleys[i].RPoint;
                 HubTrolleys[i].RPoint = HubTrolleys[0].RPoint;

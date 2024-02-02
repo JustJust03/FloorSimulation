@@ -15,6 +15,9 @@ namespace FloorSimulation
         public bool TargetWasSaveTile = false;
         public bool WasOnTopLeft;
 
+        public int LowpadDeltaX = -1; //-1 left    0      1 right
+        public int LowpadDeltaY = 0; //-1 up      0      1 down
+
         public AnalyzeInfo AInfo;
 
         public readonly List<string> VerspillingTasks = new List<string>
@@ -82,5 +85,10 @@ namespace FloorSimulation
         public abstract void RouteCompleted();
         public abstract void FailRoute();
         public abstract void DistributionCompleted();
+
+        public virtual int NTrolleysStanding()
+        {
+            return 0;
+        }
     }
 }

@@ -39,6 +39,7 @@ namespace FloorSimulation
         public bool TickingHeatMap = false;
         public const int NDistributers = 21;
         public const int SecondsToFullOperation = 240; //How long to wait before all distributers are running
+
         public int OperationalInterval; //How long to wait between distributers
 
         public List<DanishTrolley> TrolleyList; // A list with all the trolleys that are on the floor.
@@ -51,8 +52,10 @@ namespace FloorSimulation
         public List<Distributer> DistrList; // A list with all the distributers that are on the floor.
         public Distributer LHDriver;
         public List<LowPad> LPList;
+        public List<DumbLowPad> DLPList;
         public List<Distributer> TotalDistrList;
         public List<LowPad> TotalLPList;
+        public List<DumbLowPad> TotalDLPList;
         public LangeHarry FirstHarry;
         public WalkWay FirstWW;
         public WalkWayHeatMap WWHeatMap;
@@ -71,11 +74,11 @@ namespace FloorSimulation
 
             //layout = new SLayoutDayId(this, rd);
             //layout = new SLayoutDayIdBuffhub(this, rd);
-            //layout = new NewSlayout(this, rd);
+            layout = new NewSlayout(this, rd);
             //layout = new SLayoutDayIdBuffhub2Streets(this, rd);
             //layout = new SLayoutDayId2Streets(this, rd);
             //layout = new KortereVerdeelstraatSlayout(this, rd);
-            layout = new KortereVerdeelstraatSlayoutSmartStart(this, rd);
+            //layout = new KortereVerdeelstraatSlayoutSmartStart(this, rd);
 
             //layout = new LowPadSlayoutBuffhub(this, rd);
 
@@ -105,12 +108,14 @@ namespace FloorSimulation
 
             DistrList = new List<Distributer>();
             LPList = new List<LowPad>();
+            DLPList = new List<DumbLowPad>();
 
             TotalDistrList = new List<Distributer>();
             TotalLPList = new List<LowPad>();
+            TotalDLPList = new List<DumbLowPad>();
 
             layout.PlaceDistributers(NDistributers, new Point(FirstWW.RSizeWW.Width - 1000, 2000));
-            if(layout.NLowpads > 0)
+            if (layout.NLowpads > 0)
                 OperationalInterval = SecondsToFullOperation / layout.NLowpads;
             else
                 OperationalInterval = SecondsToFullOperation / NDistributers;
@@ -124,10 +129,33 @@ namespace FloorSimulation
             this.Invalidate();
         }
 
+        public void RemoveZeroPlants()
+        {
+            foreach(DumbLowPad dlp in DLPList)
+            {
+                if (dlp != null && dlp.trolley != null && dlp.trolley.PlantList.Count == 0)
+                {
+                    ;
+                    //FirstWW.unfill_tiles(dlp.trolley.RPoint, dlp.trolley.GetRSize());
+                    //dlp.trolley = null;
+                }
+            }
+        }
+
         public void TickButton(object sender, EventArgs e)
         {
+            if(STHubs[0].TotalUndistributedTrolleys() == 0)
+            {
+                ;
+                //FinishedD.DistributionCompleted();
+            }
             Ticks += SpeedMultiplier;
             ElapsedSimTime = ElapsedSimTime.Add(TimeSpan.FromMilliseconds(MilisecondsPerTick * SpeedMultiplier));
+
+            RemoveZeroPlants();
+
+            if(STHubs[0].HubTrolleys.Count == 1)
+                FirstWW.fill_tiles(STHubs[0].HubTrolleys[0].RPoint, STHubs[0].HubTrolleys[0].GetRSize());
 
             if ((int)ElapsedSimTime.TotalSeconds <= SecondsToFullOperation + 2)
                 AddAgent((int)ElapsedSimTime.TotalSeconds);
@@ -140,6 +168,9 @@ namespace FloorSimulation
             foreach (LowPad lp in LPList)
                 lp.Tick();
 
+            for (int i = 0; i < DLPList.Count; i++)
+                DLPList[i]?.Tick();
+
             if (TickingHeatMap)
                 WWHeatMap.TickHeatMap();
 
@@ -150,7 +181,13 @@ namespace FloorSimulation
         private void AddAgent(int seconds)
         {
             if (layout.NLowpads > 0)
-                AddLowPad(seconds);
+            {
+                if (TotalDLPList.Count > 0)
+                    AddDLowPad(seconds);
+                else
+                    AddLowPad(seconds);
+            }
+
             else
                 AddDistr(seconds);
         }
@@ -172,6 +209,27 @@ namespace FloorSimulation
             {
                 LPList.Add(TotalLPList[0]);
                 TotalLPList.RemoveAt(0);
+                AddLowPad(seconds);
+            }
+        }
+
+        private void AddDLowPad(int seconds)
+        {
+            if(TotalDLPList.Count ==  0) 
+                return;
+            if(OperationalInterval == 0)
+            {
+                DLPList = TotalDLPList.ToList();
+                TotalDLPList.Clear();
+                return;
+            }
+            int TargetAmntLP = seconds / OperationalInterval;
+            if (TargetAmntLP > layout.NLowpads)
+                TargetAmntLP = layout.NLowpads;
+            if(DLPList.Count < TargetAmntLP)
+            {
+                DLPList.Add(TotalDLPList[0]);
+                TotalDLPList.RemoveAt(0);
                 AddLowPad(seconds);
             }
         }
@@ -248,11 +306,13 @@ namespace FloorSimulation
                     d.DrawObject(g);
             foreach (LowPad lp in LPList)
                 lp.DrawObject(g);
+            foreach (DumbLowPad dlp in DLPList)
+                dlp?.DrawObject(g);
         }
 
         public void PlaceShops(List<ShopHub> Shops)
         {
-            layout.PlaceShops(Shops, 1040, FirstWW.RSizeWW.Height - 730);
+            layout.PlaceShops(Shops, 1040, 4270);
         }
 
         public void PlaceStartHubs()

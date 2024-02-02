@@ -90,10 +90,12 @@ namespace FloorSimulation
             foreach (LowPad LP in floor.LPList)
                 if (LP.trolley != null)
                     return false;
+            foreach (DumbLowPad DLP in floor.DLPList)
+                if (DLP != null && DLP.trolley != null)
+                    return false;
 
             DistributionCompleted();
             return true;
-
         }
 
         public void WriteHeatMap()

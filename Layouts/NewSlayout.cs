@@ -25,6 +25,7 @@ namespace FloorSimulation
             StreetWidth = 950;
             ForcedShopHeight = 200;
             UseStickersForFull = false;
+            CombineTrolleys = true;
 
             UpperY = 2100;
         }
