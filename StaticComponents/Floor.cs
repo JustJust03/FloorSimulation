@@ -71,11 +71,11 @@ namespace FloorSimulation
 
             //layout = new SLayoutDayId(this, rd);
             //layout = new SLayoutDayIdBuffhub(this, rd);
-            layout = new NewSlayout(this, rd);
+            //layout = new NewSlayout(this, rd);
             //layout = new SLayoutDayIdBuffhub2Streets(this, rd);
             //layout = new SLayoutDayId2Streets(this, rd);
             //layout = new KortereVerdeelstraatSlayout(this, rd);
-            //layout = new KortereVerdeelstraatSlayoutSmartStart(this, rd);
+            layout = new KortereVerdeelstraatSlayoutSmartStart(this, rd);
 
             //layout = new LowPadSlayoutBuffhub(this, rd);
 

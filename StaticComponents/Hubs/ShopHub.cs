@@ -19,6 +19,7 @@ namespace FloorSimulation
         public string ColliPlusDay;
         public string day;
         public int StickersToReceive; //While reading the data, the amount of stickers this shop gets is updated.
+        public List<plant> PlantsToReceive;
 
         public bool DrawRegions = false;
         public bool RegionStartOrEnd = false;
@@ -33,6 +34,7 @@ namespace FloorSimulation
             ColliPlusDay = ColliPlusDay_;
             int nstrips = ColliPlusDay.Split('-').Length;
             day = ColliPlusDay.Split('-')[nstrips - 1];
+            PlantsToReceive = new List<plant>();
         }
 
         public override string ToString() 

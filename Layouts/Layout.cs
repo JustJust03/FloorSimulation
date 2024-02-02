@@ -19,6 +19,8 @@ namespace FloorSimulation
         public int ForcedShopHeight = 160;
         public bool UseStickersForFull = true;
 
+        public bool CombineTrolleys = false;
+
         public abstract int NTrolleysInShop { get; set; }
 
         public Layout(Floor floor_, ReadData rData)

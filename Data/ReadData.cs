@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Microsoft.Win32.SafeHandles;
 using Newtonsoft.Json;
 
 namespace FloorSimulation
@@ -88,12 +89,53 @@ namespace FloorSimulation
                 if (!DistributeSecondDay && !t.PlantList.Select(obj => obj.DestinationHub.day).Contains(days[0]))
                     continue;
                 dtList.Add(t);
-                
             }
+
+            if(floor.layout.CombineTrolleys)
+                dtList = CombineTrolleys(dtList);
 
             CalculateImportStickers(dtList);
 
+            UsedShopHubs = FixUsedShopHubs();
+
             return dtList;
+        }
+
+        public List<DanishTrolley> CombineTrolleys(List<DanishTrolley> dtList)
+        {
+            List<DanishTrolley> CombinedTrolleys = new List<DanishTrolley>();
+
+            List<int> AddedTrolleys = new List<int>();
+            
+            DanishTrolley dt;
+            DanishTrolley dt2;
+            for(int dti = 0; dti < dtList.Count; dti++)
+            {
+                if (AddedTrolleys.Contains(dti))
+                    continue;
+                AddedTrolleys.Add(dti);
+                dt = dtList[dti];
+                CombinedTrolleys.Add(dt);
+                if (dt.PercentageFull > dt.FullAt * 0.95)
+                    continue;
+                //Loop over every remaining trolley and check if these could be merged.
+                else
+                {
+                    for (int secondi = 0; secondi < dtList.Count; secondi++)
+                    {
+                        if (AddedTrolleys.Contains(secondi))
+                            continue;
+                        dt2 = dtList[secondi];
+                        if (dt.PercentageFull + dt2.PercentageFull <= dt.FullAt * 0.95)
+                        {
+                            AddedTrolleys.Add(secondi);
+                            dt.MergeTrolley(dt2);
+                        }
+                    }
+                }
+            }
+
+            return CombinedTrolleys;
         }
 
         public void AddToTrolley(BoxActivity b, Floor floor)
@@ -117,6 +159,7 @@ namespace FloorSimulation
                     TransactieIdToTrolley[b.Transactieid + SplitTrolleyI].MaxUnitsPerTrolley = b.Lgstk_aantal_fust_op_sticker;
                     t = TransactieIdToTrolley[b.Transactieid + SplitTrolleyI];
                 }
+                b.Destination.PlantsToReceive.Add(p);
                 t.TakePlantIn(p);
                 if(t.PercentageFull > t.FullAt && t.PlantList.Count > 1)
                 {
@@ -216,6 +259,28 @@ namespace FloorSimulation
             int Lower10 = PercentageFullPerTrolley.Count(obj => obj < 0.10);
 
             ;
+        }
+
+        public List<ShopHub> FixUsedShopHubs()
+        {
+            List<ShopHub> FixedShopHubs = new List<ShopHub>();
+            for (int shopi = 0; shopi < UsedShopHubs.Count; shopi++)
+            {
+                ShopHub sh = UsedShopHubs[shopi];
+                if(sh.StickersToReceive < 10)
+                {
+                    ShopHub SameShopOtherDay = UsedShopHubs.First(s => s.id == sh.id && s != sh);
+                    foreach(plant p in sh.PlantsToReceive)
+                    {
+                        p.DestinationHub = SameShopOtherDay;
+                        SameShopOtherDay.StickersToReceive++;
+                    }
+                }
+                else
+                    FixedShopHubs.Add(sh);
+            }
+
+            return FixedShopHubs;
         }
             
         public void LoadHeatMap(string FileName, WalkWay WW)

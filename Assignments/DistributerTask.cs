@@ -844,7 +844,7 @@ namespace FloorSimulation
             DButer.TravelToTile(OldWalkTile);
 
             //Prevents a bug where the distributer isn't in front of the right shophub.
-            if(OldWalkTile.Rpoint.Y < TargetHub.RFloorPoint.Y)
+            if(!Trolley.IsVertical && OldWalkTile.Rpoint.Y < TargetHub.RFloorPoint.Y)
             {
                 ;
                 OldWalkTile = DButer.WW.GetTile(new Point(DButer.RPoint.X, DButer.RPoint.Y + 60 + TargetHub.RHubSize.Height));

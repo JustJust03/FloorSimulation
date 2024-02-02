@@ -194,5 +194,17 @@ namespace FloorSimulation
         {
             return PercentageFull + p.SingleUnits * 1000 / p.MaxSingleUnits <= FullAt;
         }
+
+        public void MergeTrolley(DanishTrolley dt)
+        {
+            dt.PlantList.Union(PlantList);
+            dt.PlantList = dt.PlantList
+                .OrderBy(obj => obj.DestinationHub.day)
+                .ThenBy(obj => obj.DestinationHub.id)
+                .ToList();
+            NStickers++;
+            TotalStickers++;
+            PercentageFull += dt.PercentageFull;
+        }
     }
 }

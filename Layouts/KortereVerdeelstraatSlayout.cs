@@ -14,6 +14,7 @@ namespace FloorSimulation
         Dictionary<int, int[]> ShopsToShopLength = new Dictionary<int, int[]>
         {
             {133, new int[]  { 7, 8, 8, 7, 7, 8, 8, 7, 7, 8, 8, 7, 7, 8, 7, 7, 7, 7 }},
+            {135, new int[]  { 7, 8, 8, 7, 7, 8, 8, 7, 7, 8, 8, 7, 7, 8, 8, 7, 7, 8 }},
             {141, new int[]  { 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 7, 8, 8, 7 }},
         };
 
@@ -34,6 +35,7 @@ namespace FloorSimulation
             StreetWidth = 950;
             ForcedShopWidth = 200;
             UseStickersForFull = false;
+            CombineTrolleys = true;
         }
 
         public void InitShopCorners()
@@ -277,7 +279,7 @@ namespace FloorSimulation
 
         public override StartHub GetStartHub(Agent agent)
         {
-            if (agent.id % 2 == 0)
+            if (agent.id % 4 == 0)
                 return floor.STHubs[0];
 
             List<StartHub> sortedList = floor.STHubs.OrderBy(obj =>
