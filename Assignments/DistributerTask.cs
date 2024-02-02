@@ -21,8 +21,6 @@ namespace FloorSimulation
         private FinishedDistribution FinishedD;
         int WaitedTicks = 0;
 
-
-
         public DistributerTask(Distributer DButer_, string Goal_, FinishedDistribution FinishedD_, DanishTrolley trolley_ = default):
             base(Goal_, trolley_)
         {
@@ -845,10 +843,10 @@ namespace FloorSimulation
 
             //Prevents a bug where the distributer isn't in front of the right shophub.
             if(!Trolley.IsVertical && OldWalkTile.Rpoint.Y < TargetHub.RFloorPoint.Y)
-            {
-                ;
                 OldWalkTile = DButer.WW.GetTile(new Point(DButer.RPoint.X, DButer.RPoint.Y + 60 + TargetHub.RHubSize.Height));
-            }
+            else if(Trolley.IsVertical && OldWalkTile.Rpoint.X < TargetHub.RFloorPoint.X)
+                OldWalkTile = DButer.WW.GetTile(new Point(DButer.RPoint.X + 60 + TargetHub.RHubSize.Width, DButer.RPoint.Y));
+            DButer.TravelToTile(OldWalkTile);
 
             Goal = "PushTrolleyAway";
             InTask = true;
