@@ -23,6 +23,9 @@ namespace FloorSimulation
             RealFloorWidth = 5200;
             StreetWidth += 120;
             RealFloorHeight = 5200;
+
+            UseStickersForFull = false;
+            CombineTrolleys = true;
         }
 
         public override string ToString()
@@ -51,7 +54,7 @@ namespace FloorSimulation
             foreach(ShopHub s in Shops)
                 s.DrawRegions = true;
 
-            base.PlaceShops(Shops, UpperY, LowerY);
+            LPPlaceShops(Shops, UpperY, LowerY);
             foreach(List<ShopHub> region in regions) 
             {
                 region[0].RegionStartOrEnd = true; //First Shop
@@ -60,6 +63,98 @@ namespace FloorSimulation
 
             PlaceLPAccessHubs();
             CreateDriveLines();
+        }
+
+        private void LPPlaceShops(List<ShopHub> Shops, int UpperY_, int LowerY)
+        {
+            UpperY = UpperY_;
+            int y = LowerY;
+            int x = ShopStartX;
+            int two_per_row = 1; //Keeps track of how many cols are placed without space between them
+            int placed_shops_in_a_row = 0;
+
+            bool FirstColFinished = false;
+            for (int i = 0; i < Shops.Count; i++)
+            {
+                ShopHub Shop = Shops[i];
+                if (two_per_row == 2)
+                    Shop.HasLeftAccess = true;
+                Shop.TeleportHub(new Point(x, y));
+
+                //Add corners when you get to a new col, or if this was the last col on the right
+                if (y == UpperY || (i == Shops.Count - 1 && two_per_row == 1))
+                {
+                    if (Shop.HasLeftAccess)
+                        ShopCornersX.Add(Shop.RFloorPoint.X);
+                    else
+                        ShopCornersX.Add(Shop.RFloorPoint.X + Shop.RHubSize.Width);
+                    if (i == Shops.Count - 1)
+                        ShopCornersX.Add(Shop.RFloorPoint.X + StreetWidth);
+                }
+
+                placed_shops_in_a_row++;
+                if (FirstColFinished && placed_shops_in_a_row == HalfShopsInRow && !CheckForSkip135Shops(Shops.Count, i))
+                {
+                    placed_shops_in_a_row = 0;
+                    if (two_per_row == 1)
+                        y -= ShopHeight;
+                    else
+                        y += ShopHeight;
+                }
+
+                if (two_per_row == 1 && y > UpperY)
+                    y -= ShopHeight;
+                else if (two_per_row == 2 && y < LowerY)
+                    y += ShopHeight;
+                else
+                {
+
+                    if (FirstColFinished && i < Shops.Count - 1 && y > LowerY)
+                    {
+                        floor.HubList.Add(Shop);
+                        i++;
+                        Shop = Shops[i];
+                        if (two_per_row == 2)
+                            Shop.HasLeftAccess = true;
+                        Shop.TeleportHub(new Point(x, y));
+                    }
+
+                    if (!FirstColFinished)
+                        HalfShopsInRow = (placed_shops_in_a_row - 1) / 3;
+                    FirstColFinished = true;
+                    placed_shops_in_a_row = 0;
+                    two_per_row++;
+                    if (two_per_row <= 2)
+                    {
+                        x += StreetWidth;
+                        y = UpperY;
+                    }
+                    else
+                    {
+                        LowestY = y + ShopHeight;
+                        if (two_per_row == 3)
+                            Shop.HasLeftAccess = true;
+                        x += 160;
+                        two_per_row = 1;
+                        placed_shops_in_a_row--;
+                        if (Shops.Count - i == 19)
+                        {
+                            y -= ShopHeight;
+                            placed_shops_in_a_row++;
+                        }
+                    }
+                }
+
+                floor.HubList.Add(Shop);
+            }
+        }
+
+        private bool CheckForSkip135Shops(int Nshops, int i)
+        {
+            if (Nshops != 135)
+                return false;
+            else
+                return i == 127;
         }
 
         private void PlaceLPAccessHubs()
@@ -478,7 +573,7 @@ namespace FloorSimulation
         private List<List<ShopHub>> OldAssignDBregions(List<ShopHub> Shops, List<List<ShopHub>> DistributionRegions)
         {
             //int[] NshopsPerDbuter = new int[] { 10, 10, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5 };
-            int[] NshopsPerDbuter = new int[] { 7, 7, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 6, 6, 6 }; //21
+            int[] NshopsPerDbuter = new int[] { 7, 7, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 7, 6 }; //21
             //int[] NshopsPerDbuter = new int[] {10, 10, 9, 10, 10, 9, 9, 10, 10, 9, 9, 10, 9, 9 }; // 14
             int[] NShopsPerRegion = NshopsPerDbuter.Distinct().OrderBy(x => 9999 - x).ToArray();
 

@@ -35,7 +35,7 @@ namespace FloorSimulation
         {
             UpperY = UpperY_;
             int y = LowerY;
-            int x = ShopStartX;
+            int x = 0;
             int two_per_row = 1; //Keeps track of how many cols are placed without space between them
             int placed_shops_in_a_row = 0;
 
@@ -63,9 +63,9 @@ namespace FloorSimulation
                 {
                     placed_shops_in_a_row = 0;
                     if (two_per_row == 1)
-                        y -= ShopHeight;
+                        y -= 2 * ShopHeight;
                     else
-                        y += ShopHeight;
+                        y += 2 * ShopHeight;
                 }
 
                 if (two_per_row == 1 && y > UpperY)
@@ -74,19 +74,8 @@ namespace FloorSimulation
                     y += ShopHeight;
                 else
                 {
-
-                    if (FirstColFinished && i < Shops.Count - 1 && y > LowerY)
-                    {
-                        floor.HubList.Add(Shop);
-                        i++;
-                        Shop = Shops[i];
-                        if (two_per_row == 2)
-                            Shop.HasLeftAccess = true;
-                        Shop.TeleportHub(new Point(x, y));
-                    }
-
                     if (!FirstColFinished)
-                        HalfShopsInRow = (placed_shops_in_a_row - 1) / 3;
+                        HalfShopsInRow = (placed_shops_in_a_row - 1) / 2;
                     FirstColFinished = true;
                     placed_shops_in_a_row = 0;
                     two_per_row++;
@@ -97,17 +86,10 @@ namespace FloorSimulation
                     }
                     else
                     {
+                        y -= 2 * ShopHeight; // Because the middle section was placed at the bottom
                         LowestY = y + ShopHeight;
-                        if (two_per_row == 3)
-                            Shop.HasLeftAccess = true;
                         x += 160;
                         two_per_row = 1;
-                        placed_shops_in_a_row--;
-                        if (Shops.Count - i == 19)
-                        {
-                            y -= ShopHeight;
-                            placed_shops_in_a_row++;
-                        }
                     }
                 }
 
