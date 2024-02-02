@@ -21,6 +21,8 @@ namespace FloorSimulation
 
         int WaitedTicks = 0;
 
+        plant p;
+
         private readonly List<string> TargetIsOpenSpotsRegionDb = new List<string>
         {
             "DistributePlants",
@@ -315,6 +317,9 @@ namespace FloorSimulation
             if (RegionHub.HubTrolleys.Count > 0)
                 DButer.floor.FirstWW.fill_tiles(RegionHub.HubTrolleys[0].RPoint, RegionHub.HubTrolleys[0].GetRSize());
 
+            if (!DButer.floor.layout.UseStickersForFull)
+                Trolley.TakePlantIn(p);
+
             if(RegionHub.HubTrolleys.Count > 0) 
             {
                 Goal = "TravelToLP";
@@ -364,9 +369,24 @@ namespace FloorSimulation
             //AInfo.UpdateFreq(Goal, true);
             if (Goal == "DistributePlants")
             {
-                Trolley = TargetHub.GetRandomTrolley();
+                p = DButer.PlantInHand;
+                if(DButer.floor.layout.UseStickersForFull)
+                    Trolley = TargetHub.GetRandomTrolley();
+                //Percentage full for full
+                else
+                {
+                    if (TargetHub.HubTrolleys[0].DoesPlantFit(p))
+                        Trolley = TargetHub.HubTrolleys[0];
+                    else if (TargetHub.HubTrolleys[1].DoesPlantFit(p)) 
+                        Trolley = TargetHub.HubTrolleys[1];
+                    else
+                    {
+                        Trolley = TargetHub.HubTrolleys.OrderByDescending(obj => obj.PercentageFull).FirstOrDefault();
+                        ShopTrolleyBecameFull();
+                        return;
+                    }
+                }
 
-                plant p = DButer.PlantInHand;
                 if (Trolley.TakePlantIn(p))
                 {
                     ShopTrolleyBecameFull();
