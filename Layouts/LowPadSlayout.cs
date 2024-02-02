@@ -478,8 +478,8 @@ namespace FloorSimulation
         private List<List<ShopHub>> OldAssignDBregions(List<ShopHub> Shops, List<List<ShopHub>> DistributionRegions)
         {
             //int[] NshopsPerDbuter = new int[] { 10, 10, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5 };
-            //int[] NshopsPerDbuter = new int[] { 7, 7, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 6, 6, 6 };
-            int[] NshopsPerDbuter = new int[] {10, 10, 9, 10, 10, 9, 9, 10, 10, 9, 9, 10, 9, 9 };
+            int[] NshopsPerDbuter = new int[] { 7, 7, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 6, 6, 6 }; //21
+            //int[] NshopsPerDbuter = new int[] {10, 10, 9, 10, 10, 9, 9, 10, 10, 9, 9, 10, 9, 9 }; // 14
             int[] NShopsPerRegion = NshopsPerDbuter.Distinct().OrderBy(x => 9999 - x).ToArray();
 
             for (int Nshopsi = 0; Nshopsi < NShopsPerRegion.Count(); Nshopsi++)
