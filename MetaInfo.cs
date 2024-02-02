@@ -26,7 +26,7 @@ namespace FloorSimulation
             BlackPen = new Pen(Color.Black, 2);
             
             this.Location = PanelLocation;
-            this.Size = new Size((int)(2000 * Floor.ScaleFactor), (int)(2000 * Floor.ScaleFactor));
+            this.Size = new Size((int)(2000 * Floor.ScaleFactor * 2), (int)(2000 * Floor.ScaleFactor * 2));
             this.BackColor = Color.White;
 
             InitProgressbar();

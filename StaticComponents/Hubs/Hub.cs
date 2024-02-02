@@ -97,7 +97,7 @@ namespace FloorSimulation
                 DanishTrolley DT = new DanishTrolley(i, floor, IsVertical_: true);
 
                 int trolleyX = LeftX + Rslack; 
-                LeftX += DT.GetRSize().Width + Rslack;
+                LeftX += DT.GetRSize().Width + Rslack + 10;
                 int trolleyY = RFloorPoint.Y + Rslack; 
 
                 DT.TeleportTrolley(new Point(trolleyX, trolleyY));
@@ -158,7 +158,7 @@ namespace FloorSimulation
         public virtual DanishTrolley PeekFirstTrolley()
         {
             if (HubTrolleys.Count == 0) return null;
-                return HubTrolleys[0];
+            return HubTrolleys[0];
         }
 
         public virtual DanishTrolley GetRandomTrolley()

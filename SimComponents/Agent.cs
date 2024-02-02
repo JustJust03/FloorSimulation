@@ -111,6 +111,8 @@ namespace FloorSimulation
         /// <param name="target_tile"></param>
         public void TravelToClosestTile(List<WalkTile> target_tiles)
         {
+            if (RPoint == target_tiles[0].Rpoint)
+                return;
             route = AWW.RunAlgoTiles(WW.GetTile(RPoint), target_tiles);
         }
 
@@ -154,9 +156,18 @@ namespace FloorSimulation
                 {
                     WalkTile destination = route[0];
 
-                    WW.WWC.UpdateLocalClearances(this, GetTileSize(), destination);
+                    //WW.WWC.UpdateLocalClearances(this, GetTileSize(), destination);
 
+                    /*
                     if (!AWW.IsTileAccessible(destination)) //Route failed, there was something occupying the calculated route
+                    {
+                        route = null;
+                        ticktravel = 0;
+                        MainTask.FailRoute();
+                        return;
+                    */
+
+                    if(WW.WWC.IsBlockedInDirection(this, destination))
                     {
                         route = null;
                         ticktravel = 0;

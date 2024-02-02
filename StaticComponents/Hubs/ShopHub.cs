@@ -19,6 +19,7 @@ namespace FloorSimulation
         public string ColliPlusDay;
         public string day;
         public int StickersToReceive; //While reading the data, the amount of stickers this shop gets is updated.
+        public List<plant> PlantsToReceive;
 
         public bool DrawRegions = false;
         public bool RegionStartOrEnd = false;
@@ -27,12 +28,13 @@ namespace FloorSimulation
         /// Shop hub has a standard size: (200cm x 200cm)
         /// Usually horizontal trolleys
         /// </summary>
-        public ShopHub(string name_, int id_, Point FPoint_, Floor floor_, Size s, int initial_trolleys = 0, string ColliPlusDay_ = null) : 
-            base(name_, id_, FPoint_, floor_, s, initial_trolleys: initial_trolleys)
+        public ShopHub(string name_, int id_, Point FPoint_, Floor floor_, Size s, int initial_trolleys = 0, string ColliPlusDay_ = null, bool HorizontalTrolleys_ = true) : 
+            base(name_, id_, FPoint_, floor_, s, initial_trolleys: initial_trolleys, vertical_trolleys: !HorizontalTrolleys_)
         {
             ColliPlusDay = ColliPlusDay_;
             int nstrips = ColliPlusDay.Split('-').Length;
             day = ColliPlusDay.Split('-')[nstrips - 1];
+            PlantsToReceive = new List<plant>();
         }
 
         public override string ToString() 
@@ -62,6 +64,13 @@ namespace FloorSimulation
             if (HubTrolleys[0] != null)//Max trolleys reached, give error
                 throw new ArgumentException("The first trolley place wasn't empty");
             HubTrolleys[0] = t;
+            WW.unfill_tiles(t.RPoint, t.GetRSize());
+            if(HasLeftAccess)
+                t.RPoint = new Point(RFloorPoint.X + Rslack, RFloorPoint.Y + Rslack);
+            else
+                t.RPoint = new Point(RFloorPoint.X + Rslack, RFloorPoint.Y + Rslack);
+            t.SimPoint = floor.ConvertToSimPoint(t.RPoint);
+            WW.fill_tiles(t.RPoint, t.GetRSize());
         }
 
         public override void TakeHTrolleyIn(DanishTrolley t, Point DeliveryPoint = default)
@@ -76,13 +85,18 @@ namespace FloorSimulation
         {
             //Update Accesspoints
             if (VerticalTrolleys)
-                throw new NotImplementedException("Implement access points for shop hubs first!");
+            {
+                if(HasLeftAccess) //Lower access
+                    Accesspoint[0] = WW.GetTile(new Point(NewRPoint.X + 10, NewRPoint.Y + RHubSize.Height));
+                else //Upper access
+                    Accesspoint[0] = WW.GetTile(new Point(NewRPoint.X + 10, NewRPoint.Y - 40));
+            }
             else
             {
                 if (HasLeftAccess)
-                    Accesspoint[0] = WW.GetTile(new Point(NewRPoint.X - 40, NewRPoint.Y + 20));
+                    Accesspoint[0] = WW.GetTile(new Point(NewRPoint.X - 40, NewRPoint.Y + 10));
                 else
-                    Accesspoint[0] = WW.GetTile(new Point(NewRPoint.X + RHubSize.Width, NewRPoint.Y + 20));
+                    Accesspoint[0] = WW.GetTile(new Point(NewRPoint.X + RHubSize.Width, NewRPoint.Y - 10));
             }
             base.TeleportHub(NewRPoint);
         }

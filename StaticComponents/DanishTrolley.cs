@@ -35,7 +35,9 @@ namespace FloorSimulation
         public int NStickers = 2;
         public readonly int MaxStickers = 20;
         public int TotalStickers = 2;
-        public const int MaxTotalStickers = 22 ; //22
+        public const int MaxTotalStickers = 17 ; //22
+        public int PercentageFull = 0;
+        public int FullAt = 1000;
 
         public const float TrolleyTravelSpeed = 67f; //cm/s
 
@@ -43,6 +45,8 @@ namespace FloorSimulation
         public List<LowPadAccessHub> TargetRegions;
 
         public bool ContinueDistribution = false; //The distributer can flip this bool, to tell the lowpad to continue travelling.
+        public int MaxUnitsPerTrolley;
+        public int SingleUnits;
 
         /// <summary>
         /// Constructer initializing the variables
@@ -112,6 +116,10 @@ namespace FloorSimulation
             NStickers++;
             TotalStickers++;
             Units += p.units;
+            SingleUnits += p.SingleUnits;
+            if (!floor.layout.UseStickersForFull)
+                PercentageFull += p.SingleUnits * 1000 / p.MaxSingleUnits;
+
             PlantList.Add(p);
             return IsFull();
         }
@@ -147,6 +155,8 @@ namespace FloorSimulation
 
         public bool IsFull()
         {
+            if (!floor.layout.UseStickersForFull)
+                return PercentageFull > FullAt;
             if (TotalStickers >= MaxTotalStickers)
                 return true;
             return false;
@@ -176,6 +186,25 @@ namespace FloorSimulation
                 return false;
             return true;
         }
-        // TODO: Create a function that assigns every new trolley an unique id.
+
+        /// <summary>
+        /// Uses the percentage full to determine if the plant would fit on this trolley
+        /// </summary>
+        public bool DoesPlantFit(plant p)
+        {
+            return PercentageFull + p.SingleUnits * 1000 / p.MaxSingleUnits <= FullAt;
+        }
+
+        public void MergeTrolley(DanishTrolley dt)
+        {
+            dt.PlantList.Union(PlantList);
+            dt.PlantList = dt.PlantList
+                .OrderBy(obj => obj.DestinationHub.day)
+                .ThenBy(obj => obj.DestinationHub.id)
+                .ToList();
+            NStickers++;
+            TotalStickers++;
+            PercentageFull += dt.PercentageFull;
+        }
     }
 }

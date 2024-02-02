@@ -46,6 +46,13 @@ Meer buffers: 620, 135, 140, 25, 67, 443, 45, 87
 1Street meer buffers: 446, 118, 99, 22, 49, 339, 59, 58
 2Street meer buffers: 442, 96, 100, 18, 48, 316, 32, 62
 
+//	Lowpads
+21 verdelers, 0 Lowpads: 738, 111, 170, 40, 97, 613, 100, 98
+21 verdelers, 30 Lowpads: 750, 958, 177, 43, 103, 215, 57, 35
+21 verdelers, 40 Lowpads: 752, 650, 182, 42, 102, 215, 58, 36
+21 verdelers, 50 Lowpads: 750, 503, 182, 42, 100, 215, 62, 38
+21 verdelers, 60 Lowpads: 750, 565, 175, 43, 102, 217, 73, 42
+
 Tijden per trolley (2023-07-18, 521 trolleys verdeeld)
 Minuten (/100)
 Verdelers & Lowpads

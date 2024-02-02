@@ -18,12 +18,14 @@ namespace FloorSimulation
         public string TotalTime;
         public string TotalTrolleysDistributed;
         public string TotalTrolleysExported;
+        public string PercentageFullTrolleysExported;
         public string DistributersWorking;
         public string LowpadsRunning;
         private Floor floor;
         
         private int TotalTrolleysDistr;
         private int TotalTrolleysExp;
+        private double AveragePercentageFull;
 
         public FinishedDistribution(Floor Floor)
         {
@@ -49,8 +51,10 @@ namespace FloorSimulation
             foreach(Distributer d in floor.DistrList)
                 TotalTrolleysDistr += d.MainTask.AInfo.NewFullTrolleyFreq;
             TotalTrolleysExp = floor.TrHub.TrolleysExported + floor.FullTrolleysOnFloor();
+            AveragePercentageFull = floor.TrHub.PercentageExported / floor.TrHub.TrolleysExported;
             TotalTrolleysDistributed = TotalTrolleysDistr.ToString();
             TotalTrolleysExported = TotalTrolleysExp.ToString();
+            PercentageFullTrolleysExported = AveragePercentageFull.ToString("F3");
             DistributersWorking = floor.DistrList.Count.ToString();
             LowpadsRunning = floor.layout.NLowpads.ToString();
 

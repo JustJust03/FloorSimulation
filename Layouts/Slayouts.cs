@@ -169,7 +169,7 @@ namespace FloorSimulation
             int x = 500;
             for (int i = 0; i < RData.days.Count; i++)
             {
-                floor.STHubs.Add(new StartHub("Start hub", i, new Point(x, floor.FirstWW.RSizeWW.Height - 250), floor, vertical_trolleys_: true));
+                floor.STHubs.Add(new StartHub("Start hub", i, new Point(x, floor.FirstWW.RSizeWW.Height - 250), new Size(640, 200), floor, vertical_trolleys_: true));
                 x += 960;
             }
 
@@ -309,6 +309,7 @@ namespace FloorSimulation
                     deltaX = 0;
                 return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
             })
+            .Where(obj => obj.name != "Buffer hub")
             .ToList();
 
             foreach(BufferHub buffhub in sortedList) 
@@ -371,7 +372,7 @@ namespace FloorSimulation
             int x = 2080;
             for (int i = 0; i < RData.days.Count; i++)
             {
-                floor.STHubs.Add(new StartHub("Start hub", i + RData.days.Count, new Point(x, floor.FirstWW.RSizeWW.Height - 250), floor, vertical_trolleys_: true));
+                floor.STHubs.Add(new StartHub("Start hub", i + RData.days.Count, new Point(x, floor.FirstWW.RSizeWW.Height - 250), new Size(640, 200), floor, vertical_trolleys_: true));
                 x += 960;
             }
             base.PlaceStartHubs();

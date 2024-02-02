@@ -14,6 +14,12 @@ namespace FloorSimulation
         public int RealFloorWidth = 5000;
         public int RealFloorHeight = 5000;
         public int NLowpads = 0;
+        public bool HorizontalShops = true;
+        public int ForcedShopWidth = 160;
+        public int ForcedShopHeight = 160;
+        public bool UseStickersForFull = true;
+        public bool CombineTrolleys = false;
+      
         public int UpperY;
         public int LowestY;
         public LowPadDriveLines LPDriveLines;

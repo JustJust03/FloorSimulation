@@ -63,8 +63,8 @@ namespace FloorSimulation
             List<WalkTile> TargetTiles = new List<WalkTile>();
             if (TargetTrolley.IsVertical) //Vertical target trolley's
             {
-                int toppoint = ty - dheight;
-                int botpoint = ty + theight + dheight;
+                int toppoint = ty - dheight - 1;
+                int botpoint = ty + theight + dheight + 1;
 
                 if (toppoint > 0)
                     TargetTiles.Add(WW.WalkTileList[tx][toppoint]); //top accesspoint to trolley

@@ -24,8 +24,12 @@ namespace FloorSimulation
         public Brush StandardWhiteBrush;
         public bool isSimulating = false;
         //public string date = "2023-04-14";
-        public string date = "2023-07-18";
-        public List<string> days = new List<string> { "DI", "WO" };
+        //public string date = "2023-04-7";
+        public string date = "2023-03-31";
+        //public string date = "2023-07-18";
+        public List<string> days = new List<string> { "VR", "ZO" };
+        //public List<string> days = new List<string> { "VR", "MA" };
+        //public List<string> days = new List<string> { "DI", "WO" };
         //public List<string> days = new List<string> { "VR"};
 
         public MetaInfo InfoPanel;
@@ -34,7 +38,7 @@ namespace FloorSimulation
         public string SaveFileBase;
 
         public bool LoadHeatMap = false;
-        public string HeatMapName = "2023-07-18_HeatMapTesting";
+        public string HeatMapName = "2023-07-18_21distr-BuffSlayout";
 
 
         public MainDisplay()
@@ -63,10 +67,11 @@ namespace FloorSimulation
             InitData();
 
             //MetaInfo
-            InfoPanel = new MetaInfo(new Point(floor.Width, (int)(2000 * Floor.ScaleFactor)), this, floor);
+            InfoPanel = new MetaInfo(new Point(floor.Width, (int)(2000 * Floor.ScaleFactor * 2)), this, floor);
             Controls.Add(InfoPanel);
 
             Paint += PaintMainDisplay;
+
             SaveFileBase = date + "_" + "SmartOrder_50LP_21Distr";
         }
 

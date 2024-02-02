@@ -33,7 +33,7 @@ namespace FloorSimulation
         public Random rand;
 
         // Real size: 5000 cm x 5000 cm
-        public const float ScaleFactor = 0.25f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
+        public const float ScaleFactor = 0.10f; //((Height of window - 40) / RealFloorHeight) - (800 / 2000 = 0.4)
         public Layout layout;
 
         public bool TickingHeatMap = false;
@@ -74,10 +74,14 @@ namespace FloorSimulation
 
             //layout = new SLayoutDayId(this, rd);
             //layout = new SLayoutDayIdBuffhub(this, rd);
+            //layout = new NewSlayout(this, rd);
             //layout = new SLayoutDayIdBuffhub2Streets(this, rd);
             //layout = new SLayoutDayId2Streets(this, rd);
+            //layout = new KortereVerdeelstraatSlayout(this, rd);
+            layout = new KortereVerdeelstraatSlayoutSmartStart(this, rd);
 
-            layout = new LowPadSlayoutBuffhub(this, rd);
+            //layout = new LowPadSlayoutBuffhub(this, rd);
+
 
             Size PixelFloorSize = new Size((int)(layout.RealFloorWidth * ScaleFactor),
                                            (int)(layout.RealFloorHeight * ScaleFactor));
@@ -116,7 +120,7 @@ namespace FloorSimulation
             else
                 OperationalInterval = SecondsToFullOperation / NDistributers;
 
-            TrHub = new TruckHub("Truck Hub", 6, new Point(FirstWW.RSizeWW.Width - 770, 700), this);
+            TrHub = new TruckHub("Truck Hub", 6, new Point(FirstWW.RSizeWW.Width - 770, 900), this);
             HubList.Add(TrHub);
 
             BuffHubs = new List<BufferHub>();
@@ -169,8 +173,6 @@ namespace FloorSimulation
 
             if (TickingHeatMap)
                 WWHeatMap.TickHeatMap();
-
-            FinishedD.CheckFinishedDistributionGlobal();
 
             Display.Invalidate();
             Invalidate();
@@ -345,7 +347,9 @@ namespace FloorSimulation
         {
             FullTrolleyHub ClosestHub = FTHubs[0];
             foreach (FullTrolleyHub FThub in FTHubs)
-                if (Math.Abs(db.RPoint.X - FThub.RFloorPoint.X) < Math.Abs(db.RPoint.X - ClosestHub.RFloorPoint.X))
+                if (!FTHubs[0].VerticalTrolleys && Math.Abs(db.RPoint.X - FThub.RFloorPoint.X) < Math.Abs(db.RPoint.X - ClosestHub.RFloorPoint.X))
+                    ClosestHub = FThub;
+                else if (FTHubs[0].VerticalTrolleys && Math.Abs(db.RPoint.Y - FThub.RFloorPoint.Y) < Math.Abs(db.RPoint.Y - ClosestHub.RFloorPoint.Y))
                     ClosestHub = FThub;
 
             return ClosestHub;
@@ -413,7 +417,6 @@ namespace FloorSimulation
             int trolleys = 0;
             foreach(FullTrolleyHub t in FTHubs)
                 trolleys += t.AmountOfTrolleys();
-            trolleys += TrHub.AmountOfTrolleys();
 
             return trolleys;
         }
