@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using FloorSimulation.StaticComponents.Hubs;
 using System.Linq;
+using FloorSimulation.Layouts;
 
 namespace FloorSimulation
 {
@@ -79,8 +80,9 @@ namespace FloorSimulation
             //layout = new SLayoutDayId2Streets(this, rd);
             //layout = new KortereVerdeelstraatSlayout(this, rd);
             //layout = new KortereVerdeelstraatSlayoutSmartStart(this, rd);
+            layout = new NewLPSlayout(this, rd);
 
-            layout = new LowPadSlayoutBuffhub(this, rd);
+            //layout = new LowPadSlayoutBuffhub(this, rd);
 
 
             Size PixelFloorSize = new Size((int)(layout.RealFloorWidth * ScaleFactor),
