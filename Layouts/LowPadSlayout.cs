@@ -15,6 +15,7 @@ namespace FloorSimulation
         readonly bool UseDumbLowPads = true;
         readonly bool UseDumbRegions = false;
         readonly bool UseSemiDumbRegions = false;
+        int NShops = 0;
 
         public LowPadSlayoutBuffhub(Floor floor_, ReadData rData) : base(floor_, rData)
         {
@@ -48,6 +49,7 @@ namespace FloorSimulation
 
         public override void PlaceShops(List<ShopHub> Shops, int UpperY, int LowerY)
         {
+            NShops = Shops.Count;
             regions = CreateDistributionRegions(Shops);
 
             Shops = regions.SelectMany(obj => obj).ToList();
@@ -215,10 +217,22 @@ namespace FloorSimulation
         public void CreateDriveLines()
         {
             List<LowPadAccessHub>[] ShopsPLine = new List<LowPadAccessHub>[4];
-            ShopsPLine[0] = floor.LPHubs.GetRange(0, 39);
-            ShopsPLine[1] = floor.LPHubs.GetRange(39, 38);
-            ShopsPLine[2] = floor.LPHubs.GetRange(77, 38);
-            ShopsPLine[3] = floor.LPHubs.GetRange(115, 18);
+            if (NShops == 133)
+            {
+                ShopsPLine[0] = floor.LPHubs.GetRange(0, 39);
+                ShopsPLine[1] = floor.LPHubs.GetRange(39, 38);
+                ShopsPLine[2] = floor.LPHubs.GetRange(77, 38);
+                ShopsPLine[3] = floor.LPHubs.GetRange(115, 18);
+            }
+            else if (NShops == 135)
+            {
+                ShopsPLine[0] = floor.LPHubs.GetRange(0, 39);
+                ShopsPLine[1] = floor.LPHubs.GetRange(39, 38);
+                ShopsPLine[2] = floor.LPHubs.GetRange(77, 38);
+                ShopsPLine[3] = floor.LPHubs.GetRange(115, 20);
+            }
+            else
+                throw new Exception("Haven't implemented these amount of shops");
 
             LPDriveLines = new LowPadDriveLines(ShopCornersX[ShopCornersX.Count - 1], UpperY - 300, RealFloorHeight - 160);
 
@@ -573,7 +587,7 @@ namespace FloorSimulation
         private List<List<ShopHub>> OldAssignDBregions(List<ShopHub> Shops, List<List<ShopHub>> DistributionRegions)
         {
             //int[] NshopsPerDbuter = new int[] { 10, 10, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5 };
-            int[] NshopsPerDbuter = new int[] { 7, 7, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 7, 6 }; //21
+            int[] NshopsPerDbuter = new int[] { 7, 7, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 7, 6 }; //21, 135
             //int[] NshopsPerDbuter = new int[] {10, 10, 9, 10, 10, 9, 9, 10, 10, 9, 9, 10, 9, 9 }; // 14
             int[] NShopsPerRegion = NshopsPerDbuter.Distinct().OrderBy(x => 9999 - x).ToArray();
 
