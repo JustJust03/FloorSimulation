@@ -291,13 +291,15 @@ namespace FloorSimulation
                         DistributerTrolleyBecameEmpty();
                         return;
                     }
-                    if (TargetHub.HubTrolleys[0].DoesPlantFit(DButer.trolley.PeekFirstPlant()))
+                    if (TargetHub.HubTrolleys[0] != null && TargetHub.HubTrolleys[0].DoesPlantFit(DButer.trolley.PeekFirstPlant()))
                         Trolley = TargetHub.HubTrolleys[0];
                     else if (TargetHub.HubTrolleys[1].DoesPlantFit(DButer.trolley.PeekFirstPlant())) 
                         Trolley = TargetHub.HubTrolleys[1];
                     else
                     {
-                        Trolley = TargetHub.HubTrolleys.OrderByDescending(obj => obj.PercentageFull).FirstOrDefault();
+                        Trolley = TargetHub.HubTrolleys
+                            .Where(obj => obj != null)
+                            .OrderByDescending(obj => obj.PercentageFull).FirstOrDefault();
                         ShopTrolleyBecameFull();
                         return;
                     }
@@ -833,6 +835,17 @@ namespace FloorSimulation
         /// </summary>
         private void ShopTrolleyBecameFull()
         {
+            //Sometimes there is a bug where a distributer wants to empty a hub which is already being replenished.
+            if (TargetHub.HubTrolleys[0] == null)
+            {
+                plant p = DButer.trolley.PeekFirstPlant();
+                if (p == null) //Distributer trolley is empty. So move this trolley to the Empty trolley Hub.
+                    DistributerTrolleyBecameEmpty();
+                else if (!(p.DestinationHub == TargetHub)) // Next plant is not for this hub. So travel to new trolley
+                    ContinueDistributing(p);
+                return;
+            }
+
             TargetHub.SwapIfOtherTrolley(Trolley);
 
             if(Trolley.IsVertical)
