@@ -120,13 +120,5 @@ namespace FloorSimulation
                 .Select(obj => obj.OpenSpots(this)[0])
                 .ToList();
         }
-
-        public List<WalkTile> ClosestOccupiedRegion(List<LowPadAccessHub> Regions)
-        {
-            return Regions
-                .Where(obj => obj.HasLowerAccessPoint)
-                .Select(obj => obj.OpenSpots(this)[1])
-                .ToList();
-        }
     }
 }

@@ -1,28 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity.Core.Common;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Gurobi;
 
 namespace FloorSimulation
 {
     internal class LowPadSlayoutBuffhub : SLayout
     {
         List<List<ShopHub>> regions;
-        RegionConstants RC;
-        int NRegions = 29;
         int NDbuters = Floor.NDistributers;
+        int[] ShopsPerCol = new int[] {20, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 5};
+
+        readonly bool UseDumbLowPads = true;
+        readonly bool UseDumbRegions = false;
+        readonly bool UseSemiDumbRegions = false;
 
         public LowPadSlayoutBuffhub(Floor floor_, ReadData rData) : base(floor_, rData)
         {
-            NLowpads = 0;
-            RC = new RegionConstants();
-            if (NRegions == 0)
-                NRegions = NDbuters;
-            ShopStartX = 50;
+            NLowpads = 50;
+            ShopStartX = 70;
+            RealFloorWidth = 5200;
+            StreetWidth += 120;
+            RealFloorHeight = 5200;
         }
+
         public override string ToString()
         {
             return "S-Layout grouped by an even distribution per distributer, With more small buffhubs in the street";
@@ -57,82 +59,113 @@ namespace FloorSimulation
             }
 
             PlaceLPAccessHubs();
+            CreateDriveLines();
         }
 
         private void PlaceLPAccessHubs()
         {
-            ShopHub FirstHub;
-            ShopHub LastHub;
-            int id = 0;
+            int LPAhubId = 0;
+            int HubX;
+            List<LowPadAccessHub>[] lowPadAccessHubs = new List<LowPadAccessHub>[regions.Count];
+
+            int i = 0;
             foreach(List<ShopHub> region in regions)
             {
-                FirstHub = region[0];
-                LastHub = region[region.Count - 1];
-
-                int HighestY;
-                int LowestY;
-                int HubX;
-
-                if (FirstHub.HasLeftAccess)
+                lowPadAccessHubs[i] = new List<LowPadAccessHub>();
+                foreach(ShopHub sh in region)
                 {
-                    HighestY = LastHub.RFloorPoint.Y + FirstHub.RHubSize.Height;
-                    LowestY = FirstHub.RFloorPoint.Y;
-                    HubX = FirstHub.RFloorPoint.X - 160;
+                    if (sh.HasLeftAccess)
+                        HubX = sh.RFloorPoint.X - 130;
+                    else
+                        HubX = sh.RFloorPoint.X + sh.RHubSize.Width + 70;
+
+
+                    LowPadAccessHub LPAHub = new LowPadAccessHub("LowPad Access Hub (X, Y): (" + HubX + ", " + sh.RFloorPoint.Y + ")",
+                        LPAhubId, new Point(HubX, sh.RFloorPoint.Y), floor, new Size(50, 130), new List<ShopHub> { sh });
+                    lowPadAccessHubs[i].Add(LPAHub);
+
+                    floor.AccessPointPerRegion[LPAHub.OpenSpots(default)[0].Rpoint] = LPAHub;
+                    floor.HubList.Add(LPAHub);
+                    floor.LPHubs.Add(LPAHub);
+                    floor.ShopHubPerRegion[sh] = LPAHub;
+
+                    LPAhubId++;
                 }
-                else
-                {
-                    HighestY = FirstHub.RFloorPoint.Y + FirstHub.RHubSize.Height;
-                    LowestY = LastHub.RFloorPoint.Y;
-                    HubX = FirstHub.RFloorPoint.X + FirstHub.RHubSize.Width + 100;
-                }
 
-                int HubY = LowestY + ((HighestY - LowestY) / 2) - 70;
-
-                LowPadAccessHub LPAHub = new LowPadAccessHub("LowPad Access Hub (X, Y): (" + HubX + ", " + HubY + ")",
-                    id, new Point(HubX, HubY), floor, new Size(50, 130), region);
-
-                floor.AccessPointPerRegion[LPAHub.OpenSpots(default)[0].Rpoint] = LPAHub;
-
-                floor.HubList.Add(LPAHub);
-                floor.LPHubs.Add(LPAHub);
-
-                foreach(ShopHub shop in region) 
-                    floor.ShopHubPerRegion[shop] = LPAHub;
-
-                id++;
+                i++;
             }
 
             //Assign the distributers
-            for (id = 0; id < Floor.NDistributers; id++)
+            for (int id = 0; id < Floor.NDistributers; id++)
             {
-                int[] regionsPerDB = RC.RegionsPerDbuter[(NRegions, NDbuters)][id];
-                int Nregions = regionsPerDB.Length;
-                int NShops = regions[regionsPerDB[Nregions - 1]].Count;
-                ShopHub HighestShop = regions[regionsPerDB[0]][0];
-                ShopHub LowestShop = regions[regionsPerDB[Nregions - 1]][NShops - 1];
+                ShopHub HighestShop = regions[id][0];
+                ShopHub LowestShop = regions[id][regions[id].Count - 1];
 
                 int MiddleY = (HighestShop.RFloorPoint.Y + LowestShop.RFloorPoint.Y + LowestShop.RHubSize.Height - 20) / 2;
-                int regiona = regionsPerDB[0];
                 int DBX;
-                if (regions[regiona][0].HasLeftAccess)
-                    DBX = regions[regiona][0].RFloorPoint.X - 40;
+                if (regions[id][0].HasLeftAccess)
+                    DBX = regions[id][0].RFloorPoint.X - 40;
                 else
-                    DBX = regions[regiona][0].RFloorPoint.X + regions[regiona][0].RHubSize.Width + 10;
+                    DBX = regions[id][0].RFloorPoint.X + regions[id][0].RHubSize.Width + 10;
 
-                LowPadAccessHub[] LPAHubs = new LowPadAccessHub[Nregions];
-                for (int regioni = 0; regioni < Nregions; regioni++)
-                    LPAHubs[regioni] = floor.LPHubs[regionsPerDB[regioni]];
+                Distributer db = new Distributer(id, floor, floor.FirstWW, Rpoint_: new Point(DBX, MiddleY), MaxWaitedTicks_: 100 - id, IsVertical_: false, RHubs: lowPadAccessHubs[id].ToArray());
 
-                if (Nregions == 1)
-                    LPAHubs[0].HasLowerAccessPoint = true;
-                else
-                {
-                    LPAHubs[0].HasLowerAccessPoint = true;
-                    LPAHubs[1].HasLowerAccessPoint = true;
-                }
+                foreach(LowPadAccessHub lpa in lowPadAccessHubs[id])
+                    lpa.dbuter = db;
 
-                Distributer db = new Distributer(id, floor, floor.FirstWW, Rpoint_: new Point(DBX, MiddleY), MaxWaitedTicks_: 100 - id, IsVertical_: false, RHubs: LPAHubs);
                 floor.DistrList.Add(db);
+            }
+        }
+
+        public void CreateDriveLines()
+        {
+            List<LowPadAccessHub>[] ShopsPLine = new List<LowPadAccessHub>[4];
+            ShopsPLine[0] = floor.LPHubs.GetRange(0, 39);
+            ShopsPLine[1] = floor.LPHubs.GetRange(39, 38);
+            ShopsPLine[2] = floor.LPHubs.GetRange(77, 38);
+            ShopsPLine[3] = floor.LPHubs.GetRange(115, 18);
+
+            LPDriveLines = new LowPadDriveLines(ShopCornersX[ShopCornersX.Count - 1], UpperY - 300, RealFloorHeight - 160);
+
+            LPDriveLines.AddHorizontalLine(RealFloorHeight - 210, 0, RealFloorWidth, -1); //Lowest line, Used to pick up a new full trolley
+            LPDriveLines.AddHorizontalLine(RealFloorHeight - 410, 360, 850, -1, true); //Normal loop again. Used to push the lp's with the new trolleys to the first vertical shopline
+            LPDriveLines.AddHorizontalLine(LowestY + 10, 0, 360, 1, true); //Also normal loop. Also Pushed the lp's to the first vertical shopline
+            LPDriveLines.AddHorizontalLine(RealFloorHeight - 410, 850, RealFloorWidth, -1, true); //If a lp finished the loop, but still carries a trolley, put it on this line.
+
+            LPDriveLines.AddHorizontalLine(UpperY - 180, 0, RealFloorWidth, 1); //Backup Line
+            LPDriveLines.AddHorizontalLine(LowestY + 10, 500, 3310, 1, true); //lower horizontal line below the shops.
+
+            LPDriveLines.AddVerticalLine(ShopCornersX[0] + 100, LowestY, LowestY + 310, -1); //If the first loop is skipped, up to the normal move right height
+
+
+            LPDriveLines.AddVerticalLine(ShopCornersX[0] + 200, UpperY - 20, LowestY + 310, -1, ShopsInLine: ShopsPLine[0]);
+            int ShopsPLineI = 1;
+            for(int cornerI = 2; cornerI < ShopCornersX.Count; cornerI += 2) //Shop hub lines...
+            {
+                if(ShopsPLineI < 4)
+                    LPDriveLines.AddVerticalLine(ShopCornersX[cornerI] + 200, UpperY - 20, LowestY + 20, -1, ShopsInLine: ShopsPLine[ShopsPLineI]);
+                else
+                    LPDriveLines.AddVerticalLine(ShopCornersX[cornerI] + 200, UpperY - 20, LowestY + 20, -1);
+                ShopsPLineI++;
+            }
+            for(int cornerI = 1; cornerI < ShopCornersX.Count; cornerI += 2)
+                LPDriveLines.AddVerticalLine(ShopCornersX[cornerI] - 260, UpperY - 200, LowestY, 1);
+            LPDriveLines.AddVerticalLine(ShopCornersX[ShopCornersX.Count - 1] + 400, UpperY - 200, LowestY, 1);
+
+
+            for (int EvenI = 0; EvenI < ShopCornersX.Count; EvenI += 2)
+                LPDriveLines.AddVerticalLine(ShopCornersX[EvenI] + 70, UpperY - 10, LowestY, 0, EnterLPAHubWhenHit: true);
+            for(int UnevenI = 1; UnevenI < ShopCornersX.Count - 1; UnevenI += 2)
+                LPDriveLines.AddVerticalLine(ShopCornersX[UnevenI] - 130, UpperY - 10, LowestY, 0, EnterLPAHubWhenHit: true);
+
+            LPDriveLines.AddVerticalLine(ShopCornersX[ShopCornersX.Count - 1] - 130, UpperY - 10, floor.LPHubs[floor.LPHubs.Count - 1].RFloorPoint.Y + 50, 0, EnterLPAHubWhenHit: true);
+
+            foreach(LowPadAccessHub LPAHub in floor.LPHubs)
+            {
+                if(LPAHub.HasLeftAccess)
+                    LPDriveLines.AddHorizontalLine(LPAHub.RFloorPoint.Y, LPAHub.RFloorPoint.X - 170, LPAHub.RFloorPoint.X, 1, LPA: LPAHub);
+                else
+                    LPDriveLines.AddHorizontalLine(LPAHub.RFloorPoint.Y, LPAHub.RFloorPoint.X, LPAHub.RFloorPoint.X + 170, -1, LPA: LPAHub);
             }
         }
 
@@ -147,18 +180,27 @@ namespace FloorSimulation
         private void PlaceLowPads(Point StartPoint)
         {
             LowPad lp;
+            DumbLowPad dlp;
             int y = StartPoint.Y;
             int x = StartPoint.X;
 
             for(int i  = 0; i < NLowpads; i++)
             {
-                lp = new LowPad(i, floor, floor.FirstWW, Rpoint_: new Point(x, y), MaxWaitedTicks_: 100 - i);
-                floor.TotalLPList.Add(lp);
-                x += 200;
+                if (UseDumbLowPads)
+                {
+                    dlp = new DumbLowPad(i, floor, floor.FirstWW, Rpoint_: new Point(x, y), MaxWaitedTicks_: 100 - i);
+                    floor.TotalDLPList.Add(dlp);
+                }
+                else
+                {
+                    lp = new LowPad(i, floor, floor.FirstWW, Rpoint_: new Point(x, y), MaxWaitedTicks_: 100 - i);
+                    floor.TotalLPList.Add(lp);
+                }
+                x += 150;
                 if (x > floor.FirstWW.RSizeWW.Width - 250)
                 {
                     x = StartPoint.X;
-                    y += 200;
+                    y += 150;
                     if(y > floor.FirstWW.RSizeWW.Height - 250)
                         break;
                 }
@@ -193,9 +235,10 @@ namespace FloorSimulation
                 int deltaX = obj.RFloorPoint.X - agent.RPoint.X;
                 int deltaY = obj.RFloorPoint.Y - agent.RPoint.Y;
                 if (obj.name == "Buffer hub")
-                    deltaX = 0;
+                    deltaX = 999;
                 return deltaX * deltaX + deltaY * deltaY; // Return the squared distance
             })
+            .Where(obj => obj.name != "Buffer hub")
             .ToList();
 
             foreach(BufferHub buffhub in sortedList) 
@@ -231,19 +274,36 @@ namespace FloorSimulation
 
         private List<List<ShopHub>> CreateDistributionRegions(List<ShopHub> Shops)
         {
-            if(NRegions == 0)
-                NRegions = NDbuters;
+            List<List<ShopHub>> DistributionRegions = new List<List<ShopHub>>();
+            for(int i = 0; i < NDbuters; i++)
+                DistributionRegions.Add(new List<ShopHub>());
+            if(UseDumbRegions)
+            {
+                AssignDumbDBregions(Shops, DistributionRegions);
+                return DistributionRegions;
+            }    
+            else if (UseSemiDumbRegions)
+            {
+                AssignDBregionsFixedOrder(Shops, DistributionRegions);
+                return DistributionRegions;
+            }
 
             Shops = Shops.OrderBy(obj => obj.StickersToReceive).ToList();
 
-            List<List<ShopHub>> DistributionRegions = new List<List<ShopHub>>();
-            for(int i = 0; i < NRegions; i++)
-                DistributionRegions.Add(new List<ShopHub>());
+            try
+            {
+                AssignDBregions(Shops, DistributionRegions);
+                Console.WriteLine("Used the NEW assign regions");
+            }
+            catch (GRBException)
+            {
+                OldAssignDBregions(Shops, DistributionRegions);
+                Console.WriteLine("Used the OLD assign regions");
+            }
 
-            AssignDBregions(Shops, DistributionRegions);
 
             //Sort the shops within the regions again.
-            for(int regioni = 0; regioni < DistributionRegions.Count; regioni++)
+            for (int regioni = 0; regioni < DistributionRegions.Count; regioni++)
             {
                 DistributionRegions[regioni] = DistributionRegions[regioni]
                     .OrderBy(shop => shop.day)
@@ -252,40 +312,193 @@ namespace FloorSimulation
 
             return DistributionRegions;
         }
+        private List<List<ShopHub>> AssignDumbDBregions(List<ShopHub> Shops, List<List<ShopHub>> DistributionRegions)
+        {
+            int[] NshopsPerDbuter = new int[] { 7, 7, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 6, 6, 6 };
+
+            int shopindex = 0;
+            for(int regioni = 0; regioni < NshopsPerDbuter.Length; regioni++)
+            {
+                int shopi = 0;
+                while(shopi < NshopsPerDbuter[regioni])
+                {
+                    DistributionRegions[regioni].Add(Shops[shopindex + shopi]);
+                    shopi++;
+                }
+                shopindex += shopi;
+            }
+
+            int[] StickersPerDButer = RegionConstants.StickerPerDButerNew(DistributionRegions);
+
+
+            return DistributionRegions;
+        }
 
         private List<List<ShopHub>> AssignDBregions(List<ShopHub> Shops, List<List<ShopHub>> DistributionRegions)
         {
-            int[] NshopsPerRegion = RC.ShopsPerDButer[(NRegions, NDbuters)].Distinct().OrderBy(x => 999 - x).ToArray();
-            for (int Nshopsi = 0; Nshopsi < NshopsPerRegion.Length; Nshopsi++)
+            int[] NshopsPerDbuter = new int[] { 7, 7, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 6, 6, 6 };
+
+            GRBEnv env = new GRBEnv();
+            env.Start();
+            GRBModel model = new GRBModel(env);
+
+            GRBVar[] ShopsPerDistributer = new GRBVar[Shops.Count * NDbuters];
+            for (int i = 0; i < Shops.Count * NDbuters; i++)
+                ShopsPerDistributer[i] = model.AddVar(0.0, 1.0, 0.0, GRB.BINARY, $"Shop_{i}_Shops");
+
+
+            // Ensure each shop is assigned to exactly 1 distributor
+            for (int s = 0; s < Shops.Count; s++)
             {
-                int[][] RegionsPerNshops = RC.RegionsPerDbuter[(NRegions, NDbuters)]
-                    .Where(x => 
-                    {
-                        int NShops = 0;
-                        foreach(int regioni in x)
-                            NShops += RC.ShopsPerRegion[NRegions][regioni];
+                GRBLinExpr distributorCountExpr = new GRBLinExpr();
 
-                        return NShops == NshopsPerRegion[Nshopsi];
-                    }).ToArray();
-                ;
-                List<ShopHub> SlicedShops = Shops.GetRange(0, NshopsPerRegion[Nshopsi] * RegionsPerNshops.Length);
-                Shops.RemoveRange(0, NshopsPerRegion[Nshopsi] * RegionsPerNshops.Length);
+                for (int d = 0; d < NDbuters; d++)
+                    distributorCountExpr += ShopsPerDistributer[d * Shops.Count + s];
 
-                int[] Regions = RegionsPerNshops.SelectMany(a => a).ToArray();
-
-
-                int ExtraI = 0;
-                for (int ShopI = 0; ShopI < SlicedShops.Count; ShopI++)
-                {
-                    //If the max trolleys for this shop has already been reached, continue.
-                    while (RC.ShopsPerRegion[NRegions][Regions[(ShopI + ExtraI) % Regions.Length]] == DistributionRegions[Regions[(ShopI + ExtraI) % Regions.Length]].Count)
-                        ExtraI++;
-
-                    DistributionRegions[Regions[(ShopI + ExtraI) % Regions.Length]].Add(SlicedShops[ShopI]);
-                }
+                model.AddConstr(distributorCountExpr == 1, $"Shop_{s}_DistributorCount");
             }
 
-            int[] StickersPerDButer = RC.StickersPerDistributer(DistributionRegions, NDbuters, NRegions);
+            GRBLinExpr[] ShopsPerDbuterExpr = new GRBLinExpr[NDbuters];
+            GRBLinExpr[] StickersPerDbuterExpr = new GRBLinExpr[NDbuters];
+
+            GRBVar MaxVar = model.AddVar(0, GRB.INFINITY, 0, GRB.INTEGER, "Maximum var");
+            GRBVar MinVar = model.AddVar(0, GRB.INFINITY, 0, GRB.INTEGER, "Minimum var");
+
+            //every dbuter distributes to 6 or 7 shops.
+            //calculate the stickers per distributer and minimize the difference.
+            for (int dbi = 0; dbi < DistributionRegions.Count; dbi++)
+            {
+                ShopsPerDbuterExpr[dbi] = new GRBLinExpr();
+                StickersPerDbuterExpr[dbi] = new GRBLinExpr();
+
+                for (int shopi = 0; shopi < Shops.Count; shopi++)
+                {
+                    ShopsPerDbuterExpr[dbi] += ShopsPerDistributer[dbi * Shops.Count + shopi];
+                    StickersPerDbuterExpr[dbi] += Shops[shopi].StickersToReceive * ShopsPerDistributer[dbi * Shops.Count + shopi];
+                }
+
+                model.AddConstr(ShopsPerDbuterExpr[dbi] == NshopsPerDbuter[dbi], $"Distributor_{dbi}");
+
+                model.AddConstr(MaxVar >= StickersPerDbuterExpr[dbi], $"maxVarConstraint{dbi}");
+                model.AddConstr(MinVar <= StickersPerDbuterExpr[dbi], $"minVarConstraint{dbi}");
+            }
+
+            model.SetObjective(MaxVar - MinVar, GRB.MINIMIZE);
+            model.Optimize();
+
+            //Assign the regions.
+            for(int shopi = 0; shopi < Shops.Count; shopi++)
+                for(int dbi = 0; dbi < NDbuters; dbi++)
+                    if (ShopsPerDistributer[dbi * Shops.Count + shopi].X == 1)
+                        DistributionRegions[dbi].Add(Shops[shopi]);
+
+            int[] StickersPerDButer = RegionConstants.StickerPerDButerNew(DistributionRegions);
+
+            return DistributionRegions;
+        }
+
+        private List<List<ShopHub>> AssignDBregionsFixedOrder(List<ShopHub> Shops, List<List<ShopHub>> DistributionRegions)
+        {
+            GRBEnv env = new GRBEnv();
+            env.Start();
+            GRBModel model = new GRBModel(env);
+
+            GRBVar[] ShopsPerDistributer = new GRBVar[Shops.Count * NDbuters];
+            for (int i = 0; i < Shops.Count * NDbuters; i++)
+                ShopsPerDistributer[i] = model.AddVar(0.0, 1.0, 0.0, GRB.BINARY, $"Shop_{i}_Shops");
+
+
+            // Ensure each shop is assigned to exactly 1 distributor
+            for (int s = 0; s < Shops.Count; s++)
+            {
+                GRBLinExpr distributorCountExpr = new GRBLinExpr();
+
+                for (int d = 0; d < NDbuters; d++)
+                    distributorCountExpr += ShopsPerDistributer[d * Shops.Count + s];
+
+                model.AddConstr(distributorCountExpr == 1, $"Shop_{s}_DistributorCount");
+            }
+
+            GRBLinExpr[] ShopsPerDbuterExpr = new GRBLinExpr[NDbuters];
+            GRBLinExpr[] StickersPerDbuterExpr = new GRBLinExpr[NDbuters];
+
+            GRBVar MaxVar = model.AddVar(0, GRB.INFINITY, 0, GRB.INTEGER, "Maximum var");
+            GRBVar MinVar = model.AddVar(0, GRB.INFINITY, 0, GRB.INTEGER, "Minimum var");
+
+            //every dbuter distributes to 6 or 7 shops.
+            //calculate the stickers per distributer and minimize the difference.
+            for (int dbi = 0; dbi < DistributionRegions.Count; dbi++)
+            {
+                ShopsPerDbuterExpr[dbi] = new GRBLinExpr();
+                StickersPerDbuterExpr[dbi] = new GRBLinExpr();
+
+                for (int shopi = 0; shopi < Shops.Count; shopi++)
+                {
+                    GRBLinExpr expr = new GRBLinExpr();
+                    expr.AddConstant(1.0);
+
+                    // Condition: ShopsPerDistributer[dbi * Shops.Count + shopi] == 0
+                    if(dbi > 0 || shopi > 0)
+                        expr.AddTerm(-1.0, ShopsPerDistributer[dbi * Shops.Count + shopi]);
+
+                    // Condition: ShopsPerDistributer[dbi * Shops.Count + shopi - 1] == 1 (if shopi > 0)
+                    if (shopi > 0)
+                        expr.AddTerm(1.0, ShopsPerDistributer[dbi * Shops.Count + shopi - 1]);
+
+                    // Condition: ShopsPerDistributer[(dbi - 1) * Shops.Count + shopi - 1] == 1 (if dbi > 0 and shopi > 0)
+                    if (dbi > 0 && shopi > 0)
+                        expr.AddTerm(1.0, ShopsPerDistributer[(dbi - 1) * Shops.Count + shopi - 1]);
+
+                    model.AddConstr(expr, GRB.GREATER_EQUAL, 1, "CombinedConstraint");
+
+                    StickersPerDbuterExpr[dbi] += Shops[shopi].StickersToReceive * ShopsPerDistributer[dbi * Shops.Count + shopi];
+                }
+                model.AddConstr(MaxVar >= StickersPerDbuterExpr[dbi], $"maxVarConstraint{dbi}");
+                model.AddConstr(MinVar <= StickersPerDbuterExpr[dbi], $"minVarConstraint{dbi}");
+            }
+
+
+
+            model.SetObjective(MaxVar - MinVar, GRB.MINIMIZE);
+            model.Set("TimeLimit", "100.0");
+            model.Optimize();
+
+            //Assign the regions.
+            for (int shopi = 0; shopi < Shops.Count; shopi++)
+                for (int dbi = 0; dbi < NDbuters; dbi++)
+                    if (ShopsPerDistributer[dbi * Shops.Count + shopi].X == 1)
+                        DistributionRegions[dbi].Add(Shops[shopi]);
+
+            WriteSolution WS = new WriteSolution(floor);
+            WS.Write(DistributionRegions);
+
+            return DistributionRegions;
+        }
+
+        private List<List<ShopHub>> OldAssignDBregions(List<ShopHub> Shops, List<List<ShopHub>> DistributionRegions)
+        {
+            //int[] NshopsPerDbuter = new int[] { 10, 10, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5 };
+            int[] NshopsPerDbuter = new int[] { 7, 7, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 6, 6, 6 }; //21
+            //int[] NshopsPerDbuter = new int[] {10, 10, 9, 10, 10, 9, 9, 10, 10, 9, 9, 10, 9, 9 }; // 14
+            int[] NShopsPerRegion = NshopsPerDbuter.Distinct().OrderBy(x => 9999 - x).ToArray();
+
+            for (int Nshopsi = 0; Nshopsi < NShopsPerRegion.Count(); Nshopsi++)
+            {
+                int[] IndexesOfShopsWithShopCount = Enumerable
+                                                    .Range(0, NshopsPerDbuter.Length)
+                                                    .Where(i => NshopsPerDbuter[i] == NShopsPerRegion[Nshopsi])
+                                                    .ToArray();
+                List<ShopHub> SlicedShops = Shops.GetRange(0, NShopsPerRegion[Nshopsi] * IndexesOfShopsWithShopCount.Length);
+                Shops.RemoveRange(0, NShopsPerRegion[Nshopsi] * IndexesOfShopsWithShopCount.Length);
+
+                for (int ShopI = 0; ShopI < SlicedShops.Count; ShopI++)
+                    DistributionRegions[IndexesOfShopsWithShopCount[ShopI % IndexesOfShopsWithShopCount.Length]].Add(SlicedShops[ShopI]);
+
+                ;
+            }
+
+            int[] StickersPerDButer = RegionConstants.StickerPerDButerNew(DistributionRegions);
+
 
             return DistributionRegions;
         }
@@ -293,66 +506,191 @@ namespace FloorSimulation
 
     internal class RegionConstants
     {
-        // Key: (int, int) => (Nregions, NDbuters)
-        public readonly Dictionary<(int, int), List<int[]>> RegionsPerDbuter = new Dictionary<(int, int), List<int[]>>();
-
-        // Key: Nregions
-        public readonly Dictionary<int, int[]> ShopsPerRegion = new Dictionary<int, int[]>();
-
-        // Key: (int, int) => (Nregions, NDbuters)
-        public Dictionary<(int, int), int[]> ShopsPerDButer = new Dictionary<(int, int), int[]>();
-            
-        public RegionConstants()
+        public static int[] StickerPerDButerNew(List<List<ShopHub>> DistributionRegions)
         {
-            RegionsPerDbuter[(29, 21)] = 
-            new List<int[]> {
-                new int[] {0, 1},
-                new int[] {2, 3},
-                new int[] {4},
-                new int[] {5},
-                new int[] {6, 7},
-                new int[] {8, 9},
-                new int[] {10},
-                new int[] {11},
-                new int[] {12},
-                new int[] {13},
-                new int[] {14, 15},
-                new int[] {16, 17},
-                new int[] {18},
-                new int[] {19},
-                new int[] {20},
-                new int[] {21},
-                new int[] {22, 23},
-                new int[] {24, 25},
-                new int[] {26},
-                new int[] {27},
-                new int[] {28},
-            };
-            ShopsPerRegion[29] = new int[] { 5, 5, 5, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5 };
-            //ShopsPerRegion[29] = new int[] { 5, 5, 5, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5, 4 };
-            AddShopsPerDButer(29, 21);
-        }
-
-        private void AddShopsPerDButer(int Nregions, int NDbuters)
-        {
-            int[] ShopsPerDB = new int[NDbuters];
-
-            for (int i = 0; i < NDbuters; i++) 
-                foreach(int shopi in RegionsPerDbuter[(Nregions, NDbuters)][i])
-                    ShopsPerDB[i] += ShopsPerRegion[Nregions][shopi];
-
-            ShopsPerDButer[(Nregions, NDbuters)] = ShopsPerDB;
-        }
-
-        public int[] StickersPerDistributer(List<List<ShopHub>> DistributionRegions, int NDbuters, int NRegions)
-        {
+            int NDbuters = DistributionRegions.Count;   
             int[] StickersPerDButer = new int[NDbuters];
 
             for (int i = 0; i < NDbuters; i++)
-                foreach (int Regioni in RegionsPerDbuter[(NRegions, NDbuters)][i])
-                    StickersPerDButer[i] += DistributionRegions[Regioni].Select(shop => shop.StickersToReceive).Sum();
+                StickersPerDButer[i] += DistributionRegions[i].Select(shop => shop.StickersToReceive).Sum();
 
             return StickersPerDButer;
+        }
+    }
+
+    
+    internal class LowPadDriveLines
+    {
+        List<VerticalLine> VerticalLines = new List<VerticalLine>();
+        List<HorizontalLine> HorizontalLines = new List<HorizontalLine>();
+
+        int MostRightX;
+        int UppestY;
+        int LowestY;
+
+        public LowPadDriveLines(int LastCornerX, int HighestY, int LowestY_)
+        {
+            MostRightX = LastCornerX + 300;
+            UppestY = HighestY;
+            LowestY = LowestY_;
+        }
+
+        public void AddVerticalLine(int Rx, int LowerRy, int UpperRy, int DeltaY, bool EnterLPAHubWhenHit = false, List<LowPadAccessHub> ShopsInLine = null)
+        {
+            VerticalLines.Add(new VerticalLine(Rx, LowerRy, UpperRy, DeltaY, EnterLPAHubWhenHit, ShopsInLine));
+        }
+
+        public void AddHorizontalLine(int Ry, int LeftRx, int RightRx, int DeltaX, bool CarryTrolleyToEnterLine = false, LowPadAccessHub LPA= default)
+        {
+            HorizontalLines.Add(new HorizontalLine(Ry, LeftRx, RightRx, DeltaX, CarryTrolleyToEnterLine, LPA));
+        }
+
+        public void HitDriveLine(DumbLowPad dlp)
+        {
+            if (dlp.MainTask.LowpadDeltaX != 0)
+                HitVerticalDriveLine(dlp);
+            else
+                HitHorizontalDriveLine(dlp);
+        }
+
+        public void HitVerticalDriveLine(DumbLowPad dlp)
+        {
+            if(dlp.RPoint.X > MostRightX && dlp.MainTask.LowpadDeltaX == 1)
+            {
+                dlp.MainTask.LowpadDeltaX = 0;
+                dlp.MainTask.LowpadDeltaY = 1;
+                return;
+            }
+            else if(dlp.RPoint.X <= 10 && dlp.MainTask.LowpadDeltaX == -1) //Hit the left wall delete self if no more trolleys left.
+            {
+                if(dlp.trolley == null && dlp.floor.STHubs[0].HubTrolleys.Count == 0)
+                {
+                    dlp.floor.FirstWW.unfill_tiles(dlp.RPoint, dlp.GetRSize());
+                    dlp.floor.DLPList[dlp.floor.DLPList.IndexOf(dlp)] = null;
+                    return;
+                }
+                dlp.MainTask.LowpadDeltaX = 0;
+                dlp.MainTask.LowpadDeltaY = -1;
+                return;
+            }
+
+            foreach(VerticalLine line in VerticalLines)
+            {
+                if (line.RX != dlp.RPoint.X)
+                    continue;
+                if (line.LowerRY < dlp.RPoint.Y && dlp.RPoint.Y < line.UpperRY &&
+                   (line.ShopsInLine == null || dlp.trolley == null || dlp.RPoint.Y < LowestY - 420 || line.ShopsInLine.Intersect(dlp.trolley.TargetRegions).Any()))
+                {
+                    if (line.EnterLPAHubWhenHit && dlp.LPAHub == null)
+                        return; //The lp got stuck and couldn't move out of regionhub.
+                    if(line.ShopsInLine != null && line.ShopsInLine.Count == 0)
+                    {
+                        ;
+                    }
+
+                    dlp.MainTask.LowpadDeltaX = 0;
+                    dlp.MainTask.LowpadDeltaY = line.DeltaY;
+                    if(line.EnterLPAHubWhenHit)
+                        dlp.HitAccessHub();
+                    else
+                        dlp.FinishedRegion();
+                }
+                ;
+            }
+            ;
+        }
+
+        public void HitHorizontalDriveLine(DumbLowPad dlp)
+        {
+            if(dlp.RPoint.Y > LowestY && dlp.MainTask.LowpadDeltaY == 1)
+            {
+                dlp.MainTask.LowpadDeltaX = 0;
+                dlp.MainTask.LowpadDeltaY = -1;
+                return;
+            }
+            else if (dlp.RPoint.Y < UppestY && dlp.MainTask.LowpadDeltaY == -1)
+            {
+                dlp.MainTask.LowpadDeltaX = 1;
+                dlp.MainTask.LowpadDeltaY = 0;
+                return;
+            }
+            
+            foreach(HorizontalLine line in HorizontalLines)
+            {
+                if (line.RY != dlp.RPoint.Y)
+                    continue;
+                if (line.LeftRX < dlp.RPoint.X && dlp.RPoint.X < line.RightRX &&         //Hit line,
+                   (!line.CarryTrolleyToEnterLine || line.MustHaveAtrolley(dlp)) &&     //Must have a trolley to enter this line (redo the loop).
+                   (line.LPA == default || line.EnterRegion(dlp)))                      //Must have a plant to deliver to this region and it should not be used already.
+                {
+                    dlp.MainTask.LowpadDeltaY = 0;
+                    dlp.MainTask.LowpadDeltaX = line.DeltaX;
+                }
+            }
+        }
+    }
+
+    internal class VerticalLine
+    {
+        public int RX;
+        public int LowerRY;
+        public int UpperRY;
+
+        public int DeltaY;
+        public bool EnterLPAHubWhenHit;
+        public List<LowPadAccessHub> ShopsInLine;
+
+        public VerticalLine(int Rx, int LowerRy, int UpperRy, int Deltay, bool EnterLPAHubWhenHit_, List<LowPadAccessHub> ShopsInLine_)
+        {
+            RX = Rx;
+            LowerRY = LowerRy;  
+            UpperRY = UpperRy;
+            DeltaY = Deltay;
+
+            EnterLPAHubWhenHit = EnterLPAHubWhenHit_;
+            ShopsInLine = ShopsInLine_;
+        }
+    }
+
+    internal class HorizontalLine
+    {
+        public int RY;
+        public int LeftRX;
+        public int RightRX;
+
+        public int DeltaX;
+        public bool CarryTrolleyToEnterLine;
+
+        public LowPadAccessHub LPA;
+
+        public HorizontalLine(int Ry, int LeftRx, int RightRx, int Deltax, bool CarryTrolleyToEnterLine_, LowPadAccessHub LPA_)
+        {
+            RY = Ry;
+            LeftRX = LeftRx;
+            RightRX = RightRx;
+            DeltaX = Deltax;
+            CarryTrolleyToEnterLine = CarryTrolleyToEnterLine_;
+            LPA = LPA_;
+        }
+
+        public bool MustHaveAtrolley(DumbLowPad dlp) 
+        {
+            return dlp.trolley != null;
+        }
+
+        public bool EnterRegion(DumbLowPad dlp)
+        {
+            if (dlp.trolley != null && dlp.trolley.TargetRegions.Contains(LPA) && !LPA.Targeted && LPA.HubTrolleys.Count == 0)
+            {
+                double odds = Math.Min((1.0 / dlp.trolley.TargetRegions.Count) + (1.0 / Math.Pow(1.9, LPA.dbuter.MainTask.NTrolleysStanding() + 1.0)), 1.0);
+                if (odds < 0.20)
+                    return false;
+                
+                dlp.LPAHub = LPA;
+                LPA.Targeted = true;
+                return true;
+            }
+            return false;
         }
     }
 }

@@ -185,7 +185,7 @@ namespace FloorSimulation
             for (int i = 0; i < TrolleyList.Count; i++)
             {
                 DanishTrolley t = TrolleyList[i];
-                t.IsVertical = !t.IsVertical;
+                t.IsVertical = !IsVertical;
                 if (t.IsVertical)
                     t.RPoint = new Point(RPoint.X + GetRSize().Width - 57 * (MaxTrolleysPerHarry - i), RPoint.Y);
                 else
