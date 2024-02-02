@@ -18,8 +18,11 @@ namespace FloorSimulation
         public int ForcedShopWidth = 160;
         public int ForcedShopHeight = 160;
         public bool UseStickersForFull = true;
-
         public bool CombineTrolleys = false;
+      
+        public int UpperY;
+        public int LowestY;
+        public LowPadDriveLines LPDriveLines;
 
         public abstract int NTrolleysInShop { get; set; }
 

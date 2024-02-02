@@ -71,7 +71,8 @@ namespace FloorSimulation
             Controls.Add(InfoPanel);
 
             Paint += PaintMainDisplay;
-            SaveFileBase = date + "_" + "SplitCC_BuffSlayout";
+
+            SaveFileBase = date + "_" + "SmartOrder_50LP_21Distr";
         }
 
         private void PaintMainDisplay(object sender, PaintEventArgs e)

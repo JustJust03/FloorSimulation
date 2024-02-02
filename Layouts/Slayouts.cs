@@ -11,8 +11,6 @@ namespace FloorSimulation
 
     internal class SLayout : Layout
     {
-        protected int UpperY;
-        protected int LowestY;
         protected List<int> ShopCornersX = new List<int>(); //Keeps track of the upper corners of the shops in the street. Is used to place FullHubs
         protected int StreetWidth = 800;
         protected int ShopHeight = 170;
@@ -65,9 +63,9 @@ namespace FloorSimulation
                 {
                     placed_shops_in_a_row = 0;
                     if (two_per_row == 1)
-                        y -= 2 * ShopHeight;
+                        y -= ShopHeight;
                     else
-                        y += 2 * ShopHeight;
+                        y += ShopHeight;
                 }
 
                 if (two_per_row == 1 && y > UpperY)
@@ -76,8 +74,19 @@ namespace FloorSimulation
                     y += ShopHeight;
                 else
                 {
+
+                    if (FirstColFinished && i < Shops.Count - 1 && y > LowerY)
+                    {
+                        floor.HubList.Add(Shop);
+                        i++;
+                        Shop = Shops[i];
+                        if (two_per_row == 2)
+                            Shop.HasLeftAccess = true;
+                        Shop.TeleportHub(new Point(x, y));
+                    }
+
                     if (!FirstColFinished)
-                        HalfShopsInRow = (placed_shops_in_a_row - 1) / 2;
+                        HalfShopsInRow = (placed_shops_in_a_row - 1) / 3;
                     FirstColFinished = true;
                     placed_shops_in_a_row = 0;
                     two_per_row++;
@@ -88,10 +97,17 @@ namespace FloorSimulation
                     }
                     else
                     {
-                        y -= 2 * ShopHeight; // Because the middle section was placed at the bottom
                         LowestY = y + ShopHeight;
+                        if (two_per_row == 3)
+                            Shop.HasLeftAccess = true;
                         x += 160;
                         two_per_row = 1;
+                        placed_shops_in_a_row--;
+                        if (Shops.Count - i == 19)
+                        {
+                            y -= ShopHeight;
+                            placed_shops_in_a_row++;
+                        }
                     }
                 }
 
@@ -150,7 +166,7 @@ namespace FloorSimulation
         /// </summary>
         public override void PlaceStartHubs()
         {
-            int x = 160;
+            int x = 500;
             for (int i = 0; i < RData.days.Count; i++)
             {
                 floor.STHubs.Add(new StartHub("Start hub", i, new Point(x, floor.FirstWW.RSizeWW.Height - 250), new Size(640, 200), floor, vertical_trolleys_: true));

@@ -17,7 +17,7 @@
     </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -25,6 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -47,6 +48,9 @@
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="gurobi110.netstandard20, Version=11.0.0.0, Culture=neutral, PublicKeyToken=21e2c4b1860157bc, processorArchitecture=MSIL">
+      <HintPath>packages\Gurobi.Optimizer.11.0.0\lib\netstandard2.0\gurobi110.netstandard20.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Bcl.AsyncInterfaces.1.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
@@ -91,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assignments\DistributerTask.cs" />
+    <Compile Include="Assignments\DumbLowPadTask.cs" />
     <Compile Include="Assignments\LHDriverTask.cs" />
     <Compile Include="Assignments\RegionDistributerTask.cs" />
     <Compile Include="Assignments\LowPadTask.cs" />
@@ -98,6 +103,7 @@
     <Compile Include="ControlInfo.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Data\BestShopDistribution\WriteSolution.cs" />
     <Compile Include="Data\BoxActivity.cs" />
     <Compile Include="Data\HubData.cs" />
     <Compile Include="Data\ReadData.cs" />
@@ -111,6 +117,7 @@
     </Compile>
     <Compile Include="PathFinding\AstarWalkWays.cs" />
     <Compile Include="SimComponents\Agent.cs" />
+    <Compile Include="SimComponents\DumbLowPad.cs" />
     <Compile Include="SimComponents\LowPad.cs" />
     <Compile Include="SimComponents\Distributer.cs" />
     <Compile Include="SimComponents\LangeHarry.cs" />
@@ -168,6 +175,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="logo-final.png" />
     <Content Include="SimImages\Distributer.png" />
   </ItemGroup>
   <ItemGroup>
@@ -181,6 +189,8 @@
     </PropertyGroup>
     <Error Condition="!Exists('packages\EntityFramework.6.4.4\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\EntityFramework.6.4.4\build\EntityFramework.props'))" />
     <Error Condition="!Exists('packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
+    <Error Condition="!Exists('packages\Gurobi.Optimizer.11.0.0\build\Gurobi.Optimizer.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Gurobi.Optimizer.11.0.0\build\Gurobi.Optimizer.targets'))" />
   </Target>
   <Import Project="packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
+  <Import Project="packages\Gurobi.Optimizer.11.0.0\build\Gurobi.Optimizer.targets" Condition="Exists('packages\Gurobi.Optimizer.11.0.0\build\Gurobi.Optimizer.targets')" />
 </Project>

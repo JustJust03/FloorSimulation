@@ -46,6 +46,7 @@ namespace FloorSimulation.Assignments
                 WaitedTicks++;
                 if (WaitedTicks > 100)
                 {
+                    DButer.floor.FirstWW.unfill_tiles(DButer.RPoint, DButer.GetRSize());
                     WaitedTicks = 0;
                     DButer.TravelToTile(DButer.WW.GetTile(DButer.SavePoint));
                     Waiting = false;
@@ -126,11 +127,18 @@ namespace FloorSimulation.Assignments
 
         public override void RouteCompleted()
         {
-            if (DButer.RPoint == DButer.SavePoint && Goal != "TravelToStartTile")
+            if (TargetWasSaveTile)
+            {
+                TargetWasSaveTile = false;
+                FailRoute();
+                return;
+            }
+            else if (DButer.RPoint == DButer.SavePoint && Goal != "TravelToStartTile")
             {
                 FailRoute();
                 return;
             }
+
             if (Goal == "EmptySmallBuffHub")
                 EmptySmallBuffHub();
             else if (Goal == "LHDeliverEmptyTrolleys")
@@ -177,9 +185,14 @@ namespace FloorSimulation.Assignments
             Trolley = TargetHub.GiveTrolleyToHarry(DButer.RPoint);
             if (Trolley == null)
             {
+                if(Harry.TrolleyList.Count != 0)
+                {
+                    ;
+                }
                 FailRoute();
                 return;
             }
+
             Harry.TakeTrolleyIn(Trolley);
 
             if (TargetHub.AmountOfTrolleys() > 0 && Harry.TrolleyList.Count < LangeHarry.MaxTrolleysPerHarry)
@@ -217,6 +230,7 @@ namespace FloorSimulation.Assignments
                 FailRoute();
                 return;
             }
+
             Harry.TakeTrolleyIn(Trolley);
 
             if (TargetHub.AmountOfTrolleys() > 0 && Harry.TrolleyList.Count < LangeHarry.MaxTrolleysPerHarry)

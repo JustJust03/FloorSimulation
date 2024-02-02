@@ -11,7 +11,7 @@ namespace FloorSimulation
     /// <summary>
     /// Start hub. This is where the distributers get their trolleys to distribute them.
     /// </summary>
-    internal class StartHub: Hub
+    internal class StartHub : Hub
     {
         private List<DanishTrolley> UndistributedTrolleys;
         public bool StartHubEmpty;
@@ -55,7 +55,7 @@ namespace FloorSimulation
 
         public override DanishTrolley PeekFirstTrolley()
         {
-            if(HubTrolleys.Count == 0 && UndistributedTrolleys.Count > 0)
+            if (HubTrolleys.Count == 0 && UndistributedTrolleys.Count > 0)
             {
                 int take_amount = Math.Min(MaxStartHubTrolleys, UndistributedTrolleys.Count);
                 HubTrolleys = UndistributedTrolleys.Take(take_amount).ToList();
@@ -93,7 +93,6 @@ namespace FloorSimulation
                 else
                     UpperY += t.GetRSize().Height + Rslack;
 
-
                 t.TeleportTrolley(new Point(trolleyX, trolleyY));
                 WW.fill_tiles(t.RPoint, t.GetRSize());
             }
@@ -102,6 +101,33 @@ namespace FloorSimulation
         public int TotalUndistributedTrolleys()
         {
             return UndistributedTrolleys.Count + HubTrolleys.Count;
+        }
+
+        public DanishTrolley DumbLowPadPickUp(DumbLowPad dlp)
+        {
+            if (HubTrolleys.Count == 0)
+                return null;
+            DanishTrolley t = HubTrolleys[HubTrolleys.Count - 1];
+            //if (WW.GetTile(new Point(t.RPoint.X + t.GetRSize().Width, t.RPoint.Y + 20)) == WW.GetTile(dlp.RPoint) ||
+            //    WW.GetTile(new Point(t.RPoint.X + t.GetRSize().Width, t.RPoint.Y + 20)).TileRight() == WW.GetTile(dlp.RPoint))
+            if (dlp.RPoint.Y - 20 == t.RPoint.Y && dlp.RPoint.X > t.RPoint.X && dlp.RPoint.X < t.RPoint.X + 67)
+            {
+                floor.Display.InvalInfo();
+                HubTrolleys.RemoveAt(HubTrolleys.Count - 1);
+
+                if (HubTrolleys.Count == 0 && UndistributedTrolleys.Count > 0)
+                {
+                    HubTrolleys = UndistributedTrolleys.Take(1).ToList();
+                    UndistributedTrolleys.RemoveRange(0, 1);
+                    PlaceTrolleys();
+                }
+                else if(HubTrolleys.Count == 0 && UndistributedTrolleys.Count == 0)
+                    StartHubEmpty = true;
+
+                return t;
+            }
+
+            return null;
         }
     }
 }

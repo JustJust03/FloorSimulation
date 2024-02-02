@@ -51,10 +51,14 @@ namespace FloorSimulation
                 GenerateHorizontalAccessPoints();
 
             //Creates initial empty trolleys to the bufferhub
-            for (int i = Trolleyarr.Length - initial_trolleys; i < Trolleyarr.Length; i++)
+            for (int i = HubAccessPointsX.Length - initial_trolleys; i < HubAccessPointsX.Length; i++)
             {
+                if (HubAccessPoints[0, i] == null)
+                    i++;
                 Point p = HubAccessPoints[0, i].Rpoint;
-                DanishTrolley t = new DanishTrolley(100 + i, floor, p, true);
+                p.Y += 40;
+                p.X += 10;
+                DanishTrolley t = new DanishTrolley(-i, floor, p, true);
                 WW.fill_tiles(t.RPoint, t.GetRSize());
                 Trolleyarr[0, i] = t;
             }
@@ -117,8 +121,6 @@ namespace FloorSimulation
 
             if (VerticalTrolleys)
             {
-                if (agent.IsOnHarry)
-                    return LangeHarryOpenSpots(agent);
                 for (int coli = NTrolleysInRow - 1; coli >= 0; coli--)
                     for (int rowi = 0; rowi < NRows; rowi++)
                     {
@@ -138,12 +140,17 @@ namespace FloorSimulation
             {
                 for (int rowi = 0; rowi < NRows; rowi++)
                     for (int coli = NTrolleysInRow - 1; coli >= 0; coli--)
-                        if (Trolleyarr[rowi, coli] == null)
-                        {
+                    {
+                        if (Trolleyarr[rowi, coli] == null && floor.layout.NLowpads == 0)
                             OpenSpots.Add(HubAccessPoints[rowi, coli]);
-                            if (floor.layout.NLowpads > 0)
-                                return OpenSpots;
+                        if (Trolleyarr[rowi, coli] == null && floor.layout.NLowpads > 0 && OpenSpots.Count == 0)
+                            OpenSpots.Add(HubAccessPoints[rowi, coli]);
+                        else if(Trolleyarr[rowi, coli] != null && OpenSpots.Count == 1)
+                        {
+                            floor.FirstWW.unfill_tiles(Trolleyarr[rowi, coli].RPoint, Trolleyarr[rowi, coli].GetRSize());
+                            Trolleyarr[rowi, coli] = null;
                         }
+                    }
             }
 
             return OpenSpots;
@@ -332,6 +339,10 @@ namespace FloorSimulation
 
             if (ArrIndexx == -1 || ArrIndexy == -1) return null;
             DanishTrolley t = Trolleyarr[ArrIndexy, ArrIndexx];
+            if (t == null)
+                return null;
+
+            WW.unfill_tiles(t.RPoint, t.GetRSize());
             Trolleyarr[ArrIndexy, ArrIndexx] = null;
 
             return t;
@@ -358,6 +369,7 @@ namespace FloorSimulation
             DanishTrolley t = Trolleyarr[ArrIndexy, ArrIndexx];
             if (t == null)
                 return t;
+
             Trolleyarr[ArrIndexy, ArrIndexx] = null;
             WW.unfill_tiles(t.RPoint, t.GetRSize());
 
