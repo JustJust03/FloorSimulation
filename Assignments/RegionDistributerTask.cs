@@ -294,7 +294,6 @@ namespace FloorSimulation
             Trolley = t;
             DButer.TakeTrolleyIn(t);
 
-
             if (!WasOnTopLeft)
                 OldWalkTile = DButer.WW.GetTile(new Point(OldTargetHub.HubTrolleys[1].RPoint.X, OldWalkTile.Rpoint.Y)); //Because dbuter is on the left of the trolley.
             else 

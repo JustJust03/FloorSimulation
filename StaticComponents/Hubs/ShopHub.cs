@@ -78,6 +78,13 @@ namespace FloorSimulation
             if (HubTrolleys[0] != null)//Max trolleys reached, give error
                 throw new ArgumentException("The first trolley place wasn't empty");
             HubTrolleys[0] = t;
+            WW.unfill_tiles(t.RPoint, t.GetRSize());
+            if(HasLeftAccess)
+                t.RPoint = new Point(RFloorPoint.X + Rslack, RFloorPoint.Y + Rslack);
+            else
+                t.RPoint = new Point(RFloorPoint.X + Rslack, RFloorPoint.Y + Rslack);
+            t.SimPoint = floor.ConvertToSimPoint(t.RPoint);
+            WW.fill_tiles(t.RPoint, t.GetRSize());
         }
 
 

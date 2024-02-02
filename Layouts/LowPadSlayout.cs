@@ -15,6 +15,7 @@ namespace FloorSimulation
         readonly bool UseDumbLowPads = true;
         readonly bool UseDumbRegions = false;
         readonly bool UseSemiDumbRegions = false;
+        int NShops = 0;
 
         //int[] NshopsPerDbuter = new int[] { 10, 10, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5 };
         public int[] NshopsPerDbuter = new int[] { 7, 7, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 7, 6 }; //21
@@ -54,6 +55,7 @@ namespace FloorSimulation
 
         public override void PlaceShops(List<ShopHub> Shops, int UpperY, int LowerY)
         {
+            NShops = Shops.Count;
             regions = CreateDistributionRegions(Shops);
 
             Shops = regions.SelectMany(obj => obj).ToList();
