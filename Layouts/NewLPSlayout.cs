@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 
-namespace FloorSimulation
+namespace FloorSimulation.Layouts
 {
-    internal class NewSlayout : SLayoutDayIdBuffhub
+    internal class NewLPSlayout : LowPadSlayoutBuffhub
     {
         int LowerY = 6100;
         int ShopWidth;
         int ShopHeight;
 
-        public NewSlayout(Floor floor_, ReadData rData_) : base(floor_, rData_)
+        public NewLPSlayout(Floor floor_, ReadData rData) : base(floor_, rData)
         {
             RealFloorWidth = 5500;
             RealFloorHeight = 7600;
@@ -24,9 +23,10 @@ namespace FloorSimulation
             CombineTrolleys = true;
 
             UpperY = 2100;
+            NshopsPerDbuter = new int[] { 7, 7, 7, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 6, 6 }; //21
         }
 
-        public override void PlaceShops(List<ShopHub> Shops, int UpperY_, int LowerY_)
+        public override void LPPlaceShops(List<ShopHub> Shops, int UpperY_, int LowerY_)
         {
             int y = LowerY;
             int x = ShopStartX;
@@ -34,6 +34,7 @@ namespace FloorSimulation
             int placed_shops_in_a_row = 0;
             ShopWidth = Shops[0].RHubSize.Width;
             ShopHeight = Shops[0].RHubSize.Height;
+            int Regioni = 3;
 
             bool FirstColFinished = false;
             for (int i = 0; i < Shops.Count; i++)
@@ -55,35 +56,50 @@ namespace FloorSimulation
                 }
 
                 placed_shops_in_a_row++;
-                if (FirstColFinished && (two_per_row == 1 && placed_shops_in_a_row + 1 == HalfShopsInRow) || (two_per_row == 2 && placed_shops_in_a_row == HalfShopsInRow))
+                if (FirstColFinished && placed_shops_in_a_row == NshopsPerDbuter[Regioni])
                 {
+                    Regioni++;
+                    placed_shops_in_a_row = 0;
                     if (two_per_row == 1)
-                        y -= 2 * ShopHeight;
+                        y -= ShopHeight;
                     else
-                        y += 2 * ShopHeight;
+                        y += ShopHeight;
                 }
 
                 if (two_per_row == 1 && y > UpperY)
                     y -= ShopHeight;
-                else if (two_per_row == 2 && y < LowerY)
+                else if (two_per_row == 2 && y <= LowerY)
                     y += ShopHeight;
                 else
                 {
-                    if (!FirstColFinished)
-                        HalfShopsInRow = placed_shops_in_a_row / 2;
+                    /*
+                    if (FirstColFinished && i < Shops.Count - 1 && y > LowerY)
+                    {
+                        floor.HubList.Add(Shop);
+                        i++;
+                        Shop = Shops[i];
+                        if (two_per_row == 2)
+                            Shop.HasLeftAccess = true;
+                        Shop.TeleportHub(new Point(x, y));
+                    }
+                    */
+
                     FirstColFinished = true;
                     placed_shops_in_a_row = 0;
                     two_per_row++;
                     if (two_per_row <= 2)
                     {
-                        x += StreetWidth + ShopWidth;
+                        x += StreetWidth;
                         y = UpperY;
                     }
                     else
                     {
-                        LowestY = y + ShopHeight;
+                        LowestY = y;
+                        if (two_per_row == 3)
+                            Shop.HasLeftAccess = true;
                         x += ShopWidth;
                         two_per_row = 1;
+                        y -= ShopHeight;
                     }
                 }
 

@@ -16,6 +16,12 @@ namespace FloorSimulation
         readonly bool UseDumbRegions = false;
         readonly bool UseSemiDumbRegions = false;
 
+        //int[] NshopsPerDbuter = new int[] { 10, 10, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5 };
+        public int[] NshopsPerDbuter = new int[] { 7, 7, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 7, 6 }; //21
+        //int[] NshopsPerDbuter = new int[] {10, 10, 9, 10, 10, 9, 9, 10, 10, 9, 9, 10, 9, 9 }; // 14
+        public int[] RegionsPLine = new int[] { 6, 6, 6, 3 };
+
+
         public LowPadSlayoutBuffhub(Floor floor_, ReadData rData) : base(floor_, rData)
         {
             NLowpads = 50;
@@ -65,7 +71,7 @@ namespace FloorSimulation
             CreateDriveLines();
         }
 
-        private void LPPlaceShops(List<ShopHub> Shops, int UpperY_, int LowerY)
+        public virtual void LPPlaceShops(List<ShopHub> Shops, int UpperY_, int LowerY)
         {
             UpperY = UpperY_;
             int y = LowerY;
@@ -108,7 +114,6 @@ namespace FloorSimulation
                     y += ShopHeight;
                 else
                 {
-
                     if (FirstColFinished && i < Shops.Count - 1 && y > LowerY)
                     {
                         floor.HubList.Add(Shop);
@@ -149,7 +154,7 @@ namespace FloorSimulation
             }
         }
 
-        private bool CheckForSkip135Shops(int Nshops, int i)
+        public bool CheckForSkip135Shops(int Nshops, int i)
         {
             if (Nshops != 135)
                 return false;
@@ -214,24 +219,19 @@ namespace FloorSimulation
 
         public void CreateDriveLines()
         {
-            List<LowPadAccessHub>[] ShopsPLine = new List<LowPadAccessHub>[4];
-            ShopsPLine[0] = floor.LPHubs.GetRange(0, 39);
-            ShopsPLine[1] = floor.LPHubs.GetRange(39, 38);
-            ShopsPLine[2] = floor.LPHubs.GetRange(77, 38);
-            ShopsPLine[3] = floor.LPHubs.GetRange(115, 18);
+            List<LowPadAccessHub>[] ShopsPLine = CalculateShopsPLine();
 
             LPDriveLines = new LowPadDriveLines(ShopCornersX[ShopCornersX.Count - 1], UpperY - 300, RealFloorHeight - 160);
 
             LPDriveLines.AddHorizontalLine(RealFloorHeight - 210, 0, RealFloorWidth, -1); //Lowest line, Used to pick up a new full trolley
-            LPDriveLines.AddHorizontalLine(RealFloorHeight - 410, 360, 850, -1, true); //Normal loop again. Used to push the lp's with the new trolleys to the first vertical shopline
+            LPDriveLines.AddHorizontalLine(LowestY + 180, 360, 850, -1, true); //Normal loop again. Used to push the lp's with the new trolleys to the first vertical shopline
             LPDriveLines.AddHorizontalLine(LowestY + 10, 0, 360, 1, true); //Also normal loop. Also Pushed the lp's to the first vertical shopline
-            LPDriveLines.AddHorizontalLine(RealFloorHeight - 410, 850, RealFloorWidth, -1, true); //If a lp finished the loop, but still carries a trolley, put it on this line.
+            LPDriveLines.AddHorizontalLine(LowestY + 180, 850, RealFloorWidth, -1, true); //If a lp finished the loop, but still carries a trolley, put it on this line.
 
             LPDriveLines.AddHorizontalLine(UpperY - 180, 0, RealFloorWidth, 1); //Backup Line
             LPDriveLines.AddHorizontalLine(LowestY + 10, 500, 3310, 1, true); //lower horizontal line below the shops.
 
             LPDriveLines.AddVerticalLine(ShopCornersX[0] + 100, LowestY, LowestY + 310, -1); //If the first loop is skipped, up to the normal move right height
-
 
             LPDriveLines.AddVerticalLine(ShopCornersX[0] + 200, UpperY - 20, LowestY + 310, -1, ShopsInLine: ShopsPLine[0]);
             int ShopsPLineI = 1;
@@ -262,6 +262,24 @@ namespace FloorSimulation
                 else
                     LPDriveLines.AddHorizontalLine(LPAHub.RFloorPoint.Y, LPAHub.RFloorPoint.X, LPAHub.RFloorPoint.X + 170, -1, LPA: LPAHub);
             }
+        }
+
+        public List<LowPadAccessHub>[] CalculateShopsPLine()
+        {
+            List<LowPadAccessHub>[] ShopsPLine = new List<LowPadAccessHub>[4];
+
+            int ShopsAdded = 0;
+            int RegionsAdded = 0;
+            for (int i = 0; i < RegionsPLine.Length; i++)
+            {
+
+                int ShopsInLine = NshopsPerDbuter.Skip(RegionsAdded).Take(RegionsPLine[i]).Sum();
+                RegionsAdded = RegionsPLine[i];
+                ShopsPLine[i] = floor.LPHubs.GetRange(ShopsAdded, ShopsInLine);
+                ShopsAdded += ShopsInLine;
+            }
+
+            return ShopsPLine;
         }
 
         public override void PlaceDistributers(int amount, Point StartPoint)
@@ -572,11 +590,7 @@ namespace FloorSimulation
 
         private List<List<ShopHub>> OldAssignDBregions(List<ShopHub> Shops, List<List<ShopHub>> DistributionRegions)
         {
-            //int[] NshopsPerDbuter = new int[] { 10, 10, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5 };
-            int[] NshopsPerDbuter = new int[] { 7, 7, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 6, 6, 6, 6, 7, 7, 7, 6 }; //21
-            //int[] NshopsPerDbuter = new int[] {10, 10, 9, 10, 10, 9, 9, 10, 10, 9, 9, 10, 9, 9 }; // 14
             int[] NShopsPerRegion = NshopsPerDbuter.Distinct().OrderBy(x => 9999 - x).ToArray();
-
             for (int Nshopsi = 0; Nshopsi < NShopsPerRegion.Count(); Nshopsi++)
             {
                 int[] IndexesOfShopsWithShopCount = Enumerable
