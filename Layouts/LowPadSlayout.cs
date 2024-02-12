@@ -734,11 +734,12 @@ namespace FloorSimulation
                 if (line.RX != dlp.RPoint.X)
                     continue;
                 if (line.LowerRY < dlp.RPoint.Y && dlp.RPoint.Y < line.UpperRY &&
-                   (line.ShopsInLine == null || dlp.trolley == null || dlp.RPoint.Y < LowestY - 420 || line.ShopsInLine.Intersect(dlp.trolley.TargetRegions).Any()))
+                   //(line.ShopsInLine == null || dlp.trolley == null || dlp.RPoint.Y < LowestY - 420 || line.ShopsInLine.Intersect(dlp.trolley.TargetRegions).Any()))
+                   (line.ShopsInLine == null || dlp.trolley == null || line.ShopsInLine.Intersect(dlp.trolley.TargetRegions).Any()))
                 {
                     if (line.EnterLPAHubWhenHit && dlp.LPAHub == null)
                         return; //The lp got stuck and couldn't move out of regionhub.
-                    if(line.ShopsInLine != null && line.ShopsInLine.Count == 0)
+                    if(line.ShopsInLine != null)
                     {
                         ;
                     }
@@ -837,7 +838,7 @@ namespace FloorSimulation
         {
             if (dlp.trolley != null && dlp.trolley.TargetRegions.Contains(LPA) && !LPA.Targeted && LPA.HubTrolleys.Count == 0)
             {
-                double odds = Math.Min((1.0 / dlp.trolley.TargetRegions.Count) + (1.0 / Math.Pow(1.9, LPA.dbuter.MainTask.NTrolleysStanding() + 1.0)), 1.0);
+                double odds = Math.Min((1.0 / dlp.trolley.TargetRegions.Count) + (1.0 / Math.Pow(2, LPA.dbuter.MainTask.NTrolleysStanding() + 1.0)), 1.0);
                 if (odds < 0.20)
                     return false;
                 
