@@ -145,11 +145,11 @@ namespace FloorSimulation
                             OpenSpots.Add(HubAccessPoints[rowi, coli]);
                         if (Trolleyarr[rowi, coli] == null && floor.layout.NLowpads > 0 && OpenSpots.Count == 0)
                             OpenSpots.Add(HubAccessPoints[rowi, coli]);
-                        else if(Trolleyarr[rowi, coli] != null && OpenSpots.Count == 1)
-                        {
-                            floor.FirstWW.unfill_tiles(Trolleyarr[rowi, coli].RPoint, Trolleyarr[rowi, coli].GetRSize());
-                            Trolleyarr[rowi, coli] = null;
-                        }
+                        //else if(Trolleyarr[rowi, coli] != null && OpenSpots.Count == 1)
+                        //{
+                        //    floor.FirstWW.unfill_tiles(Trolleyarr[rowi, coli].RPoint, Trolleyarr[rowi, coli].GetRSize());
+                        //    Trolleyarr[rowi, coli] = null;
+                        //}
                     }
             }
 

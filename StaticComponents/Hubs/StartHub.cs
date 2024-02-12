@@ -31,6 +31,8 @@ namespace FloorSimulation
         {
             if (UT.Count == 0)
                 StartHubEmpty = true;
+            else
+                StartHubEmpty = false;  
 
             UndistributedTrolleys = UndistributedTrolleys.Union(UT).ToList();
 
