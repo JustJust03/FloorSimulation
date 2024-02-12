@@ -20,6 +20,7 @@ namespace FloorSimulation
         public Dictionary<string, ShopHub> DestPlusDayToHub;
         public List<ShopHub> UsedShopHubs;
         public List<string> days;
+        public ShopHub OtherShopsShop;
 
         int SplitTrolleyI = 0;
 
@@ -77,7 +78,6 @@ namespace FloorSimulation
                 AddToTrolley(b, floor);
 
             floor.layout.SortPlantLists(TransactieIdToTrolley.Values.ToList());
-           
 
             List<DanishTrolley> dtList = new List<DanishTrolley>();
             foreach(DanishTrolley t in TransactieIdToTrolley.Values.ToList())
@@ -159,6 +159,7 @@ namespace FloorSimulation
                     TransactieIdToTrolley[b.Transactieid + SplitTrolleyI].MaxUnitsPerTrolley = b.Lgstk_aantal_fust_op_sticker;
                     t = TransactieIdToTrolley[b.Transactieid + SplitTrolleyI];
                 }
+
                 b.Destination.PlantsToReceive.Add(p);
                 t.TakePlantIn(p);
                 if(t.PercentageFull > t.FullAt && t.PlantList.Count > 1)
@@ -207,25 +208,24 @@ namespace FloorSimulation
                 }
             }
 
+            Size HubSize = new Size(floor.layout.ForcedShopWidth, floor.layout.ForcedShopHeight);
+            ShopHub s;
             foreach(HubData d in data)
             {
                 int ntrolleys = floor.layout.NTrolleysInShop;
-                Size HubSize;
-                ShopHub s;
                 if (ntrolleys == 1) 
                 {
                     HubSize = new Size(160, 80);
                     s = new ShopHub(d.Search_Name, d.Zoeknaam2, default, floor, HubSize, initial_trolleys: ntrolleys, ColliPlusDay_: d.ColliPlusDay, HorizontalTrolleys_: floor.layout.HorizontalShops );
                 }
                 else
-                {
-                    HubSize = new Size(floor.layout.ForcedShopWidth, floor.layout.ForcedShopHeight);
                     s = new ShopHub(d.Search_Name, d.Zoeknaam2, default, floor, HubSize, initial_trolleys: ntrolleys, d.ColliPlusDay, HorizontalTrolleys_: floor.layout.HorizontalShops);
-                }
 
                 shops.Add(s);
                 DestPlusDayToHub[s.ColliPlusDay] = s;
             }
+
+            OtherShopsShop =  new ShopHub("Other Shops", 444, default, floor, HubSize, initial_trolleys: 2, "444-Other Shops-VR", HorizontalTrolleys_: floor.layout.HorizontalShops);
 
             return shops;
         }
@@ -263,13 +263,21 @@ namespace FloorSimulation
 
         public List<ShopHub> FixUsedShopHubs()
         {
+            bool UsedOtherShopsShop = false;
             List<ShopHub> FixedShopHubs = new List<ShopHub>();
             for (int shopi = 0; shopi < UsedShopHubs.Count; shopi++)
             {
                 ShopHub sh = UsedShopHubs[shopi];
                 if(sh.StickersToReceive < 10)
                 {
-                    ShopHub SameShopOtherDay = UsedShopHubs.First(s => s.id == sh.id && s != sh);
+                    ShopHub SameShopOtherDay = UsedShopHubs.FirstOrDefault(s => s.id == sh.id && s != sh);
+
+                    if(SameShopOtherDay == null)
+                    {
+                        SameShopOtherDay = OtherShopsShop;
+                        UsedOtherShopsShop = true;
+                    }
+                        
                     foreach(plant p in sh.PlantsToReceive)
                     {
                         p.DestinationHub = SameShopOtherDay;
@@ -279,6 +287,8 @@ namespace FloorSimulation
                 else
                     FixedShopHubs.Add(sh);
             }
+            if(UsedOtherShopsShop)
+                FixedShopHubs.Add(OtherShopsShop);
 
             return FixedShopHubs;
         }

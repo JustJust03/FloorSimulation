@@ -27,10 +27,10 @@ namespace FloorSimulation
         //public string date = "2023-04-7";
         public string date = "2023-03-31";
         //public string date = "2023-07-18";
-        public List<string> days = new List<string> { "VR", "ZO" };
+        //public List<string> days = new List<string> { "VR", "ZO" };
         //public List<string> days = new List<string> { "VR", "MA" };
         //public List<string> days = new List<string> { "DI", "WO" };
-        //public List<string> days = new List<string> { "VR"};
+        public List<string> days = new List<string> { "VR"};
 
         public MetaInfo InfoPanel;
         public ControlInfo ControlPanel;
@@ -38,7 +38,7 @@ namespace FloorSimulation
         public string SaveFileBase;
 
         public bool LoadHeatMap = false;
-        public string HeatMapName = "2023-07-18_21distr-BuffSlayout";
+        public string HeatMapName = "2023-07-18_21distr-2streets";
 
 
         public MainDisplay()
