@@ -254,7 +254,7 @@ namespace FloorSimulation
         {
             List<LowPadAccessHub>[] ShopsPLine = CalculateShopsPLine();
 
-            LPDriveLines = new LowPadDriveLines(ShopCornersX[ShopCornersX.Count - 1], UpperY - 300, RealFloorHeight - 160);
+            LPDriveLines = new LowPadDriveLines(ShopCornersX[ShopCornersX.Count - 1], UpperY - 300, RealFloorHeight - 160, LowestY);
 
             LPDriveLines.AddHorizontalLine(RealFloorHeight - 210, 0, RealFloorWidth, -1); //Lowest line, Used to pick up a new full trolley
             LPDriveLines.AddHorizontalLine(LowestY + 180, 360, 850, -1, true); //Normal loop again. Used to push the lp's with the new trolleys to the first vertical shopline
@@ -682,12 +682,14 @@ namespace FloorSimulation
         int MostRightX;
         int UppestY;
         int LowestY;
+        int LowestShopY;
 
-        public LowPadDriveLines(int LastCornerX, int HighestY, int LowestY_)
+        public LowPadDriveLines(int LastCornerX, int HighestY, int LowestY_, int LowestSY_)
         {
             MostRightX = LastCornerX + 300;
             UppestY = HighestY;
             LowestY = LowestY_;
+            LowestShopY = LowestSY_;
         }
 
         public void AddVerticalLine(int Rx, int LowerRy, int UpperRy, int DeltaY, bool EnterLPAHubWhenHit = false, List<LowPadAccessHub> ShopsInLine = null)
@@ -734,15 +736,10 @@ namespace FloorSimulation
                 if (line.RX != dlp.RPoint.X)
                     continue;
                 if (line.LowerRY < dlp.RPoint.Y && dlp.RPoint.Y < line.UpperRY &&
-                   //(line.ShopsInLine == null || dlp.trolley == null || dlp.RPoint.Y < LowestY - 420 || line.ShopsInLine.Intersect(dlp.trolley.TargetRegions).Any()))
-                   (line.ShopsInLine == null || dlp.trolley == null || line.ShopsInLine.Intersect(dlp.trolley.TargetRegions).Any()))
+                   (line.ShopsInLine == null || dlp.trolley == null || dlp.RPoint.Y < LowestShopY || line.ShopsInLine.Intersect(dlp.trolley.TargetRegions).Any()))
                 {
                     if (line.EnterLPAHubWhenHit && dlp.LPAHub == null)
                         return; //The lp got stuck and couldn't move out of regionhub.
-                    if(line.ShopsInLine != null)
-                    {
-                        ;
-                    }
 
                     dlp.MainTask.LowpadDeltaX = 0;
                     dlp.MainTask.LowpadDeltaY = line.DeltaY;
