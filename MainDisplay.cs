@@ -72,7 +72,7 @@ namespace FloorSimulation
 
             Paint += PaintMainDisplay;
 
-            SaveFileBase = date + "_" + "SplitCC_NewLPSlayout_SemiSmartOrder_50LP_21Distr_half";
+            SaveFileBase = date + "_" + "SplitCC_NewLPSlayout_SemiSmartOrder_60LP_21Distr_half";
         }
 
         private void PaintMainDisplay(object sender, PaintEventArgs e)

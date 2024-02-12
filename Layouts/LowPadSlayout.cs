@@ -26,7 +26,7 @@ namespace FloorSimulation
 
         public LowPadSlayoutBuffhub(Floor floor_, ReadData rData) : base(floor_, rData)
         {
-            NLowpads = 50;
+            NLowpads = 60;
             ShopStartX = 70;
             RealFloorWidth = 5200;
             StreetWidth += 120;
@@ -257,12 +257,12 @@ namespace FloorSimulation
             LPDriveLines = new LowPadDriveLines(ShopCornersX[ShopCornersX.Count - 1], UpperY - 300, RealFloorHeight - 160, LowestY);
 
             LPDriveLines.AddHorizontalLine(RealFloorHeight - 210, 0, RealFloorWidth, -1); //Lowest line, Used to pick up a new full trolley
-            LPDriveLines.AddHorizontalLine(LowestY + 180, 360, 850, -1, true); //Normal loop again. Used to push the lp's with the new trolleys to the first vertical shopline
-            LPDriveLines.AddHorizontalLine(LowestY + 10, 0, 360, 1, true); //Also normal loop. Also Pushed the lp's to the first vertical shopline
-            LPDriveLines.AddHorizontalLine(LowestY + 180, 850, RealFloorWidth, -1, true); //If a lp finished the loop, but still carries a trolley, put it on this line.
+            LPDriveLines.AddHorizontalLine(LowestY + 250, 360, 850, -1, true); //Normal loop again. Used to push the lp's with the new trolleys to the first vertical shopline
+            LPDriveLines.AddHorizontalLine(LowestY + 80, 0, 360, 1, true); //Also normal loop. Also Pushed the lp's to the first vertical shopline
+            LPDriveLines.AddHorizontalLine(LowestY + 250, 850, RealFloorWidth, -1, true); //If a lp finished the loop, but still carries a trolley, put it on this line.
 
             LPDriveLines.AddHorizontalLine(UpperY - 180, 0, RealFloorWidth, 1); //Backup Line
-            LPDriveLines.AddHorizontalLine(LowestY + 10, 500, 3310, 1, true); //lower horizontal line below the shops.
+            LPDriveLines.AddHorizontalLine(LowestY + 80, 500, 3310, 1, true); //lower horizontal line below the shops.
 
             LPDriveLines.AddVerticalLine(ShopCornersX[0] + 100, LowestY, LowestY + 310, -1); //If the first loop is skipped, up to the normal move right height
 
@@ -271,9 +271,9 @@ namespace FloorSimulation
             for(int cornerI = 2; cornerI < ShopCornersX.Count; cornerI += 2) //Shop hub lines...
             {
                 if(ShopsPLineI < 4)
-                    LPDriveLines.AddVerticalLine(ShopCornersX[cornerI] + 200, UpperY - 20, LowestY + 20, -1, ShopsInLine: ShopsPLine[ShopsPLineI]);
+                    LPDriveLines.AddVerticalLine(ShopCornersX[cornerI] + 200, UpperY - 20, LowestY + 90, -1, ShopsInLine: ShopsPLine[ShopsPLineI]);
                 else
-                    LPDriveLines.AddVerticalLine(ShopCornersX[cornerI] + 200, UpperY - 20, LowestY + 20, -1);
+                    LPDriveLines.AddVerticalLine(ShopCornersX[cornerI] + 200, UpperY - 20, LowestY + 90, -1);
                 ShopsPLineI++;
             }
             for(int cornerI = 1; cornerI < ShopCornersX.Count; cornerI += 2)
