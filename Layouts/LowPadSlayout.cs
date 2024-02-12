@@ -23,10 +23,9 @@ namespace FloorSimulation
         //int[] NshopsPerDbuter = new int[] {10, 10, 9, 10, 10, 9, 9, 10, 10, 9, 9, 10, 9, 9 }; // 14
         public int[] RegionsPLine = new int[] { 6, 6, 6, 3 };
 
-
         public LowPadSlayoutBuffhub(Floor floor_, ReadData rData) : base(floor_, rData)
         {
-            NLowpads = 60;
+            NLowpads = 40;
             ShopStartX = 70;
             RealFloorWidth = 5200;
             StreetWidth += 120;
@@ -835,7 +834,7 @@ namespace FloorSimulation
         {
             if (dlp.trolley != null && dlp.trolley.TargetRegions.Contains(LPA) && !LPA.Targeted && LPA.HubTrolleys.Count == 0)
             {
-                double odds = Math.Min((1.0 / dlp.trolley.TargetRegions.Count) + (1.0 / Math.Pow(2, LPA.dbuter.MainTask.NTrolleysStanding() + 1.0)), 1.0);
+                double odds = Math.Min((1.0 / dlp.trolley.TargetRegions.Count) + (1.0 / Math.Pow(2.5, LPA.dbuter.MainTask.NTrolleysStanding() + 1.0)), 1.0);
                 if (odds < 0.20)
                     return false;
                 
