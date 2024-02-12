@@ -38,7 +38,7 @@ namespace FloorSimulation
         public string SaveFileBase;
 
         public bool LoadHeatMap = false;
-        public string HeatMapName = "2023-07-18_21distr-BuffSlayout";
+        public string HeatMapName = "2023-07-18_21distr-50LP";
 
 
         public MainDisplay()

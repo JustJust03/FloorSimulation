@@ -227,8 +227,8 @@ namespace FloorSimulation
                 TargetAmntLP = layout.NLowpads;
             if(DLPList.Count < TargetAmntLP)
             {
-                DLPList.Add(TotalDLPList[0]);
-                TotalDLPList.RemoveAt(0);
+                DLPList.Add(TotalDLPList[TotalDLPList.Count - 1]);
+                TotalDLPList.RemoveAt(TotalDLPList.Count - 1);
                 AddLowPad(seconds);
             }
         }
