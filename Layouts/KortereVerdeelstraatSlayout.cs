@@ -9,8 +9,8 @@ namespace FloorSimulation
 {
     internal class KortereVerdeelstraatSlayout : SLayout
     {
-        int Nshops;
-        int[] Shoplength;
+        protected int Nshops;
+        protected int[] Shoplength;
         Dictionary<int, int[]> ShopsToShopLength = new Dictionary<int, int[]>
         {
             {133, new int[]  { 7, 8, 8, 7, 7, 8, 8, 7, 7, 8, 8, 7, 7, 8, 7, 7, 7, 7 }},
@@ -19,12 +19,12 @@ namespace FloorSimulation
         };
 
         protected Dictionary<ShopHub, StartHub> ShopToStartHub;
-        int LeftX = 600;
-        int LowerY = 6300;
-        int TussenWidth = 600;
+        protected int LeftX = 600;
+        protected int LowerY = 6300;
+        protected int TussenWidth = 600;
         List<int> ShopCornersY = new List<int>();
-        int ShopWidth;
-        int ShopHeight;
+        protected int ShopWidth;
+        protected int ShopHeight;
         int BuffhubWidth = 600;
 
         public KortereVerdeelstraatSlayout(Floor floor_, ReadData RD_) : base(floor_, RD_)
@@ -306,6 +306,89 @@ namespace FloorSimulation
                 sthub.AddUndistributedTrolleys(d);
             }
             ;
+        }
+    }
+
+    internal class SSKortereVerdeelstraatSmartStart : KortereVerdeelstraatSlayoutSmartStart
+    {
+        Dictionary<int, int[]> ShopsToShopLength = new Dictionary<int, int[]>
+        {
+            {135, new int[]  { 7, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8}},
+        };
+        
+        public SSKortereVerdeelstraatSmartStart(Floor floor_, ReadData RD_) : base(floor_, RD_)
+        {
+
+        }
+
+        public override void PlaceShops(List<ShopHub> Shops, int _, int __)
+        {
+            Nshops = Shops.Count;
+            Shoplength = ShopsToShopLength[Nshops];
+
+            int RowsPlaced = 0;
+            int PlacedShopsInARow = 0;
+            bool LowerAccess = true;
+            int x = LeftX;
+            int y = LowerY;
+            ShopWidth = Shops[0].RHubSize.Width;
+            ShopHeight = Shops[0].RHubSize.Height;
+
+            for (int i = 0; i < Shops.Count; i++)
+            {
+                ShopHub shop = Shops[i];
+                shop.HasLeftAccess = LowerAccess;
+                shop.TeleportHub(new Point(x, y));
+                if (LowerAccess)
+                    x += ShopWidth;
+                else
+                    x -= ShopWidth;
+
+                PlacedShopsInARow++;
+                if (Shoplength[RowsPlaced] == PlacedShopsInARow)
+                {
+                    if (RowsPlaced < (Shoplength.Length / 2) - 1)// Move up.
+                    {
+                        if(RowsPlaced % 2 == 0)
+                        {
+                            x -= ShopWidth;
+                            y -= ShopHeight;
+                            LowerAccess = false;
+                        }
+                        else
+                        {
+                            x += ShopWidth;
+                            y -= StreetWidth + ShopHeight;
+                            LowerAccess = true;
+                        }
+                    }
+                    else if(RowsPlaced == (Shoplength.Length / 2) - 1)
+                    {
+                        x += ShopWidth * 2;
+                    }
+                    else
+                    {
+                        if(RowsPlaced % 2 == 0)
+                        {
+                            y += ShopHeight;
+                            x += ShopWidth;
+                            LowerAccess = true;
+                        }
+                        else
+                        {
+                            y += StreetWidth + ShopHeight;
+                            x -= ShopWidth;
+                            LowerAccess = false;
+                        }
+                    }
+
+                    PlacedShopsInARow = 0;
+                    RowsPlaced++;
+                }
+
+                floor.HubList.Add(shop);
+            }
+            InitShopCorners();
         }
     }
 }
