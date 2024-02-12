@@ -103,6 +103,7 @@
     <Compile Include="ControlInfo.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Data\BestShopDistribution\ReadSolution.cs" />
     <Compile Include="Data\BestShopDistribution\WriteSolution.cs" />
     <Compile Include="Data\BoxActivity.cs" />
     <Compile Include="Data\HubData.cs" />

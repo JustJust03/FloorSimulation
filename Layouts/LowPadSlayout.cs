@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace FloorSimulation
 
         readonly bool UseDumbLowPads = true;
         readonly bool UseDumbRegions = false;
-        readonly bool UseSemiDumbRegions = false;
+        readonly bool UseSemiDumbRegions = true;
         int NShops = 0;
 
         //int[] NshopsPerDbuter = new int[] { 10, 10, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5, 4, 9, 9, 4, 5, 5 };
@@ -62,7 +63,11 @@ namespace FloorSimulation
             foreach(ShopHub s in Shops)
                 s.DrawRegions = true;
 
-            LPPlaceShops(Shops, UpperY, LowerY);
+            if(UseSemiDumbRegions)
+                LPPlaceShopsSemiDumb(Shops, UpperY, LowerY);
+            else
+                LPPlaceShops(Shops, UpperY, LowerY);
+
             foreach(List<ShopHub> region in regions) 
             {
                 region[0].RegionStartOrEnd = true; //First Shop
@@ -71,6 +76,11 @@ namespace FloorSimulation
 
             PlaceLPAccessHubs();
             CreateDriveLines();
+        }
+
+        public virtual void LPPlaceShopsSemiDumb(List<ShopHub> Shops, int UpperY_, int LowerY)
+        {
+            throw new NotImplementedException("This has not yet been implemented for the old layout.");
         }
 
         public virtual void LPPlaceShops(List<ShopHub> Shops, int UpperY_, int LowerY)
@@ -154,6 +164,27 @@ namespace FloorSimulation
 
                 floor.HubList.Add(Shop);
             }
+        }
+
+        public int[] MaxShopsPerRow()
+        {
+            Dictionary<int, int[]> RowToIndices = new Dictionary<int, int[]>();
+            RowToIndices.Add(0, new int[] { 0, 5 });
+            RowToIndices.Add(1, new int[] { 1, 4 });
+            RowToIndices.Add(2, new int[] { 2, 3 });
+
+            int TussenPadHeight = 1;
+            int[] MaxPerRow = new int[3];
+            for (int i = 0; i < 3; i++)
+                for (int j = 0; j < NshopsPerDbuter.Length; j++)
+                {
+                    if (RowToIndices[i].Contains(j % 6) && MaxPerRow[i] < NshopsPerDbuter[j])
+                        MaxPerRow[i] = NshopsPerDbuter[j];
+                    if (j == NshopsPerDbuter.Length - 1)
+                        MaxPerRow[i] += TussenPadHeight;
+                }
+
+            return MaxPerRow;
         }
 
         public bool CheckForSkip135Shops(int Nshops, int i)
@@ -276,7 +307,7 @@ namespace FloorSimulation
             {
 
                 int ShopsInLine = NshopsPerDbuter.Skip(RegionsAdded).Take(RegionsPLine[i]).Sum();
-                RegionsAdded = RegionsPLine[i];
+                RegionsAdded += RegionsPLine[i];
                 ShopsPLine[i] = floor.LPHubs.GetRange(ShopsAdded, ShopsInLine);
                 ShopsAdded += ShopsInLine;
             }
@@ -514,6 +545,19 @@ namespace FloorSimulation
 
         private List<List<ShopHub>> AssignDBregionsFixedOrder(List<ShopHub> Shops, List<List<ShopHub>> DistributionRegions)
         {
+            int[] StickersPerDButer;
+            string file = Program.rootfolder + @"\Data\BestShopDistribution\" +
+                floor.Display.date + "_" + floor.layout.NLowpads + "Lowpads_" + Floor.NDistributers + "Distributers" + ".json";
+            if (File.Exists(file))
+            {
+                ReadSolution RS = new ReadSolution();
+                RS.Read(Shops, DistributionRegions, file);
+
+                StickersPerDButer = RegionConstants.StickerPerDButerNew(DistributionRegions);
+
+                NshopsPerDbuter = DistributionRegions.Select(lst => lst.Count).ToArray();
+                return DistributionRegions;
+            }
             GRBEnv env = new GRBEnv();
             env.Start();
             GRBModel model = new GRBModel(env);
@@ -572,8 +616,6 @@ namespace FloorSimulation
                 model.AddConstr(MinVar <= StickersPerDbuterExpr[dbi], $"minVarConstraint{dbi}");
             }
 
-
-
             model.SetObjective(MaxVar - MinVar, GRB.MINIMIZE);
             model.Set("TimeLimit", "100.0");
             model.Optimize();
@@ -586,6 +628,8 @@ namespace FloorSimulation
 
             WriteSolution WS = new WriteSolution(floor);
             WS.Write(DistributionRegions);
+
+            NshopsPerDbuter = DistributionRegions.Select(lst => lst.Count).ToArray();
 
             return DistributionRegions;
         }
