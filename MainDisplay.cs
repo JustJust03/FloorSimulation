@@ -23,10 +23,12 @@ namespace FloorSimulation
         public Font BiggerSFont;
         public Brush StandardWhiteBrush;
         public bool isSimulating = false;
+
         //public string date = "2023-04-14";
         //public string date = "2023-04-7";
         public string date = "2023-03-31";
         //public string date = "2023-07-18";
+
         public List<string> days = new List<string> { "VR", "ZO" };
         //public List<string> days = new List<string> { "VR", "MA" };
         //public List<string> days = new List<string> { "DI", "WO" };
@@ -72,7 +74,7 @@ namespace FloorSimulation
 
             Paint += PaintMainDisplay;
 
-            SaveFileBase = date + "_" + "SplitCC_BuffSlayout-1Street";
+            SaveFileBase = date + "_" + "Output_Robbe";
         }
 
         private void PaintMainDisplay(object sender, PaintEventArgs e)
