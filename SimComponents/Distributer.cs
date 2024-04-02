@@ -13,9 +13,13 @@ namespace FloorSimulation
     /// </summary>
     internal class Distributer : Agent
     {
-        public const float OddsOfBord = 0.065f;
-        public const float OddsOfLaag = 0.15f;
-        public const float OddsOfHer = 0.28f;
+        //public const float OddsOfBord = 0.065f;
+        //public const float OddsOfLaag = 0.15f;
+        //public const float OddsOfHer = 0.28f;
+        public const float OddsOfBord = 0;
+        public const float OddsOfLaag = 0;
+        public const float OddsOfHer = 0;
+
         public const int BordTime = 34000; //ms
         public const int LaagTime = 30000; //ms
         public const int HerTime = 16000; //ms
@@ -98,15 +102,16 @@ namespace FloorSimulation
         private bool RollForSideActivity()
         {
             //Nieuwe laag bijzetten
-            int r = floor.rand.Next(0, 1000);
-            if (r <= OddsOfLaag * 1000)
+            int r = floor.rand.Next(0, 10000);
+            if (r < OddsOfLaag * 10000)
             {
                 SideActivityMsLeft += LaagTime;
                 SideActivity = "Laag";
             }
+
             //De kar herindelen
-            r = floor.rand.Next(0, 1000);
-            if (r <= OddsOfHer * 1000)
+            r = floor.rand.Next(0, 10000);
+            if (r < OddsOfHer * 10000)
             {
                 SideActivityMsLeft += HerTime;
                 SideActivity = "Her";

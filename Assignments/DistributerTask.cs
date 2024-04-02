@@ -323,7 +323,7 @@ namespace FloorSimulation
                     ShopTrolleyBecameFull();
                     return;
                 }
-                if (Trolley.NStickers == Trolley.MaxStickers) //Sticker bord became full. Add side activity
+                if (Distributer.OddsOfBord > 0.01 && Trolley.NStickers == Trolley.MaxStickers) //Sticker bord became full. Add side activity
                 {
                     StickerBordBecameFull();
                     return;

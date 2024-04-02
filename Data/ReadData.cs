@@ -39,7 +39,7 @@ namespace FloorSimulation
         /// </summary>
         /// <param name="date"></param>
         /// <returns></returns>
-        public List<DanishTrolley> ReadBoxHistoryToTrolleys(string date, Floor floor, string length = "", bool DistributeSecondDay = true)
+        public List<DanishTrolley> ReadBoxHistoryToTrolleys(string date, Floor floor, string length = "", bool DistributeSecondDay = true, bool FixAmountOfShopHubs = true)
         {
             List<BoxActivity> ActivityList = new List<BoxActivity>();
             UsedShopHubs = new List<ShopHub>(); 
@@ -96,7 +96,9 @@ namespace FloorSimulation
 
             CalculateImportStickers(dtList);
 
-            UsedShopHubs = FixUsedShopHubs();
+            //Should only be used when running big datasets.
+            if(FixAmountOfShopHubs)
+                UsedShopHubs = FixUsedShopHubs();
 
             return dtList;
         }
@@ -225,7 +227,7 @@ namespace FloorSimulation
                 DestPlusDayToHub[s.ColliPlusDay] = s;
             }
 
-            OtherShopsShop =  new ShopHub("Other Shops", 444, default, floor, HubSize, initial_trolleys: 2, "444-Other Shops-VR", HorizontalTrolleys_: floor.layout.HorizontalShops);
+            OtherShopsShop =  new ShopHub("Other Shops", 444, default, floor, HubSize, initial_trolleys: 2, "444-Other Shops-" + days[days.Count - 1], HorizontalTrolleys_: floor.layout.HorizontalShops);
 
             return shops;
         }

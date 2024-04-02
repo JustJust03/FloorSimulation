@@ -17,7 +17,7 @@ namespace FloorSimulation
         public string name;//Assign plant names here 
         public ShopHub DestinationHub;
         public const int ReorderTime = 24000; //ms
-        //public const int ReorderTime = 3; //ms
+        //public const int ReorderTime = 0; //ms
         public int units;
         public int SingleUnits;
         public int MaxSingleUnits;

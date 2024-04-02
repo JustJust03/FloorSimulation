@@ -26,13 +26,16 @@ namespace FloorSimulation
 
         //public string date = "2023-04-14";
         //public string date = "2023-04-7";
-        public string date = "2023-03-31";
+        public string date = "2023-07-18_for_200";
         //public string date = "2023-07-18";
 
-        public List<string> days = new List<string> { "VR", "ZO" };
+        //public List<string> days = new List<string> { "VR", "ZO" };
         //public List<string> days = new List<string> { "VR", "MA" };
-        //public List<string> days = new List<string> { "DI", "WO" };
+        public List<string> days = new List<string> { "DI", "WO" };
         //public List<string> days = new List<string> { "VR"};
+
+        //public bool FixAmountOfShopHubs = true;
+        public bool FixAmountOfShopHubs = false;
 
         public MetaInfo InfoPanel;
         public ControlInfo ControlPanel;
@@ -91,10 +94,12 @@ namespace FloorSimulation
         {
             List<ShopHub> shops = rd.ReadHubData(floor);
 
-            //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, length: "top_200");
-            //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor);
-            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, DistributeSecondDay: false);
-            //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, length: "for_30", DistributeSecondDay: false);
+
+            //Gebruik deze voor de hele dag.
+            //List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, DistributeSecondDay: false);
+
+            //Gebruik deze wanneer je een klein deel doet (for_200)
+            List<DanishTrolley> L = rd.ReadBoxHistoryToTrolleys(date, floor, DistributeSecondDay: false, FixAmountOfShopHubs: false);
 
             floor.PlaceShops(rd.UsedShopHubs);
             floor.PlaceStartHubs();
